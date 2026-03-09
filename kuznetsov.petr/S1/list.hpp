@@ -287,6 +287,26 @@ namespace kuznetsov {
       return LCIter< T >(nullptr);
     }
 
+    LRIter< T > rbegin()
+    {
+      return LRIter< T >(head_);
+    }
+
+    LRIter< T > rend()
+    {
+      return LRIter< T >(nullptr);
+    }
+
+    LRCIter< T > rcbegin() const
+    {
+      return LRCIter< T >(head_);
+    }
+
+    LRCIter< T > rcend() const
+    {
+      return LRCIter< T >(nullptr);
+    }
+
     void clear()
     {
       if (!head_) {
