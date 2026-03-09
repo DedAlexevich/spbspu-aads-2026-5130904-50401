@@ -49,7 +49,9 @@ namespace kuznetsov {
     }
     const T& operator*() const
     {
-      if (!curr_) throw std::logic_error("Dereferencing null iterator");
+      if (!this->curr_) {
+        throw std::logic_error("Null iterator");
+      }
       return curr_->val_;
     }
     bool operator==(const LCIter& y) const
@@ -74,6 +76,69 @@ namespace kuznetsov {
 
     T& operator*()
     {
+      if (!this->curr_) {
+        throw std::logic_error("Null iterator");
+      }
+      return this->curr_->val_;
+    }
+  };
+
+  template<class T>
+  class LRCIter {
+  public:
+    LRCIter(Node< T >* pn): curr_(pn) {}
+
+    LRCIter& operator++() {
+      if (curr_) curr_ = curr_->prev_;
+      return *this;
+    }
+
+    LRCIter operator++(int) {
+      LRCIter temp(*this);
+      ++(*this);
+      return temp;
+    }
+
+    LRCIter& operator--() {
+      if (curr_) curr_ = curr_->next_;
+      return *this;
+    }
+
+    LRCIter operator--(int) {
+      LRCIter temp(*this);
+      --(*this);
+      return temp;
+    }
+
+    const T& operator*() const {
+      if (!this->curr_) {
+        throw std::logic_error("Null iterator");
+      }
+      return curr_->val_;
+    }
+
+    bool operator==(const LRCIter& y) const {
+      return curr_ == y.curr_;
+    }
+
+    bool operator!=(const LRCIter& y) const {
+      return !(*this == y);
+    }
+
+  protected:
+    friend class List< T >;
+    Node< T >* curr_;
+  };
+
+  template<class T>
+  class LRIter : public LRCIter< T > {
+  public:
+    LRIter(Node< T >* pn): LRCIter< T >(pn) {}
+
+    T& operator*() {
+      if (!this->curr_) {
+        throw std::logic_error("Null iterator");
+      }
       return this->curr_->val_;
     }
   };
