@@ -20,13 +20,41 @@ namespace kuznetsov {
     friend class List< T >;
     Node< T >* curr;
   public:
-    LIter& operator++();
-    LIter& operator++(int);
-    LIter& operator--();
-    LIter& operator--(int);
-    T& operator*();
-    bool operator==(const List& __x, const List& __y);
-    bool operator!=(const List& __x, const List& __y);
+    LIter& operator++()
+    {
+      this->curr = this->curr->next;
+      return this;
+    }
+    LIter& operator++(int)
+    {
+      LIter temp(*this);
+      ++(*this);
+      return temp;
+    }
+    LIter& operator--()
+    {
+      this->curr = this->curr->prev;
+      return this;
+    }
+    LIter& operator--(int)
+    {
+      LIter temp(*this);
+      --(*this);
+      return temp;
+    }
+    T& operator*()
+    {
+      return curr->val;
+    }
+    bool operator==(const LIter& y)
+    {
+      return this->curr == y.curr;
+    }
+
+    bool operator!=(const LIter& y)
+    {
+      return !(this == y);
+    }
   };
 
 
