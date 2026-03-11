@@ -3,15 +3,12 @@
 #include <cstddef>
 #include <iostream>
 namespace kuznetsov {
-
-  namespace {
-    template< class T >
-    struct Node {
-      T val_;
-      Node< T >* next_;
-      Node< T >* prev_;
-    };
-  }
+  template< class T >
+  struct Node {
+    T val_;
+    Node< T >* next_;
+    Node< T >* prev_;
+  };
 
   template< class T >
   class List;
@@ -432,5 +429,5 @@ namespace kuznetsov {
   };
 
 }
-
 #endif
+
