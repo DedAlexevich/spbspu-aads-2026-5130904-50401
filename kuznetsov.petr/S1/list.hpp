@@ -10,17 +10,17 @@ namespace kuznetsov {
     Node< T >* next_;
     Node< T >* prev_;
   };
-  
+
   template< class T >
   class List;
-  
+
   template< class T >
   class LCIter {
   public:
     LCIter(Node< T >* pn):
       curr_(pn)
     {}
-    
+
     LCIter& operator++()
     {
       if (curr_) {
@@ -28,14 +28,14 @@ namespace kuznetsov {
       }
       return *this;
     }
-    
+
     LCIter operator++(int)
     {
       LCIter temp(*this);
       ++(*this);
       return temp;
     }
-    
+
     LCIter& operator--()
     {
       if (curr_) {
@@ -43,14 +43,14 @@ namespace kuznetsov {
       }
       return *this;
     }
-    
+
     LCIter operator--(int)
     {
       LCIter temp(*this);
       --(*this);
       return temp;
     }
-    
+
     const T& operator*() const
     {
       if (!this->curr_) {
@@ -58,12 +58,12 @@ namespace kuznetsov {
       }
       return curr_->val_;
     }
-    
+
     bool operator==(const LCIter& y) const
     {
       return this->curr_ == y.curr_;
     }
-    
+
     bool operator!=(const LCIter& y) const
     {
       return !(*this == y);
@@ -72,13 +72,13 @@ namespace kuznetsov {
     friend class List< T >;
     Node< T >* curr_;
   };
-  
+
   template< class T >
   class LIter: public LCIter< T > {
   public:
     LIter(Node< T >* pn): LCIter< T >(pn)
     {}
-    
+
     T& operator*()
     {
       if (!this->curr_) {
@@ -87,14 +87,14 @@ namespace kuznetsov {
       return this->curr_->val_;
     }
   };
-  
+
   template< class T >
   class LRCIter {
   public:
     LRCIter(Node< T >* pn):
       curr_(pn)
     {}
-    
+
     LRCIter& operator++()
     {
       if (curr_) {
@@ -102,14 +102,14 @@ namespace kuznetsov {
       }
       return *this;
     }
-    
+
     LRCIter operator++(int)
     {
       LRCIter temp(*this);
       ++(*this);
       return temp;
     }
-    
+
     LRCIter& operator--()
     {
       if (curr_) {
@@ -117,14 +117,14 @@ namespace kuznetsov {
       }
       return *this;
     }
-    
+
     LRCIter operator--(int)
     {
       LRCIter temp(*this);
       --(*this);
       return temp;
     }
-    
+
     const T& operator*() const
     {
       if (!this->curr_) {
@@ -132,26 +132,26 @@ namespace kuznetsov {
       }
       return curr_->val_;
     }
-    
+
     bool operator==(const LRCIter& y) const
     {
       return curr_ == y.curr_;
     }
-    
+
     bool operator!=(const LRCIter& y) const
     {
       return !(*this == y);
     }
-    
+
   protected:
     friend class List< T >;
     Node< T >* curr_;
   };
-  
+
   template< class T >
   class LRIter: public LRCIter< T > {
   public:
-    LRIter(Node< T >* pn): 
+    LRIter(Node< T >* pn):
       LRCIter< T >(pn)
     {}
 
@@ -191,7 +191,7 @@ namespace kuznetsov {
 
     List(List&& other) noexcept :
       head_(other.head_),
-      size_(other.size_) 
+      size_(other.size_)
     {
       other.head_ = nullptr;
       other.size_ = 0;
@@ -233,15 +233,15 @@ namespace kuznetsov {
       }
 
       clear();
-      
+
       head_ = other.head_;
       size_ = other.size_;
-      
+
       other.head_ = nullptr;
       other.size_ = 0;
       return *this;
     }
-    
+
     LIter< T > insert(LCIter< T > it, const T& val)
     {
       Node< T >* n = new Node< T >{val, nullptr, nullptr};
@@ -418,41 +418,41 @@ namespace kuznetsov {
       }
       Node< T >* nextNode = it.curr_->next_;
       bool f = (it.curr_ == head_);
-      
+
       if (size_ == 1) {
         delete it.curr_;
         head_ = nullptr;
         size_ = 0;
         return LIter< T >(nullptr);
       }
-      
+
       it.curr_->prev_->next_ = it.curr_->next_;
       it.curr_->next_->prev_ = it.curr_->prev_;
       delete it.curr_;
       --size_;
-      
+
       if (f) {
         head_ = nextNode;
       }
-      
+
       return LIter< T >(nextNode);
     }
-    
+
     size_t size() const
     {
       return size_;
     }
-    
+
     bool empty() const
     {
       return !size_;
     }
-    
+
   private:
     Node< T >* head_;
     size_t size_;
   };
-  
+
 }
 #endif
 
