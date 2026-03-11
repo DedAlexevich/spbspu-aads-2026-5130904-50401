@@ -155,7 +155,6 @@ namespace kuznetsov {
       do {
         try {
           insert(end(), current->val_);
-          size_++;
           current = current->next_;
         } catch (...) {
           std::cerr << "Copy construct error\n";
