@@ -98,7 +98,7 @@ namespace kuznetsov {
     LRCIter& operator++()
     {
       if (curr_) {
-        curr_ = curr_->next_;
+        curr_ = curr_->prev_;
       }
       return *this;
     }
