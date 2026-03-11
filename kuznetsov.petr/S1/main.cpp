@@ -48,6 +48,26 @@ int main()
     return 1;
   }
 
+  for (size_t row = 0; row < countRows; ++row) {
+    bool first = true;
+    listBegin = list.cbegin();
+    do {
+      auto& seq = (*listBegin).second;
+      if (row < seq.size()) {
+        auto it = seq.cbegin();
+        for (size_t i = 0; i < row; ++i) {
+          ++it;
+        }
+        if (!first) {
+          std::cout << ' ';
+        }
+        std::cout << *it;
+        first = false;
+      }
+      listBegin++;
+    } while (listBegin != list.begin());
+    std::cout << '\n';
+  }
 
 
 
