@@ -1,10 +1,12 @@
 #include <iostream>
 #include <utility>
+#include <limits>
 #include "list.hpp"
 
 int main()
 {
   namespace  kuz = kuznetsov;
+  size_t MAX = std::numeric_limits< size_t >::max();
   using stringListpair = std::pair< std::string, kuz::List< size_t > >;
   auto list = kuz::List< stringListpair >();
   std::string name;
@@ -22,11 +24,6 @@ int main()
     std::cin.clear();
   }
 
-  if (list.empty()) {
-    std::cout << "0\n";
-    return 0;
-  }
-
   auto listBegin = list.cbegin();
   std::cout << (*listBegin).first;
   listBegin++;
@@ -34,6 +31,7 @@ int main()
     std::cout << ' ' << (*listBegin).first;
     listBegin++;
   }
+
 
   std::cout << '\n';
   size_t countRows = 0;
@@ -44,8 +42,8 @@ int main()
   } while (listBegin != list.cbegin());
 
   if (countRows == 0) {
-    std::cerr << "Empty sequences\n";
-    return 1;
+    std::cerr << "0\n";
+    return 0;
   }
 
   auto sums = kuz::List<size_t>();
@@ -68,6 +66,10 @@ int main()
           std::cout << ' ';
         }
         std::cout << *it;
+        if (MAX - *it < + *sumIt) {
+          std::cerr << "Overflow\n";
+          return 1;
+        }
         *sumIt += *it;
         first = false;
       }
