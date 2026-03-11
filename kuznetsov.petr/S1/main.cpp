@@ -17,6 +17,11 @@ int main()
     }
     stringListpair p{name, currSequence};
     list.insert(list.end(), p);
+    if (std::cin.bad()) {
+      return 1;
+    } else if (!std::cin.eof()) {
+      std::cin.clear();
+    }
   }
 
   auto be = list.cbegin();
