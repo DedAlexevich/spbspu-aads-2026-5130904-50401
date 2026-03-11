@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include <cstddef>
 #include <iostream>
+
 namespace kuznetsov {
   template< class T >
   struct Node {
@@ -9,15 +10,17 @@ namespace kuznetsov {
     Node< T >* next_;
     Node< T >* prev_;
   };
-
+  
   template< class T >
   class List;
-
+  
   template< class T >
   class LCIter {
   public:
-    LCIter(Node< T >* pn): curr_(pn) {}
-
+    LCIter(Node< T >* pn):
+      curr_(pn)
+    {}
+    
     LCIter& operator++()
     {
       if (curr_) {
@@ -25,12 +28,14 @@ namespace kuznetsov {
       }
       return *this;
     }
+    
     LCIter operator++(int)
     {
       LCIter temp(*this);
       ++(*this);
       return temp;
     }
+    
     LCIter& operator--()
     {
       if (curr_) {
@@ -38,12 +43,14 @@ namespace kuznetsov {
       }
       return *this;
     }
+    
     LCIter operator--(int)
     {
       LCIter temp(*this);
       --(*this);
       return temp;
     }
+    
     const T& operator*() const
     {
       if (!this->curr_) {
@@ -51,11 +58,12 @@ namespace kuznetsov {
       }
       return curr_->val_;
     }
+    
     bool operator==(const LCIter& y) const
     {
       return this->curr_ == y.curr_;
     }
-
+    
     bool operator!=(const LCIter& y) const
     {
       return !(*this == y);
@@ -64,13 +72,13 @@ namespace kuznetsov {
     friend class List< T >;
     Node< T >* curr_;
   };
-
+  
   template< class T >
-  class LIter : public LCIter< T > {
+  class LIter: public LCIter< T > {
   public:
     LIter(Node< T >* pn): LCIter< T >(pn)
     {}
-
+    
     T& operator*()
     {
       if (!this->curr_) {
@@ -79,58 +87,73 @@ namespace kuznetsov {
       return this->curr_->val_;
     }
   };
-
-  template<class T>
+  
+  template< class T >
   class LRCIter {
   public:
-    LRCIter(Node< T >* pn): curr_(pn) {}
-
-    LRCIter& operator++() {
-      if (curr_) curr_ = curr_->prev_;
+    LRCIter(Node< T >* pn):
+      curr_(pn)
+    {}
+    
+    LRCIter& operator++()
+    {
+      if (curr_) {
+        curr_ = curr_->next_;
+      }
       return *this;
     }
-
-    LRCIter operator++(int) {
+    
+    LRCIter operator++(int)
+    {
       LRCIter temp(*this);
       ++(*this);
       return temp;
     }
-
-    LRCIter& operator--() {
-      if (curr_) curr_ = curr_->next_;
+    
+    LRCIter& operator--()
+    {
+      if (curr_) {
+        curr_ = curr_->next_;
+      }
       return *this;
     }
-
-    LRCIter operator--(int) {
+    
+    LRCIter operator--(int)
+    {
       LRCIter temp(*this);
       --(*this);
       return temp;
     }
-
-    const T& operator*() const {
+    
+    const T& operator*() const
+    {
       if (!this->curr_) {
         throw std::logic_error("Null iterator");
       }
       return curr_->val_;
     }
-
-    bool operator==(const LRCIter& y) const {
+    
+    bool operator==(const LRCIter& y) const
+    {
       return curr_ == y.curr_;
     }
-
-    bool operator!=(const LRCIter& y) const {
+    
+    bool operator!=(const LRCIter& y) const
+    {
       return !(*this == y);
     }
-
+    
   protected:
     friend class List< T >;
     Node< T >* curr_;
   };
-
-  template<class T>
-  class LRIter : public LRCIter< T > {
+  
+  template< class T >
+  class LRIter: public LRCIter< T > {
   public:
-    LRIter(Node< T >* pn): LRCIter< T >(pn) {}
+    LRIter(Node< T >* pn): 
+      LRCIter< T >(pn)
+    {}
 
     T& operator*() {
       if (!this->curr_) {
@@ -146,11 +169,13 @@ namespace kuznetsov {
     List(): head_(nullptr), size_(0)
     {}
 
-    List(const List& other): head_(nullptr), size_(0) {
+    List(const List& other):
+      head_(nullptr),
+      size_(0)
+    {
       if (other.empty()) {
         return;
       }
-
       Node<T>* current = other.head_;
       do {
         try {
@@ -164,7 +189,10 @@ namespace kuznetsov {
       } while (current != other.head_);
     }
 
-    List(List&& other) noexcept : head_(other.head_), size_(other.size_) {
+    List(List&& other) noexcept :
+      head_(other.head_),
+      size_(other.size_) 
+    {
       other.head_ = nullptr;
       other.size_ = 0;
     }
@@ -174,17 +202,15 @@ namespace kuznetsov {
       clear();
     }
 
-    List& operator=(const List& other) {
+    List& operator=(const List& other)
+    {
       if (this == &other) {
         return *this;
       }
-
       clear();
-
       if (other.empty()) {
         return *this;
       }
-
       Node<T>* current = other.head_;
       do {
         try {
@@ -200,22 +226,24 @@ namespace kuznetsov {
       return *this;
     }
 
-    List& operator=(List&& other) noexcept {
+    List& operator=(List&& other) noexcept
+    {
       if (this == &other) {
         return *this;
       }
 
       clear();
-
+      
       head_ = other.head_;
       size_ = other.size_;
-
+      
       other.head_ = nullptr;
       other.size_ = 0;
       return *this;
     }
-
-    LIter< T > insert(LCIter< T > it, const T& val) {
+    
+    LIter< T > insert(LCIter< T > it, const T& val)
+    {
       Node< T >* n = new Node< T >{val, nullptr, nullptr};
 
       if (head_ == nullptr) {
@@ -237,7 +265,7 @@ namespace kuznetsov {
         n->prev_ = prev;
         prev->next_ = n;
         current->prev_ = n;
-        
+
         if (current == head_) {
           head_ = n;
         }
@@ -270,7 +298,7 @@ namespace kuznetsov {
         n->prev_ = prev;
         prev->next_ = n;
         current->prev_ = n;
-        
+
         if (current == head_) {
           head_ = n;
         }
@@ -390,43 +418,41 @@ namespace kuznetsov {
       }
       Node< T >* nextNode = it.curr_->next_;
       bool f = (it.curr_ == head_);
-
+      
       if (size_ == 1) {
         delete it.curr_;
         head_ = nullptr;
         size_ = 0;
         return LIter< T >(nullptr);
       }
-
+      
       it.curr_->prev_->next_ = it.curr_->next_;
       it.curr_->next_->prev_ = it.curr_->prev_;
-
       delete it.curr_;
       --size_;
-
+      
       if (f) {
         head_ = nextNode;
       }
-
+      
       return LIter< T >(nextNode);
     }
-
+    
     size_t size() const
     {
       return size_;
     }
-
+    
     bool empty() const
     {
       return !size_;
     }
-
+    
   private:
     Node< T >* head_;
     size_t size_;
-
   };
-
+  
 }
 #endif
 
