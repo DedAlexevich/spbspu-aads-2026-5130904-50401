@@ -25,6 +25,7 @@ int main()
   }
 
   if (list.empty()) {
+    std::cout << "\n";
     return 0;
   }
 
