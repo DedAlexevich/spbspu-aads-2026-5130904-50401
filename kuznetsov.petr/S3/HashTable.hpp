@@ -85,7 +85,12 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth)
   for (size_t i = 0; i < capacity_; ++i) {
     if (oth.states_[i] == State::STORE) {
       new (values_ + i) Value(oth.values_[i]);
-      new (keys_ + i) Key(oth.keys_[i]);
+      try {
+        new (keys_ + i) Key(oth.keys_[i]);
+      } catch(...) {
+        (values_ + i)->~Value();
+        throw;
+      }
     }
     states_[i] = oth.states_[i];
   }
@@ -185,7 +190,12 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value val)
   }
   
   new (values_ + pos) Value(val);
-  new (keys_ + pos) Key(k);
+  try {
+    new (keys_ + pos) Key(k);
+  } catch(...) {
+    (values_ + pos)->~Value();
+    throw;
+  }
   states_[pos] = State::STORE;
   ++size_;
 }
