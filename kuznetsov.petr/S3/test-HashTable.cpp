@@ -5,7 +5,7 @@
 #include "HashTable.hpp"
 
 struct LongComp {
-  bool operator()(long a, long b)
+  bool operator()(const long a, const long b) const
   {
     return a == b;
   }
@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(Default_Construct_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
   BOOST_TEST(map.getSize() == 0);  
-  BOOST_TEST(map.getCapacity() == 10);
+  BOOST_TEST(map.getCapacity() == 16);
 }
 /*
 BOOST_AUTO_TEST_CASE(Copy_Construct_Test)
@@ -35,15 +35,15 @@ BOOST_AUTO_TEST_CASE(Copy_Construct_Test)
 */
 BOOST_AUTO_TEST_CASE(Move_Construct_Test)
 {
-  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(32);
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(std::move(map));
   BOOST_TEST(map.getCapacity() == 0);
-  BOOST_TEST(map2.getCapacity() == 15);
+  BOOST_TEST(map2.getCapacity() == 32);
 }
 
 BOOST_AUTO_TEST_CASE(Copy_Assignment_Test)
 {
-  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(16);
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2;
 
   map2 = map;
@@ -54,12 +54,12 @@ BOOST_AUTO_TEST_CASE(Copy_Assignment_Test)
 
 BOOST_AUTO_TEST_CASE(Move_Assignment_Test)
 {
-  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(32);
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2;
   size_t s = map.getSize();
   map2 = std::move(map);
   
-  BOOST_TEST(map2.getCapacity() == 15);
+  BOOST_TEST(map2.getCapacity() == 32);
   BOOST_TEST(map2.getSize() == s);
   BOOST_TEST(map.getCapacity() == 0);
   BOOST_TEST(map.getSize() == 0);
@@ -78,6 +78,15 @@ BOOST_AUTO_TEST_CASE(Add_Test)
   
 }
 
+BOOST_AUTO_TEST_CASE(Has_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map.add(1, 21);
+  map.add(2, 34);
+  BOOST_TEST(map.has(1) == true);
+  BOOST_TEST(map.has(3) == false);
+  BOOST_TEST(map.has(2) == true);
+}
 
 
 

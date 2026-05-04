@@ -1,6 +1,7 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 #include <cstddef>
+#include <cmath>
 
 namespace kuznetsov {
   
@@ -43,6 +44,7 @@ namespace kuznetsov {
     Equal comparator_;
     State* states_;
     Value* values_;
+    Key* keys_;
     size_t size_;
     size_t capacity_;
   }; 
@@ -51,7 +53,7 @@ namespace kuznetsov {
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable():
-  HashTable(10)
+  HashTable(16)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -60,8 +62,10 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::~HashTable()
   for (size_t i = 0; i < capacity_; ++i) {
     if (states_[i] == State::STORE) {
       (values_ + i)->~Value();
+      (keys_ + i)->~Key();
     }
   }
+  ::operator delete(keys_);
   ::operator delete(values_);
   delete[] states_;
 }
@@ -85,6 +89,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth)
   for (size_t i = 0; i < capacity_; ++i) {
     if (oth.states_[i] == State::STORE) {
       new (values_ + i) Value(oth.values_[i]);
+      new (keys_ + i) Key(oth.keys_[i]);
     }
     states_[i] = oth.states_[i];
   }
@@ -96,13 +101,18 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t capacity):
   hasher_(Hash{}),
   comparator_(Equal{}),
   states_(nullptr),
-  values_(static_cast< Value* >(::operator new(sizeof(Value) * capacity))),
+  values_(nullptr),
+  keys_(nullptr),
   size_(0),
-  capacity_(capacity)
+  capacity_(std::pow(2,ceil(log2(capacity))))
 {
   try {
-    states_ = new State[capacity] {};
+    states_ = new State[capacity_] {};
+    values_ = static_cast< Value* >(::operator new(sizeof(Value) * capacity_));
+    keys_ = static_cast< Key* >(::operator new(sizeof(Key) * capacity_));
   } catch (...) {
+    delete[] states_;
+    ::operator delete(keys_);
     ::operator delete(values_);
     throw;
   }
@@ -114,11 +124,13 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
   comparator_(oth.comparator_),
   states_(oth.states_),
   values_(oth.values_),
+  keys_(oth.keys_),
   size_(oth.size_),
   capacity_(oth.capacity_)
 {
   oth.states_ = nullptr;
   oth.values_ = nullptr;
+  oth.keys_ = nullptr;
   oth.size_ = 0;
   oth.capacity_ = 0;
 }
@@ -152,6 +164,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::swap(HashTable& oth) noexc
   std::swap(comparator_, oth.comparator_);
   std::swap(states_, oth.states_);
   std::swap(values_, oth.values_);
+  std::swap(keys_, oth.keys_);
   std::swap(size_, oth.size_);
   std::swap(capacity_, oth.capacity_);
 }
@@ -173,10 +186,30 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value val)
   }
   
   new (values_ + pos) Value(val);
+  new (keys_ + pos) Key(k);
   states_[pos] = State::STORE;
   ++size_;
 }
 
+template< class Key, class Value, class Hash, class Equal >
+bool kuznetsov::HashTable< Key, Value, Hash, Equal >::has(Key k) const
+{
+  size_t hash = hasher_(k);
+  size_t i = 0;
+  size_t pos = 0;
+  for (; i < capacity_; ++i) {
+    pos = (hash + (i + i * i) / 2) % capacity_;
+    if (states_[pos] == State::FREE) {
+      return false;
+    }
+    if (states_[pos] == State::STORE) {
+      if (comparator_(k, keys_[pos])) {
+        return true;
+      } 
+    }
+  }
+  return false;
+}
 
 #endif
 
