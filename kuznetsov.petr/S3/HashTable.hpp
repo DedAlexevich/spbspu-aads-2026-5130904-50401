@@ -1,5 +1,6 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
+#include <cstddef>
 
 namespace kuznetsov {
   
@@ -107,9 +108,20 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t capacity):
   }
 }
 
-
-
-
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noexcept :
+  hasher_(oth.hasher_),
+  comparator_(oth.comparator_),
+  states_(oth.states_),
+  values_(oth.values_),
+  size_(oth.size_),
+  capacity_(oth.capacity_)
+{
+  oth.states_ = nullptr;
+  oth.values_ = nullptr;
+  oth.size_ = 0;
+  oth.capacity_ = 0;
+}
 
 #endif
 

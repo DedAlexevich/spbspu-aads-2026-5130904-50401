@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <cstddef>
 #include <functional>
+#include <utility>
 #include "HashTable.hpp"
 
 struct LongComp {
@@ -10,11 +11,34 @@ struct LongComp {
   }
 };
 
-BOOST_AUTO_TEST_CASE(createDefaultHashTable)
+BOOST_AUTO_TEST_CASE(Default_Construct_Test)
 {
-  kuznetsov::HashTable< long, int, std::hash< long >, LongComp> map;
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
   BOOST_TEST(map.getSize() == 0);  
   BOOST_TEST(map.getCapacity() == 10);
+}
+/*
+BOOST_AUTO_TEST_CASE(Copy_Construct_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  long keys[] {1, 2, 3, 4};
+  for (size_t i = 0; i < 4; ++i) {
+    map.add(keys[i], i*2);
+  }
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
+  BOOST_TEST(map.getSize() == map2.getSize());
+  BOOST_TEST(map.getCapacity() == map2.getCapacity());
+  for (size_t i = 0; i < 4; ++i) {
+    BOOST_TEST(map[keys[i]] == map2[keys[i]]);
+  }
+}
+*/
+BOOST_AUTO_TEST_CASE(Move_Construct_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(std::move(map));
+  BOOST_TEST(map.getCapacity() == 0);
+  BOOST_TEST(map2.getCapacity() == 15);
 }
 
 
