@@ -67,9 +67,15 @@ BOOST_AUTO_TEST_CASE(Move_Assignment_Test)
 
 BOOST_AUTO_TEST_CASE(Add_Test)
 {
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  BOOST_TEST(map.getSize() == 0);
+  map.add(1, 3);   
+  BOOST_TEST(map.getSize() == 1);
+  map.add(2, 4);   
+  BOOST_TEST(map.getSize() == 2);
+  map.add(1, 8);   
+  BOOST_TEST(map.getSize() == 3);
   
-
-
 }
 
 

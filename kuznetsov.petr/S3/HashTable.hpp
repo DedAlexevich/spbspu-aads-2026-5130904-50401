@@ -156,5 +156,27 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::swap(HashTable& oth) noexc
   std::swap(capacity_, oth.capacity_);
 }
 
+template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value val)
+{
+  if (size_ == capacity_) {
+    throw std::logic_error("Not enough slots");
+  }
+  size_t hash = hasher_(k);
+  size_t pos = 0;
+  size_t i = 0;
+  for (; i < capacity_; ++i) {
+    pos = (hash + (i + i * i) / 2) % capacity_;
+    if (states_[pos] == State::FREE or states_[pos] == State::DELETED) {
+      break;
+    }
+  }
+  
+  new (values_ + pos) Value(val);
+  states_[pos] = State::STORE;
+  ++size_;
+}
+
+
 #endif
 
