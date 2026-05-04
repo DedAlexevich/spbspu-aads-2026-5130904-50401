@@ -67,14 +67,14 @@ BOOST_AUTO_TEST_CASE(Move_Assignment_Test)
 
 BOOST_AUTO_TEST_CASE(Add_Test)
 {
-  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(2);
   BOOST_TEST(map.getSize() == 0);
   map.add(1, 3);   
   BOOST_TEST(map.getSize() == 1);
-  map.add(2, 4);   
-  BOOST_TEST(map.getSize() == 2);
-  map.add(1, 8);   
-  BOOST_TEST(map.getSize() == 3);
+  BOOST_CHECK_THROW(map.add(1, 4), std::logic_error);
+  map.add(2, 2);
+  BOOST_TEST(map.getSize() == 2);   
+  BOOST_CHECK_THROW(map.add(3, 4), std::logic_error);
   
 }
 
@@ -102,7 +102,17 @@ BOOST_AUTO_TEST_CASE(Drop_Test)
   BOOST_CHECK_THROW(map.drop(3), std::logic_error);
 }
 
-
+BOOST_AUTO_TEST_CASE(Rehash_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(4);
+  map.add(1, 2);
+  map.add(2, 3);
+  map.add(3, 4);
+  BOOST_TEST(map.getCapacity() == 4);
+  map.rehash();
+  BOOST_TEST(map.getCapacity() == 8);
+  BOOST_TEST(map.getSize() == 3);
+}
 
 
 

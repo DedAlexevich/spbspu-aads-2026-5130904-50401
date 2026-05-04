@@ -25,9 +25,8 @@ namespace kuznetsov {
     void add(Key k, Value val);
     Value drop(Key k);
     bool has(Key k) const;
-    void rehash(size_t slots);
+    void rehash();
     
-    void extend();
     void swap(HashTable&) noexcept;
     
     size_t getSize() const;
@@ -175,6 +174,9 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value val)
   if (size_ == capacity_) {
     throw std::logic_error("Not enough slots");
   }
+  if (has(k)) {
+    throw std::logic_error("Such key already exist");
+  }
   size_t hash = hasher_(k);
   size_t pos = 0;
   size_t i = 0;
@@ -236,7 +238,19 @@ Value kuznetsov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
   throw std::logic_error("Unexpected error");
 }
 
+template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::rehash()
+{
+  size_t newCap = capacity_ * 2;
 
+  HashTable< Key, Value, Hash, Equal > newTable(newCap);
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (states_[i] == State::STORE) {
+      newTable.add(keys_[i], values_[i]);
+    }
+  }
+  swap(newTable);
+}
 
 #endif
 
