@@ -114,6 +114,28 @@ BOOST_AUTO_TEST_CASE(Rehash_Test)
   BOOST_TEST(map.getSize() == 3);
 }
 
+BOOST_AUTO_TEST_CASE(At_Method_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map.add(1, 34);
+  map.add(2, 52);
+  map.add(3, 67);
+  BOOST_TEST(map.at(1) == 34);  
+  BOOST_TEST(map.at(2) == 52);  
+  BOOST_TEST(map.at(3) == 67);  
+  BOOST_CHECK_THROW(map.at(4), std::out_of_range);
+}
 
-
+BOOST_AUTO_TEST_CASE(At_Const_Method_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map.add(1, 34);
+  map.add(2, 52);
+  map.add(3, 67);
+  const kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
+  BOOST_TEST(map2.at(1) == 34);  
+  BOOST_TEST(map2.at(2) == 52);  
+  BOOST_TEST(map2.at(3) == 67);  
+  BOOST_CHECK_THROW(map2.at(4), std::out_of_range);
+}
 

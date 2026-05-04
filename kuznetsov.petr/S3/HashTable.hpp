@@ -35,9 +35,6 @@ namespace kuznetsov {
     Value& at(Key k);
     const Value& at(Key k) const;
 
-    Value& operator[](Key k);
-    const Value& operator[](Key k) const;
-
   private:
     Hash hasher_;
     Equal comparator_;
@@ -251,6 +248,32 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::rehash()
   }
   swap(newTable);
 }
+
+template< class Key, class Value, class Hash, class Equal >
+const Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(Key k) const
+{
+  size_t hash = hasher_(k);
+  size_t pos = 0;
+  for (size_t i = 0; i < capacity_; ++i) {
+    pos = (hash + (i + i * i) / 2) % capacity_;
+    if (states_[pos] == State::FREE) {
+      break;
+    }
+    if (states_[pos] == State::STORE && comparator_(k, keys_[pos])) {
+      return values_[pos];
+    }
+  }
+  throw std::out_of_range("Key not found");
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(Key k)
+{
+  const HashTable* cthis = this;
+  return const_cast< Value& >((*cthis).at(k));
+}
+
+
 
 #endif
 
