@@ -50,12 +50,7 @@ namespace kuznetsov {
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable():
-  hasher_(Hash{}),
-  comparator_(Equal{}),
-  states_(new State[10]{}),
-  values_(static_cast< Value* >(::operator new(sizeof(Value) * 10))),
-  size_(0),
-  capacity_(10)
+  HashTable(10)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -81,6 +76,39 @@ size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getCapacity()
 {
   return capacity_;
 }
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth):
+  HashTable(oth.getCapacity())
+{
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (oth.states_[i] == State::STORE) {
+      new (values_ + i) Value(oth.values_[i]);
+    }
+    states_ = oth.states_[i];
+  }
+}
+
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t capacity):
+  hasher_(Hash{}),
+  comparator_(Equal{}),
+  states_(nullptr),
+  values_(static_cast< Value* >(::operator new(sizeof(Value) * capacity))),
+  size_(0),
+  capacity_(capacity)
+{
+  try {
+    states_ = new State[capacity] {};
+  } catch (...) {
+    ::operator delete(values_);
+    throw;
+  }
+}
+
+
+
 
 
 #endif
