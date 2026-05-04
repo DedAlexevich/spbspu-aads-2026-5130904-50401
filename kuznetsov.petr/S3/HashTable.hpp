@@ -211,5 +211,32 @@ bool kuznetsov::HashTable< Key, Value, Hash, Equal >::has(Key k) const
   return false;
 }
 
+template< class Key, class Value, class Hash, class Equal >
+Value kuznetsov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
+{
+  size_t hash = hasher_(k);
+  size_t i = 0;
+  size_t pos = 0;
+  for (; i < capacity_; ++i) {
+    pos = (hash + (i + i * i) / 2) % capacity_;
+    if (states_[pos] == State::FREE) {
+      throw std::logic_error("Not found value");
+    }
+    if (states_[pos] == State::STORE) {
+      if (comparator_(k, keys_[pos])) {
+        Value res = std::move(values_[pos]);
+        (values_ + pos)->~Value();
+        (keys_ + pos)->~Key();
+        states_[pos] = State::DELETED;
+        --size_;
+        return res;
+      } 
+    }
+  }
+  throw std::logic_error("Unexpected error");
+}
+
+
+
 #endif
 
