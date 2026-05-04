@@ -10,7 +10,7 @@ bool comp(long a, long b)
 
 BOOST_AUTO_TEST_CASE(createDefaultHashTable)
 {
-  HashTable< long, int, std::hash, comp> map;
+  kuznetsov::HashTable< long, int, std::hash, comp> map;
   BOOST_TEST(map.getSize() == 0);  
   BOOST_TEST(map.getCapacity() == 10);
 }

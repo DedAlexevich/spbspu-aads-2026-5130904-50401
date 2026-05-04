@@ -20,7 +20,7 @@ namespace kuznetsov {
     HashTable& operator=(const HashTable&);
     HashTable& operator=(HashTable&&) noexcept;
     
-    void add(Key k, Value val)
+    void add(Key k, Value val);
     Value drop(Key k);
     bool has(Key k);
     void rehash(size_t slots);
