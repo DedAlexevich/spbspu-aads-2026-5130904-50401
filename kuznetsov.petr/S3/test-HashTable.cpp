@@ -41,5 +41,41 @@ BOOST_AUTO_TEST_CASE(Move_Construct_Test)
   BOOST_TEST(map2.getCapacity() == 15);
 }
 
+BOOST_AUTO_TEST_CASE(Copy_Assignment_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2;
+
+  map2 = map;
+
+  BOOST_TEST(map2.getCapacity() == map.getCapacity());
+  BOOST_TEST(map2.getSize() == map.getSize());
+}
+
+BOOST_AUTO_TEST_CASE(Move_Assignment_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(15);
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2;
+  size_t s = map.getSize();
+  map2 = std::move(map);
+  
+  BOOST_TEST(map2.getCapacity() == 15);
+  BOOST_TEST(map2.getSize() == s);
+  BOOST_TEST(map.getCapacity() == 0);
+  BOOST_TEST(map.getSize() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(Add_Test)
+{
+  
+
+
+}
+
+
+
+
+
+
 
 

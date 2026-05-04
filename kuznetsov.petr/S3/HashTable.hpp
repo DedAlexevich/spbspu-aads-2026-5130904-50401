@@ -23,14 +23,14 @@ namespace kuznetsov {
     
     void add(Key k, Value val);
     Value drop(Key k);
-    bool has(Key k);
+    bool has(Key k) const;
     void rehash(size_t slots);
     
     void extend();
     void swap(HashTable&) noexcept;
     
-    size_t getSize();
-    size_t getCapacity();
+    size_t getSize() const;
+    size_t getCapacity() const;
 
     Value& at(Key k);
     const Value& at(Key k) const;
@@ -67,13 +67,13 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getSize()
+size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getSize() const
 {
   return size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getCapacity()
+size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getCapacity() const
 {
   return capacity_;
 }
@@ -86,7 +86,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth)
     if (oth.states_[i] == State::STORE) {
       new (values_ + i) Value(oth.values_[i]);
     }
-    states_ = oth.states_[i];
+    states_[i] = oth.states_[i];
   }
 }
 
@@ -121,6 +121,39 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
   oth.values_ = nullptr;
   oth.size_ = 0;
   oth.capacity_ = 0;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
+{
+  if(std::addressof(oth) == this) {
+    return *this;
+  }
+  HashTable< Key, Value, Hash, Equal > cp(oth);
+  swap(cp);
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
+{
+  if(std::addressof(oth) == this) {
+    return *this;
+  }
+  HashTable< Key, Value, Hash, Equal > cp(std::move(oth));
+  swap(cp);
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::swap(HashTable& oth) noexcept
+{
+  std::swap(hasher_, oth.hasher_);
+  std::swap(comparator_, oth.comparator_);
+  std::swap(states_, oth.states_);
+  std::swap(values_, oth.values_);
+  std::swap(size_, oth.size_);
+  std::swap(capacity_, oth.capacity_);
 }
 
 #endif
