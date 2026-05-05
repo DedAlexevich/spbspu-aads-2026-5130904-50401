@@ -8,6 +8,18 @@ namespace kuznetsov {
   enum class State {
     FREE, STORE, DELETED
   };
+  
+  template< bool cond, class T, class F>
+  struct condition {
+    using type = T;
+  };
+
+  template< class T, class F >
+  struct condition< false, T, F > {
+    using type = F;
+  };
+  template< class Key, class Value, class Hash, class Equal, bool IsConst >
+  struct Iterator; 
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
@@ -34,8 +46,22 @@ namespace kuznetsov {
 
     Value& at(Key k);
     const Value& at(Key k) const;
+    
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator begin() const;
 
+    iterator end();
+    const_iterator end() const;
+    const_iterator cend() const;
   private:
+    using const_iterator = Iterator< Key, Value, Hash, Equal, true >;
+    using iterator = Iterator< Key, Value, Hash, Equal, false >;
+
+    friend class const_iterator;
+    friend class iterator;
+    
+
     Hash hasher_;
     Equal comparator_;
     State* states_;
@@ -43,7 +69,22 @@ namespace kuznetsov {
     Key* keys_;
     size_t size_;
     size_t capacity_;
-  }; 
+  };
+  
+  
+
+  template< class Key, class Value, class Hash, class Equal, bool IsConst >
+  struct Iterator {
+    using reference = condition< IsConst, const Value&, Value& >;
+    using point = condition< IsConst, const Value*, Value* >;
+    
+    
+    
+  private:
+    HashTable< Key, Value, Hash, Equal >* table;
+    size_t i; 
+  }
+
 }
 
 
