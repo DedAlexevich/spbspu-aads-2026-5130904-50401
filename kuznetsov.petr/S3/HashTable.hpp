@@ -9,20 +9,26 @@ namespace kuznetsov {
     FREE, STORE, DELETED
   };
   
-  template< bool cond, class T, class F>
-  struct condition {
+  template< bool B, class T, class F >
+  struct conditional {
     using type = T;
   };
 
-  template< class T, class F >
-  struct condition< false, T, F > {
+  template<class T, class F>
+  struct conditional< false, T, F > {
     using type = F;
   };
+
   template< class Key, class Value, class Hash, class Equal, bool IsConst >
   struct Iterator; 
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
+    using const_iterator = Iterator< Key, Value, Hash, Equal, true >;
+    using iterator = Iterator< Key, Value, Hash, Equal, false >;
+
+    template<class K, class V, class H, class E, bool C>
+    friend struct Iterator;
 
     HashTable();
     HashTable(const HashTable&);
@@ -49,19 +55,12 @@ namespace kuznetsov {
     
     iterator begin();
     const_iterator begin() const;
-    const_iterator begin() const;
+    const_iterator cbegin() const;
 
     iterator end();
     const_iterator end() const;
     const_iterator cend() const;
   private:
-    using const_iterator = Iterator< Key, Value, Hash, Equal, true >;
-    using iterator = Iterator< Key, Value, Hash, Equal, false >;
-
-    friend class const_iterator;
-    friend class iterator;
-    
-
     Hash hasher_;
     Equal comparator_;
     State* states_;
@@ -73,20 +72,63 @@ namespace kuznetsov {
   
   
 
-  template< class Key, class Value, class Hash, class Equal, bool IsConst >
+  template< class Key, class Value, bool IsConst >
   struct Iterator {
-    using reference = condition< IsConst, const Value&, Value& >;
-    using point = condition< IsConst, const Value*, Value* >;
+    using value_type =  conditional< IsConst, const std::pair< const Key, Value >, std::pair< const Key, Value > >;
+    using reference = typename conditional< IsConst, const value_type&, value_type& >::type;
+    using point = typename conditional< IsConst, const value_type*, value_type* >::type;
     
+    Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap);
     
+    template< bool OthConst >
+    bool operator==(const Iterator< Key, Value, OthConst >&) const;
     
+    template< bool OthConst >
+    bool operator!=(const Iterator< Key, Value, OthConst >&) const;
+    
+    reference operator*();
+    point operator->();
+    
+    Iterator operator++();
+    Iterator operator--();
+
+    Iterator operator++(int);
+    Iterator operator--(int);
+
   private:
-    HashTable< Key, Value, Hash, Equal >* table;
-    size_t i; 
-  }
+    Key* keys_;
+    Value* values_;
+    State* states_;
+    size_t i_;
+    size_t cap_;
+  };
 
 }
 
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >::Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap):
+  keys_(k),
+  values_(v),
+  states_(s),
+  i_(ind),
+  cap_(cap)
+{}
+
+template< class Key, class Value, bool IsConst >
+template< bool OthConst >
+bool kuznetsov::Iterator< Key, Value, IsConst >::operator==(const Iterator< Key, Value, OthConst >& oth) const
+{
+  bool f = (this->keys_ + this->i_) == (oth.keys_ + oth.i_);
+  f = f && (this->values_ + this->i_) == (oth.values_ + oth.i_);
+  return f; 
+}
+
+template< class Key, class Value, bool IsConst >
+template< bool OthConst >
+bool kuznetsov::Iterator< Key, Value, IsConst >::operator!=(const Iterator< Key, Value, OthConst >& oth) const
+{
+  return !(*this == oth);
+}
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable():
@@ -128,6 +170,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth)
       new (values_ + i) Value(oth.values_[i]);
       try {
         new (keys_ + i) Key(oth.keys_[i]);
+        ++size_;
       } catch(...) {
         (values_ + i)->~Value();
         throw;
