@@ -68,9 +68,7 @@ namespace kuznetsov {
     Key* keys_;
     size_t size_;
     size_t capacity_;
-  };
-  
-  
+  };  
 
   template< class Key, class Value, bool IsConst >
   struct Iterator {
@@ -101,8 +99,56 @@ namespace kuznetsov {
     size_t i_;
     size_t cap_;
   };
-
 }
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::begin()
+{
+  size_t i = 0;
+  while (i < capacity_ && states_[i] != State::STORE) {
+    ++i;
+  }
+  return iterator(keys_, values_, states_, i, capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const
+{
+  size_t i = 0;
+  while (i < capacity_ && states_[i] != State::STORE) {
+    ++i;
+  }
+  return const_iterator(keys_, values_, states_, i, capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const
+{
+  size_t i = 0;
+  while (i < capacity_ && states_[i] != State::STORE) {
+    ++i;
+  }
+  return const_iterator(keys_, values_, states_, i, capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::end()
+{
+  return iterator(keys_, values_, states_, capacity_, capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::end() const
+{
+  return const_iterator(keys_, values_, states_, capacity_, capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const
+{
+  return const_iterator(keys_, values_, states_, capacity_, capacity_);
+}
+
 
 template< class Key, class Value, bool IsConst >
 kuznetsov::Iterator< Key, Value, IsConst >::Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap):
@@ -414,8 +460,6 @@ Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(Key k)
   const HashTable* cthis = this;
   return const_cast< Value& >((*cthis).at(k));
 }
-
-
 
 #endif
 
