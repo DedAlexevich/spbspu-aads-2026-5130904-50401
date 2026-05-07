@@ -5,11 +5,11 @@
 #include <cmath>
 
 namespace kuznetsov {
-  
+
   enum class State {
     FREE, STORE, DELETED
   };
-  
+
   template< bool B, class T, class F >
   struct conditional {
     using type = T;
@@ -21,7 +21,7 @@ namespace kuznetsov {
   };
 
   template< class Key, class Value, bool IsConst >
-  struct Iterator; 
+  struct Iterator;
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
@@ -37,20 +37,20 @@ namespace kuznetsov {
 
     HashTable& operator=(const HashTable&);
     HashTable& operator=(HashTable&&) noexcept;
-    
+
     void add(Key k, Value val);
     void remove(Key k);
     bool has(Key k) const;
     void rehash();
-    
+
     void swap(HashTable&) noexcept;
-    
+
     size_t getSize() const;
     size_t getCapacity() const;
 
     Value& at(Key k);
     const Value& at(Key k) const;
-    
+
     iterator begin();
     const_iterator begin() const;
     const_iterator cbegin() const;
@@ -66,26 +66,26 @@ namespace kuznetsov {
     Key* keys_;
     size_t size_;
     size_t capacity_;
-  };  
+  };
 
   template< class Key, class Value, bool IsConst >
   struct Iterator {
     using pair_type = std::pair< const Key, Value >;
     using reference = typename conditional< IsConst, const pair_type&, pair_type& >::type;
     using point = typename conditional< IsConst, const pair_type*, pair_type* >::type;
-    
+
     Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap);
-    
+
     template< bool OthConst >
     bool operator==(const Iterator< Key, Value, OthConst >&) const;
-    
+
     template< bool OthConst >
     bool operator!=(const Iterator< Key, Value, OthConst >&) const;
-    
+
     reference operator*();
     point operator->();
-    
-    Iterator operator++(); 
+
+    Iterator operator++();
     Iterator operator--();
 
     Iterator operator++(int);
@@ -172,7 +172,7 @@ bool kuznetsov::Iterator< Key, Value, IsConst >::operator==(const Iterator< Key,
 {
   bool f = (this->keys_ + this->i_) == (oth.keys_ + oth.i_);
   f = f && (this->values_ + this->i_) == (oth.values_ + oth.i_);
-  return f; 
+  return f;
 }
 
 template< class Key, class Value, bool IsConst >
@@ -380,7 +380,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value val)
       break;
     }
   }
-  
+
   new (values_ + pos) Value(val);
   try {
     new (keys_ + pos) Key(k);
@@ -406,7 +406,7 @@ bool kuznetsov::HashTable< Key, Value, Hash, Equal >::has(Key k) const
     if (states_[pos] == State::STORE) {
       if (comparator_(k, keys_[pos])) {
         return true;
-      } 
+      }
     }
   }
   return false;
@@ -430,7 +430,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
         states_[pos] = State::DELETED;
         --size_;
         return;
-      } 
+      }
     }
   }
   throw std::logic_error("Unexpected error");

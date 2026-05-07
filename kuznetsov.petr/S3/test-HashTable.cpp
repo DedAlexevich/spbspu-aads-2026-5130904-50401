@@ -15,7 +15,7 @@ struct LongComp {
 BOOST_AUTO_TEST_CASE(Default_Construct_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
-  BOOST_TEST(map.getSize() == 0);  
+  BOOST_TEST(map.getSize() == 0);
   BOOST_TEST(map.getCapacity() == 16);
 }
 
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(Move_Assignment_Test)
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2;
   size_t s = map.getSize();
   map2 = std::move(map);
-  
+
   BOOST_TEST(map2.getCapacity() == 32);
   BOOST_TEST(map2.getSize() == s);
   BOOST_TEST(map.getCapacity() == 0);
@@ -70,13 +70,13 @@ BOOST_AUTO_TEST_CASE(Add_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map(2);
   BOOST_TEST(map.getSize() == 0);
-  map.add(1, 3);   
+  map.add(1, 3);
   BOOST_TEST(map.getSize() == 1);
   BOOST_CHECK_THROW(map.add(1, 4), std::logic_error);
   map.add(2, 2);
-  BOOST_TEST(map.getSize() == 2);   
+  BOOST_TEST(map.getSize() == 2);
   BOOST_CHECK_THROW(map.add(3, 4), std::logic_error);
-  
+
 }
 
 BOOST_AUTO_TEST_CASE(Has_Test)
@@ -121,9 +121,9 @@ BOOST_AUTO_TEST_CASE(At_Method_Test)
   map.add(1, 34);
   map.add(2, 52);
   map.add(3, 67);
-  BOOST_TEST(map.at(1) == 34);  
-  BOOST_TEST(map.at(2) == 52);  
-  BOOST_TEST(map.at(3) == 67);  
+  BOOST_TEST(map.at(1) == 34);
+  BOOST_TEST(map.at(2) == 52);
+  BOOST_TEST(map.at(3) == 67);
   BOOST_CHECK_THROW(map.at(4), std::out_of_range);
 }
 
@@ -134,9 +134,9 @@ BOOST_AUTO_TEST_CASE(At_Const_Method_Test)
   map.add(2, 52);
   map.add(3, 67);
   const kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
-  BOOST_TEST(map2.at(1) == 34);  
-  BOOST_TEST(map2.at(2) == 52);  
-  BOOST_TEST(map2.at(3) == 67);  
+  BOOST_TEST(map2.at(1) == 34);
+  BOOST_TEST(map2.at(2) == 52);
+  BOOST_TEST(map2.at(3) == 67);
   BOOST_CHECK_THROW(map2.at(4), std::out_of_range);
 }
 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(Iterators_Test)
   size_t i = 0;
   kuznetsov::Iterator< long, int, true > it = map.cbegin();
   for (; i < 3; ++i) {
-    BOOST_TEST((*it).first == keys[i]);
+    BOOST_TEST(it->first == keys[i]);
     BOOST_TEST((*it).second == values[i]);
     ++it;
   }
