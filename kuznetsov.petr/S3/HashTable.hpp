@@ -19,15 +19,15 @@ namespace kuznetsov {
     using type = F;
   };
 
-  template< class Key, class Value, class Hash, class Equal, bool IsConst >
+  template< class Key, class Value, bool IsConst >
   struct Iterator; 
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
-    using const_iterator = Iterator< Key, Value, Hash, Equal, true >;
-    using iterator = Iterator< Key, Value, Hash, Equal, false >;
+    using const_iterator = Iterator< Key, Value, true >;
+    using iterator = Iterator< Key, Value, false >;
 
-    template<class K, class V, class H, class E, bool C>
+    template< class K, class V, bool C >
     friend struct Iterator;
 
     HashTable();
@@ -41,7 +41,7 @@ namespace kuznetsov {
     HashTable& operator=(HashTable&&) noexcept;
     
     void add(Key k, Value val);
-    Value drop(Key k);
+    void remove(Key k);
     bool has(Key k) const;
     void rehash();
     
@@ -74,9 +74,8 @@ namespace kuznetsov {
 
   template< class Key, class Value, bool IsConst >
   struct Iterator {
-    using value_type =  conditional< IsConst, const std::pair< const Key, Value >, std::pair< const Key, Value > >;
-    using reference = typename conditional< IsConst, const value_type&, value_type& >::type;
-    using point = typename conditional< IsConst, const value_type*, value_type* >::type;
+    using reference = typename conditional< IsConst, const std::pair< const Key&, const Value& >, const std::pair< const Key&, Value& > >::type;
+    using point = typename conditional< IsConst, const std::pair< const Key&, const Value* >, const std::pair< const Key&, Value* > >::type;
     
     Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap);
     
@@ -128,6 +127,56 @@ template< bool OthConst >
 bool kuznetsov::Iterator< Key, Value, IsConst >::operator!=(const Iterator< Key, Value, OthConst >& oth) const
 {
   return !(*this == oth);
+}
+
+template< class Key, class Value, bool IsConst >
+typename kuznetsov::Iterator< Key, Value, IsConst >::reference kuznetsov::Iterator< Key, Value, IsConst >::operator*()
+{
+  return {keys_[i_], values_[i_]};  
+}
+
+template< class Key, class Value, bool IsConst >
+typename kuznetsov::Iterator< Key, Value, IsConst >::point kuznetsov::Iterator< Key, Value, IsConst >::operator->()
+{
+  return {keys_[i_], &values_[i_]};
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++()
+{
+  ++i_;
+  while (i_ < cap_ && states_[i_] != State::STORE) {
+    ++i_;
+  }
+  return *this;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
+{
+  Iterator tmp = *this;
+  ++(*this);
+  return tmp;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--()
+{
+  if (i_ == 0) {
+    return *this;
+  }
+  while (i_ > cap_ && states_[i_] != State::STORE) {
+    --i_;
+  }
+  return *this;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
+{
+  Iterator tmp = *this;
+  --(*this);
+  return tmp;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -305,7 +354,7 @@ bool kuznetsov::HashTable< Key, Value, Hash, Equal >::has(Key k) const
 }
 
 template< class Key, class Value, class Hash, class Equal >
-Value kuznetsov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
 {
   size_t hash = hasher_(k);
   size_t i = 0;
@@ -317,12 +366,11 @@ Value kuznetsov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
     }
     if (states_[pos] == State::STORE) {
       if (comparator_(k, keys_[pos])) {
-        Value res = std::move(values_[pos]);
         (values_ + pos)->~Value();
         (keys_ + pos)->~Key();
         states_[pos] = State::DELETED;
         --size_;
-        return res;
+        return;
       } 
     }
   }

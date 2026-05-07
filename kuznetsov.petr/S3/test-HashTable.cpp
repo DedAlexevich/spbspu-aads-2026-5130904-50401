@@ -95,12 +95,12 @@ BOOST_AUTO_TEST_CASE(Drop_Test)
   map.add(1, 21);
   map.add(2, 34);
   BOOST_TEST(map.getSize() == 2);
-  BOOST_TEST(map.drop(1) == 21);
+  map.remove(1);
   BOOST_TEST(map.getSize() == 1);
-  BOOST_CHECK_THROW(map.drop(3), std::logic_error);
-  BOOST_TEST(map.drop(2) == 34);
+  BOOST_CHECK_THROW(map.remove(3), std::logic_error);
+  map.remove(2);
   BOOST_TEST(map.getSize() == 0);
-  BOOST_CHECK_THROW(map.drop(3), std::logic_error);
+  BOOST_CHECK_THROW(map.remove(3), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(Rehash_Test)
