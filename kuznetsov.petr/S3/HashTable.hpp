@@ -1,5 +1,6 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
+#include <stdexcept>
 #include <cstddef>
 #include <cmath>
 
@@ -26,9 +27,6 @@ namespace kuznetsov {
   struct HashTable {
     using const_iterator = Iterator< Key, Value, true >;
     using iterator = Iterator< Key, Value, false >;
-
-    template< class K, class V, bool C >
-    friend struct Iterator;
 
     HashTable();
     HashTable(const HashTable&);
@@ -423,7 +421,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
   for (; i < capacity_; ++i) {
     pos = (hash + (i + i * i) / 2) % capacity_;
     if (states_[pos] == State::FREE) {
-      throw std::logic_error("Not found value");
+      throw std::logic_error("Not found key");
     }
     if (states_[pos] == State::STORE) {
       if (comparator_(k, keys_[pos])) {
