@@ -63,7 +63,7 @@ namespace kuznetsov {
     T& at(size_t pos);
     const T& at(size_t pos) const;
 
-    void reserve(size_t required); 
+    void reserve(size_t required);
     void shrinkToFit();
     void pushBackRange(CIter< T > start, size_t c);
     void pushBackCount(size_t k, const T& val);
