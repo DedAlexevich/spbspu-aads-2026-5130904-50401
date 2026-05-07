@@ -72,8 +72,9 @@ namespace kuznetsov {
 
   template< class Key, class Value, bool IsConst >
   struct Iterator {
-    using reference = typename conditional< IsConst, const std::pair< const Key&, const Value& >, const std::pair< const Key&, Value& > >::type;
-    using point = typename conditional< IsConst, const std::pair< const Key&, const Value* >, const std::pair< const Key&, Value* > >::type;
+    using pair_type = std::pair< const Key, Value >;
+    using reference = typename conditional< IsConst, const pair_type&, pair_type& >::type;
+    using point = typename conditional< IsConst, const pair_type*, pair_type* >::type;
     
     Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap);
     
@@ -86,13 +87,14 @@ namespace kuznetsov {
     reference operator*();
     point operator->();
     
-    Iterator operator++();
+    Iterator operator++(); 
     Iterator operator--();
 
     Iterator operator++(int);
     Iterator operator--(int);
 
   private:
+    pair_type curr_;
     Key* keys_;
     Value* values_;
     State* states_;
@@ -102,7 +104,8 @@ namespace kuznetsov {
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::begin()
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::begin()
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != State::STORE) {
@@ -112,7 +115,8 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator kuznetsov::HashTable< 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != State::STORE) {
@@ -122,7 +126,8 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashT
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != State::STORE) {
@@ -132,19 +137,22 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashT
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::end()
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::end()
 {
   return iterator(keys_, values_, states_, capacity_, capacity_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::end() const
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::end() const
 {
   return const_iterator(keys_, values_, states_, capacity_, capacity_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return const_iterator(keys_, values_, states_, capacity_, capacity_);
 }
@@ -152,6 +160,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator kuznetsov::HashT
 
 template< class Key, class Value, bool IsConst >
 kuznetsov::Iterator< Key, Value, IsConst >::Iterator(Key* k, Value* v, State* s, size_t ind, size_t cap):
+  curr_(),
   keys_(k),
   values_(v),
   states_(s),
@@ -176,15 +185,19 @@ bool kuznetsov::Iterator< Key, Value, IsConst >::operator!=(const Iterator< Key,
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::reference kuznetsov::Iterator< Key, Value, IsConst >::operator*()
+typename kuznetsov::Iterator< Key, Value, IsConst >::reference
+kuznetsov::Iterator< Key, Value, IsConst >::operator*()
 {
-  return {keys_[i_], values_[i_]};  
+  new (&curr_) pair_type(keys_[i_], values_[i_]);
+  return curr_;
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::point kuznetsov::Iterator< Key, Value, IsConst >::operator->()
+typename kuznetsov::Iterator< Key, Value, IsConst >::point
+kuznetsov::Iterator< Key, Value, IsConst >::operator->()
 {
-  return {keys_[i_], &values_[i_]};
+  new (&curr_) pair_type(keys_[i_], values_[i_]);
+  return &curr_;
 }
 
 template< class Key, class Value, bool IsConst >
@@ -316,7 +329,8 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
+kuznetsov::HashTable< Key, Value, Hash, Equal >&
+kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
 {
   if(std::addressof(oth) == this) {
     return *this;
@@ -327,7 +341,8 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >& kuznetsov::HashTable< Key, Valu
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
+kuznetsov::HashTable< Key, Value, Hash, Equal >&
+kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
 {
   if(std::addressof(oth) == this) {
     return *this;

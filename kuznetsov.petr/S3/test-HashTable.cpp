@@ -140,3 +140,20 @@ BOOST_AUTO_TEST_CASE(At_Const_Method_Test)
   BOOST_CHECK_THROW(map2.at(4), std::out_of_range);
 }
 
+BOOST_AUTO_TEST_CASE(Iterators_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map.add(1, 34);
+  map.add(2, 52);
+  map.add(3, 67);
+  long keys[] {1, 2, 3};
+  int values[] {34, 52, 67};
+  size_t i = 0;
+  kuznetsov::Iterator< long, int, true > it = map.cbegin();
+  for (; i < 3; ++i) {
+    BOOST_TEST((*it).first == keys[i]);
+    BOOST_TEST((*it).second == values[i]);
+    ++it;
+  }
+}
+
