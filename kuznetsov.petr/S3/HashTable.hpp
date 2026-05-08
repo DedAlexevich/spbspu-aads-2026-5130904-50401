@@ -2,6 +2,7 @@
 #define HASH_TABLE_HPP
 #include <stdexcept>
 #include <cstddef>
+#include <utility>
 #include <cmath>
 
 namespace kuznetsov {

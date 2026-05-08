@@ -12,9 +12,14 @@ namespace kuznetsov {
   };
 
   struct Hasher {
-    size_t operator()(Edge e);
+    size_t operator()(const Edge& e) const;
+    size_t operator()(const std::string&) const;
   };
-
+  
+  struct KeyComparator {
+    bool operator()(const Edge& e) const;
+    bool operator()(const std::string&) const;
+  };
 
 }
 
@@ -29,13 +34,24 @@ int main(int argc, char** argv)
     std::cerr << "Couldn't open file\n";
     return 1;
   }
-
+  namespace kuz = kuznetsov;
   std::string name;
   size_t count = 0;
+  using graph = kuz::HashTable< kuz::Edge, kuz::Vector< size_t >, kuz::Hasher, kuz::KeyComparator >;
+  kuz::HashTable< std::string, graph, kuz::Hasher, kuz::KeyComparator > graphs;
+
+
   while (input >> name >> count) {
-    std::cout << name << '\n';
-    std::cout << count << '\n';
+    graph t(count);
+    for (size_t i = 0; i < count; ++i) {
+      Edge e;
+      size_t weight;
+      input >> e.from_ >> e.to_ >> weight;
+      t.add(e, weight);
+    }
+    graphs.add(name, t);
   }
+
 
 }
 
