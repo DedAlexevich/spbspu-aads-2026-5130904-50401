@@ -1,8 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <boost/hash2/siphash.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/describe/class.hpp>
-#include <fstream>
 #include "../common/includes/top-it-vector.hpp"
 #include "./HashTable.hpp"
 
@@ -61,8 +61,12 @@ int main(int argc, char** argv)
   std::string name;
   size_t count = 0;
   using graph = kuz::HashTable< kuz::Edge, kuz::Vector< size_t >, kuz::Hasher, kuz::KeyComparator >;
-  kuz::HashTable< std::string, graph, kuz::Hasher, kuz::KeyComparator > graphs;
-
+  using table = kuz::HashTable< std::string, graph, kuz::Hasher, kuz::KeyComparator >;
+  using command = void(*)(std::ostream&, std::istream&, table&);
+  using constCommand = void(*)(std::ostream&, std::istream&, const table&);
+  table graphs;
+  kuz::HashTable< std::string, command, kuz::Hasher, kuz::KeyComparator > cmds;
+  kuz::HashTable< std::string, constCommand, kuz::Hasher, kuz::KeyComparator > constCmds;
 
   while (input >> name >> count) {
     graph t(count);
@@ -81,5 +85,13 @@ int main(int argc, char** argv)
   }
   std::cout << graphs.getSize() << '\n';
 
-}
+  std::string cmd;
+  while (std::cin >> cmd) {
 
+
+
+
+  }
+
+
+}
