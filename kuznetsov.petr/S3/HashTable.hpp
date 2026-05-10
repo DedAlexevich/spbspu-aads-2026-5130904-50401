@@ -313,7 +313,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
   hasher_(oth.hasher_),
   comparator_(oth.comparator_),
   states_(oth.states_),
-  slots_(oth.slots),
+  slots_(oth.slots_),
   size_(oth.size_),
   capacity_(oth.capacity_)
 {
