@@ -252,4 +252,65 @@ void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
   }
 }
 
+void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
+{
+  std::string name;
+  in >> name;
+  if (t.has(name)) {
+    throw std::logic_error("Such graph already exist");
+  }
+  std::string g1;
+  in >> g1;
+  if (!t.has(g1)) {
+    throw std::logic_error("graph doesnt exist");
+  }
+
+  size_t count;
+  in >> count;
+
+  Graph gr(count);
+  Vector< std::string > vertexes;
+
+  for (size_t i = 0; i < count; ++i) {
+    std::string v;
+    in >> v;
+    const Graph& source = t.at(g1);
+    if (!source.vertexes_.contain(v)) {
+      throw std::logic_error("Such vertex doesnt exist");
+    }
+    gr.addVertexes(v);
+    vertexes.pushBack(v);
+  }
+
+  const Graph& source = t.at(g1);
+
+  for (auto it = source.table_.begin(); it != source.table_.end(); ++it) {
+    const std::string& from = (*it).first.first;
+    const std::string& to = (*it).first.second;
+
+    bool fromExists = false, toExists = false;
+    for (size_t i = 0; i < vertexes.getSize(); ++i) {
+      if (vertexes[i] == from) fromExists = true;
+      if (vertexes[i] == to) toExists = true;
+    }
+
+    if (fromExists && toExists) {
+      const Vector< size_t >& weights = (*it).second;
+      for (size_t i = 0; i < weights.getSize(); ++i) {
+        gr.addEdge(from, to, weights[i]);
+      }
+    }
+  }
+
+  try {
+    t.add(name, gr);
+  } catch(...) {
+    t.rehash();
+    t.add(name, gr);
+  }
+
+
+}
+
+
 

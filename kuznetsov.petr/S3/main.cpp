@@ -36,6 +36,7 @@ int main(int argc, char** argv)
   cmds.add("cut", kuz::cut);
   cmds.add("create", kuz::create);
   cmds.add("merge", kuz::merge);
+  cmds.add("extract", kuz::extract);
   while (input >> name >> count) {
     kuz::Graph t(count);
     for (size_t i = 0; i < count; ++i) {
@@ -46,7 +47,6 @@ int main(int argc, char** argv)
     }
     grphs.add(name, t);
   }
-  std::cout << grphs.getSize() << '\n';
 
   std::string cmd;
   while (std::cin >> cmd) {
