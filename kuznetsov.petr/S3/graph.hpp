@@ -34,7 +34,6 @@ namespace kuznetsov {
     void addEdge(const std::string& v1, const std::string& v2, size_t w);
     void removeEdge(const std::string& v1, const std::string& v2, size_t w);
 
-  private:
     HashTable< key, Vector< size_t >, SipHasher< key >, KeyComparator > table_;
     Vector< std::string > vertexes_;
   };

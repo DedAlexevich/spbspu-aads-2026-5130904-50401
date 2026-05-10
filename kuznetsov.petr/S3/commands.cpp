@@ -16,17 +16,6 @@ void sort(kuznetsov::Vector< T >& v) {
   }
 }
 
-
-void kuznetsov::sortString(Vector< std::string >& v)
-{
-  sort(v);
-}
-
-void kuznetsov::sortWeight(Vector< size_t >& v)
-{
-  sort(v);
-}
-
 void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
 {
   if (t.getSize() == 0) {
@@ -39,13 +28,29 @@ void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
   }
   sort(names);
   auto it = names.cbegin();
-  std::cout << *it;
-  ++it;
   for (; it != names.cend(); ++it) {
-    out << '\n' << *it;
+    out << *it << '\n';
   }
-  out << '\n';
 }
 
+void kuznetsov::vertexes(std::ostream& out, std::istream& in, const table& t)
+{
+  std::string name;
+  in >> name;
+  if (!t.has(name)) {
+    throw std::logic_error("Graph doesnt exist");
+  }
+
+  const Graph& g = t.at(name);
+  if (g.vertexes_.isEmpty()) {
+    out << '\n';
+    return;
+  }
+  Vector< std::string > vrts(g.vertexes_);
+  sort(vrts);
+  for (auto it = vrts.cbegin(); it != vrts.cend(); ++it) {
+    out << *it << '\n';
+  }
+}
 
 

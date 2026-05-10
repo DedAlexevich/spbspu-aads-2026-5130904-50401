@@ -7,26 +7,7 @@
 #include "./graph.hpp"
 #include "./Hasher.hpp"
 #include "./HashTable.hpp"
-
-namespace kuznetsov {
-  using table = HashTable< std::string, Graph, SipHasher< std::string >, KeyComparator >;
-
-  void sortString(Vector< std::string >&);
-  void sortWeight(Vector< std::string >&);
-
-  void graphs(std::ostream&, std::istream&, const table&);
-  void vertexes(std::ostream&, std::istream&, const table&);
-  void outbound(std::ostream&, std::istream&, const table&);
-  void inbound(std::ostream&, std::istream&, const table&);
-
-  void bind(std::ostream&, std::istream&, table&);
-  void cut(std::ostream&, std::istream&, table&);
-
-  void create(std::ostream&, std::istream&, table&);
-  void merge(std::ostream&, std::istream&, table&);
-  void extract(std::ostream&, std::istream&, table&);
-
-}
+#include "./commands.hpp"
 
 int main(int argc, char** argv)
 {
@@ -47,7 +28,8 @@ int main(int argc, char** argv)
   kuz::table grphs;
   kuz::HashTable< std::string, command, kuz::SipHasher< std::string >, kuz::KeyComparator > cmds;
   kuz::HashTable< std::string, constCommand, kuz::SipHasher< std::string >, kuz::KeyComparator > constCmds;
-
+  constCmds.add("graphs", kuz::graphs);
+  constCmds.add("vertexes", kuz::vertexes);
   while (input >> name >> count) {
     kuz::Graph t(count);
     for (size_t i = 0; i < count; ++i) {
@@ -66,7 +48,7 @@ int main(int argc, char** argv)
       if (cmds.has(cmd)) {
         cmds.at(cmd)(std::cout, std::cin, grphs);
       } else {
-        cmds.at(cmd)(std::cout, std::cin, grphs);
+        constCmds.at(cmd)(std::cout, std::cin, grphs);
       }
     } catch (const std::logic_error& e) {
       std::cout << "<INVALID COMMAND>\n";
