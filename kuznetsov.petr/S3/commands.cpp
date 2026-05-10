@@ -99,6 +99,10 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
     }
     ++it;
   }
+  if (res.isEmpty()) {
+    out << '\n';
+    return;
+  }
   sort(res, PairComparator{});
   auto itr = res.cbegin();
   out << (*itr).first << ' ' << (*itr).second;
@@ -138,6 +142,10 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
       }
     }
     ++it;
+  }
+  if (res.isEmpty()) {
+    out << '\n';
+    return;
   }
   sort(res, PairComparator{});
   auto itr = res.cbegin();
