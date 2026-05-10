@@ -255,8 +255,8 @@ void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
   try {
     t.add(name, gr3);
   } catch(...) {
-  t.rehash();
-  t.add(name, gr3);
+    t.rehash();
+    t.add(name, gr3);
   }
 }
 
@@ -279,10 +279,10 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
   Graph gr(count);
   Vector< std::string > vertexes;
 
+  const Graph& source = t.at(g1);
   for (size_t i = 0; i < count; ++i) {
     std::string v;
     in >> v;
-    const Graph& source = t.at(g1);
     if (!source.vertexes_.contain(v)) {
       throw std::logic_error("Such vertex doesnt exist");
     }
@@ -290,7 +290,6 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
     vertexes.pushBack(v);
   }
 
-  const Graph& source = t.at(g1);
 
   for (auto it = source.table_.begin(); it != source.table_.end(); ++it) {
     const std::string& from = (*it).first.first;
@@ -298,8 +297,12 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
 
     bool fromExists = false, toExists = false;
     for (size_t i = 0; i < vertexes.getSize(); ++i) {
-      if (vertexes[i] == from) fromExists = true;
-      if (vertexes[i] == to) toExists = true;
+      if (vertexes[i] == from) {
+        fromExists = true;
+      }
+      if (vertexes[i] == to) {
+        toExists = true;
+      }
     }
 
     if (fromExists && toExists) {
@@ -316,8 +319,6 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
     t.rehash();
     t.add(name, gr);
   }
-
-
 }
 
 

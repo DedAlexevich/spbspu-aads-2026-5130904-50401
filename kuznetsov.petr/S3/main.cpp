@@ -3,7 +3,6 @@
 #include <boost/hash2/siphash.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/describe/class.hpp>
-#include "../common/includes/top-it-vector.hpp"
 #include "./graph.hpp"
 #include "./Hasher.hpp"
 #include "./HashTable.hpp"
@@ -61,10 +60,6 @@ int main(int argc, char** argv)
       auto skip = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(skip, '\n');
     }
-
-
-
   }
-
-
 }
+

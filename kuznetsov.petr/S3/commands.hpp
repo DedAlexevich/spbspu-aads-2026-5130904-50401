@@ -1,7 +1,6 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <string>
-#include "../common/includes/top-it-vector.hpp"
 #include "./graph.hpp"
 
 namespace kuznetsov {
@@ -20,7 +19,6 @@ namespace kuznetsov {
   void extract(std::ostream&, std::istream&, table&);
 
 }
-
 
 #endif
 

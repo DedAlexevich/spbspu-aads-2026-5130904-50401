@@ -23,9 +23,7 @@ namespace kuznetsov {
     }
   };
 
-
   struct Graph {
-
     Graph();
     Graph(size_t c);
 
@@ -38,8 +36,6 @@ namespace kuznetsov {
     Vector< std::string > vertexes_;
   };
 }
-
-
 
 #endif
 
