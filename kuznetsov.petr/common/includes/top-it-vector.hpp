@@ -50,6 +50,8 @@ namespace kuznetsov {
     CIter< T > erase(CIter< T > start, CIter< T > end, C c);
 
     void clear();
+    bool contain(const T&) const noexcept;
+
 
     CIter< T > cbegin() const noexcept;
     CIter< T > cend() const noexcept;
@@ -512,6 +514,17 @@ void kuznetsov::Vector< T >::clear()
     (data_ + i)->~T();
   }
   size_ = 0;
+}
+
+template< class T >
+bool kuznetsov::Vector< T >::contain(const T& obj) const noexcept
+{
+  for (size_t i = 0; i < size_; ++i) {
+    if (data_[i] == obj) {
+      return true;
+    }
+  }
+  return false;
 }
 
 template< class T >
