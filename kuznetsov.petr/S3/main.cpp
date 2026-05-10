@@ -30,6 +30,10 @@ int main(int argc, char** argv)
   kuz::HashTable< std::string, constCommand, kuz::SipHasher< std::string >, kuz::KeyComparator > constCmds;
   constCmds.add("graphs", kuz::graphs);
   constCmds.add("vertexes", kuz::vertexes);
+  constCmds.add("outbound", kuz::outbound);
+  constCmds.add("inbound", kuz::inbound);
+  cmds.add("bind", kuz::bind);
+  cmds.add("cut", kuz::cut);
   while (input >> name >> count) {
     kuz::Graph t(count);
     for (size_t i = 0; i < count; ++i) {
@@ -51,7 +55,7 @@ int main(int argc, char** argv)
         constCmds.at(cmd)(std::cout, std::cin, grphs);
       }
     } catch (const std::logic_error& e) {
-      std::cout << "<INVALID COMMAND>\n";
+      std::cerr << "<INVALID COMMAND>\n";
       auto skip = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(skip, '\n');
     }

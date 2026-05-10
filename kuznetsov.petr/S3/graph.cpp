@@ -50,7 +50,12 @@ void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, siz
   if (table_.has(k)) {
     table_.at(k).pushBack(w);
   } else {
-    table_.add(k, Vector< size_t >());
+    try {
+      table_.add(k, Vector< size_t >());
+    } catch(...) {
+      table_.rehash();
+      table_.add(k, Vector< size_t >());
+    }
     table_.at(k).pushBack(w);
   }
 }

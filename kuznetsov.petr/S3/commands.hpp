@@ -7,9 +7,6 @@
 namespace kuznetsov {
   using table = HashTable< std::string, Graph, SipHasher< std::string >, KeyComparator >;
 
-  void sortString(Vector< std::string >&);
-  void sortWeight(Vector< size_t >&);
-
   void graphs(std::ostream&, std::istream&, const table&);
   void vertexes(std::ostream&, std::istream&, const table&);
   void outbound(std::ostream&, std::istream&, const table&);
