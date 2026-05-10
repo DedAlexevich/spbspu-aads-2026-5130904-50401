@@ -27,6 +27,7 @@ namespace kuznetsov {
   struct Graph {
 
     Graph();
+    Graph(size_t c);
 
     void addVertexes(const std::string& name);
     void removeVertexes(const std::string& name);

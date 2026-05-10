@@ -4,27 +4,12 @@
 #include <boost/hash2/hash_append.hpp>
 #include <boost/describe/class.hpp>
 #include "../common/includes/top-it-vector.hpp"
+#include "./graph.hpp"
+#include "./Hasher.hpp"
 #include "./HashTable.hpp"
-#include "Hasher.hpp"
 
 namespace kuznetsov {
-  using key = std::pair< std::string, std::string >;
-  struct KeyComparator {
-    bool operator()(const key& e1, const key& e2) const
-    {
-      bool f = e1.first == e2.first;
-      f = f && e1.second == e2.second;
-      return f;
-    }
-    bool operator()(const std::string& s1, const std::string& s2) const
-    {
-      return s1 == s2;
-    }
-  };
-  using hasherPair = SipHasher< std::pair< std::string, std::string > >;
-  using hasherString = SipHasher< std::string >;
-  using graph = HashTable< key, Vector< size_t >, hasherPair, KeyComparator >;
-  using table = HashTable< std::string, graph, hasherString, KeyComparator >;
+  using table = HashTable< std::string, Graph, SipHasher< std::string >, KeyComparator >;
 
   void sortString(Vector< std::string >&);
   void sortWeight(Vector< std::string >&);
@@ -60,21 +45,16 @@ int main(int argc, char** argv)
   using command = void(*)(std::ostream&, std::istream&, kuz::table&);
   using constCommand = void(*)(std::ostream&, std::istream&, const kuz::table&);
   kuz::table grphs;
-  kuz::HashTable< std::string, command, kuz::hasherString, kuz::KeyComparator > cmds;
-  kuz::HashTable< std::string, constCommand, kuz::hasherString, kuz::KeyComparator > constCmds;
+  kuz::HashTable< std::string, command, kuz::SipHasher< std::string >, kuz::KeyComparator > cmds;
+  kuz::HashTable< std::string, constCommand, kuz::SipHasher< std::string >, kuz::KeyComparator > constCmds;
 
   while (input >> name >> count) {
-    kuz::graph t(count);
+    kuz::Graph t(count);
     for (size_t i = 0; i < count; ++i) {
       kuz::key e;
       size_t weight;
       input >> e.first >> e.second >> weight;
-      if (t.has(e)) {
-        t.at(e).pushBack(weight);
-      } else {
-        t.add(e, kuz::Vector< size_t >());
-        t.at(e).pushBack(weight);
-      }
+      t.addEdge(e.first, e.second, weight);
     }
     grphs.add(name, t);
   }

@@ -8,10 +8,15 @@ kuznetsov::Graph::Graph():
   vertexes_()
 {}
 
+kuznetsov::Graph::Graph(size_t c):
+  table_(c),
+  vertexes_()
+{}
+
 void kuznetsov::Graph::addVertexes(const std::string& name)
 {
   if (vertexes_.contain(name)) {
-    throw std::logic_error("Such vertex already exist");
+    return;
   }
   vertexes_.pushBack(name);
 }
@@ -19,7 +24,7 @@ void kuznetsov::Graph::addVertexes(const std::string& name)
 void kuznetsov::Graph::removeVertexes(const std::string& name)
 {
   if (!vertexes_.contain(name)) {
-    throw std::logic_error("Such vertex not exist");
+    return;
   }
 
   for (auto it = vertexes_.cbegin(); it != vertexes_.cend(); ++it) {
@@ -39,6 +44,8 @@ void kuznetsov::Graph::removeVertexes(const std::string& name)
 
 void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, size_t w)
 {
+  addVertexes(v1);
+  addVertexes(v2);
   auto k = std::make_pair(v1, v2);
   if (table_.has(k)) {
     table_.at(k).pushBack(w);
