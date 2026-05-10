@@ -100,9 +100,17 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
     ++it;
   }
   sort(res, PairComparator{});
-  for (auto it = res.cbegin(); it != res.cend(); ++it) {
-    out << (*it).first << ' ' << (*it).second << '\n';
+  auto itr = res.cbegin();
+  out << (*itr).first << ' ' << (*itr).second;
+  ++itr;
+  for (; itr != res.cend(); ++itr) {
+    if ((*(itr - 1)).first == (*(itr)).first) {
+      out << ' ' << (*itr).second;
+    } else {
+      out << '\n' << (*itr).first << ' ' << (*itr).second;
+    }
   }
+  out << '\n';
 
 }
 
@@ -132,10 +140,17 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
     ++it;
   }
   sort(res, PairComparator{});
-  for (auto it = res.cbegin(); it != res.cend(); ++it) {
-    out << (*it).first << ' ' << (*it).second << '\n';
+  auto itr = res.cbegin();
+  out << (*itr).first << ' ' << (*itr).second;
+  ++itr;
+  for (; itr != res.cend(); ++itr) {
+    if ((*(itr - 1)).first == (*(itr)).first) {
+      out << ' ' << (*itr).second;
+    } else {
+      out << '\n' << (*itr).first << ' ' << (*itr).second;
+    }
   }
-
+  out << '\n';
 }
 
 void kuznetsov::bind(std::ostream&, std::istream& in, table& t)
@@ -171,4 +186,70 @@ void kuznetsov::cut(std::ostream&, std::istream& in, table& t)
   }
   g.removeEdge(v1, v2, w);
 }
+
+void kuznetsov::create(std::ostream&, std::istream& in, table& t)
+{
+  std::string name;
+  size_t count = 0;
+  std::string v;
+  in >> name;
+  if (t.has(name)) {
+    throw std::logic_error("Such graph already exist");
+  }
+  in >> count;
+  Graph g(count);
+  for (size_t i = 0; i < count; ++i) {
+    in >> v;
+    g.addVertexes(v);
+  }
+  t.add(name, g);
+  if (std::cin.fail()) {
+    std::cin.clear();
+  }
+}
+
+void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
+{
+  std::string name;
+  in >> name;
+  if (t.has(name)) {
+    throw std::logic_error("Such graph already exist");
+  }
+  std::string g1, g2;
+  in >> g1 >> g2;
+  if (!t.has(g1) || !t.has(g2)) {
+    throw std::logic_error("One of graphs doesnt exist");
+  }
+  Graph& gr1 = t.at(g1);
+  Graph& gr2 = t.at(g2);
+  Graph gr3;
+
+  for (auto it1 = gr1.table_.begin(); it1 != gr1.table_.end(); ++it1) {
+    const Vector< size_t >& w = it1->second;
+    for (size_t i = 0; i < w.getSize(); ++i) {
+      gr3.addEdge(it1->first.first, it1->first.second, w[i]);
+    }
+  }
+  for (auto it1 = gr2.table_.begin(); it1 != gr2.table_.end(); ++it1) {
+    const Vector< size_t >& w = it1->second;
+    for (size_t i = 0; i < w.getSize(); ++i) {
+      gr3.addEdge(it1->first.first, it1->first.second, w[i]);
+    }
+  }
+
+  for (size_t i = 0; i < gr1.vertexes_.getSize(); ++i) {
+    gr3.addVertexes(gr1.vertexes_[i]);
+  }
+
+  for (size_t i = 0; i < gr2.vertexes_.getSize(); ++i) {
+    gr3.addVertexes(gr2.vertexes_[i]);
+  }
+  try {
+    t.add(name, gr3);
+  } catch(...) {
+  t.rehash();
+  t.add(name, gr3);
+  }
+}
+
 

@@ -34,6 +34,8 @@ int main(int argc, char** argv)
   constCmds.add("inbound", kuz::inbound);
   cmds.add("bind", kuz::bind);
   cmds.add("cut", kuz::cut);
+  cmds.add("create", kuz::create);
+  cmds.add("merge", kuz::merge);
   while (input >> name >> count) {
     kuz::Graph t(count);
     for (size_t i = 0; i < count; ++i) {
