@@ -57,7 +57,7 @@ int main(int argc, char** argv)
         constCmds.at(cmd)(std::cout, std::cin, grphs);
       }
     } catch (const std::logic_error& e) {
-      std::cerr << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
       auto skip = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(skip, '\n');
     }
