@@ -5,37 +5,15 @@
 #include <boost/describe/class.hpp>
 #include "../common/includes/top-it-vector.hpp"
 #include "./HashTable.hpp"
+#include "Hasher.hpp"
 
 namespace kuznetsov {
-
-  struct Edge {
-    std::string from_;
-    std::string to_;
-  };
-
-  BOOST_DESCRIBE_STRUCT(Edge, (), (from_, to_));
-  struct Hasher {
-    size_t operator()(const Edge& e) const
-    {
-      boost::hash2::siphash_64 hasher(seed);
-      boost::hash2::hash_append(hasher, {}, e);
-      return hasher.result();
-    }
-    size_t operator()(const std::string& s) const
-    {
-      boost::hash2::siphash_64 hasher(seed);
-      hasher.update(s.data(), s.size());
-      return hasher.result();
-    }
-  private:
-    size_t seed;
-  };
-
+  using key = std::pair< std::string, std::string >;
   struct KeyComparator {
-    bool operator()(const Edge& e1, const Edge& e2) const
+    bool operator()(const key& e1, const key& e2) const
     {
-      bool f = e1.from_ == e2.from_;
-      f = f && e1.to_ == e2.to_;
+      bool f = e1.first == e2.first;
+      f = f && e1.second == e2.second;
       return f;
     }
     bool operator()(const std::string& s1, const std::string& s2) const
@@ -43,6 +21,25 @@ namespace kuznetsov {
       return s1 == s2;
     }
   };
+  using hasherPair = SipHasher< std::pair< std::string, std::string > >;
+  using hasherString = SipHasher< std::string >;
+  using graph = HashTable< key, Vector< size_t >, hasherPair, KeyComparator >;
+  using table = HashTable< std::string, graph, hasherString, KeyComparator >;
+
+  void sortString(Vector< std::string >&);
+  void sortWeight(Vector< std::string >&);
+
+  void graphs(std::ostream&, std::istream&, const table&);
+  void vertexes(std::ostream&, std::istream&, const table&);
+  void outbound(std::ostream&, std::istream&, const table&);
+  void inbound(std::ostream&, std::istream&, const table&);
+
+  void bind(std::ostream&, std::istream&, table&);
+  void cut(std::ostream&, std::istream&, table&);
+
+  void create(std::ostream&, std::istream&, table&);
+  void merge(std::ostream&, std::istream&, table&);
+  void extract(std::ostream&, std::istream&, table&);
 
 }
 
@@ -60,20 +57,18 @@ int main(int argc, char** argv)
   namespace kuz = kuznetsov;
   std::string name;
   size_t count = 0;
-  using graph = kuz::HashTable< kuz::Edge, kuz::Vector< size_t >, kuz::Hasher, kuz::KeyComparator >;
-  using table = kuz::HashTable< std::string, graph, kuz::Hasher, kuz::KeyComparator >;
-  using command = void(*)(std::ostream&, std::istream&, table&);
-  using constCommand = void(*)(std::ostream&, std::istream&, const table&);
-  table graphs;
-  kuz::HashTable< std::string, command, kuz::Hasher, kuz::KeyComparator > cmds;
-  kuz::HashTable< std::string, constCommand, kuz::Hasher, kuz::KeyComparator > constCmds;
+  using command = void(*)(std::ostream&, std::istream&, kuz::table&);
+  using constCommand = void(*)(std::ostream&, std::istream&, const kuz::table&);
+  kuz::table grphs;
+  kuz::HashTable< std::string, command, kuz::hasherString, kuz::KeyComparator > cmds;
+  kuz::HashTable< std::string, constCommand, kuz::hasherString, kuz::KeyComparator > constCmds;
 
   while (input >> name >> count) {
-    graph t(count);
+    kuz::graph t(count);
     for (size_t i = 0; i < count; ++i) {
-      kuz::Edge e;
+      kuz::key e;
       size_t weight;
-      input >> e.from_ >> e.to_ >> weight;
+      input >> e.first >> e.second >> weight;
       if (t.has(e)) {
         t.at(e).pushBack(weight);
       } else {
@@ -81,13 +76,23 @@ int main(int argc, char** argv)
         t.at(e).pushBack(weight);
       }
     }
-    graphs.add(name, t);
+    grphs.add(name, t);
   }
-  std::cout << graphs.getSize() << '\n';
+  std::cout << grphs.getSize() << '\n';
 
   std::string cmd;
   while (std::cin >> cmd) {
-
+    try {
+      if (cmds.has(cmd)) {
+        cmds.at(cmd)(std::cout, std::cin, grphs);
+      } else {
+        cmds.at(cmd)(std::cout, std::cin, grphs);
+      }
+    } catch (const std::logic_error& e) {
+      std::cout << "<INVALID COMMAND>\n";
+      auto skip = std::numeric_limits< std::streamsize >::max();
+      std::cin.ignore(skip, '\n');
+    }
 
 
 
