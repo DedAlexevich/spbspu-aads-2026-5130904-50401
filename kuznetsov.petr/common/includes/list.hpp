@@ -20,57 +20,20 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
-    LCIter(detail::Node< T >* pn):
-      curr_(pn)
-    {}
 
-    LCIter& operator++()
-    {
-      if (curr_) {
-        curr_ = curr_->next_;
-      }
-      return *this;
-    }
+    LCIter(detail::Node< T >* pn);
 
-    LCIter operator++(int)
-    {
-      LCIter temp(*this);
-      ++(*this);
-      return temp;
-    }
+    LCIter& operator++();
+    LCIter operator++(int);
 
-    LCIter& operator--()
-    {
-      if (curr_) {
-        curr_ = curr_->prev_;
-      }
-      return *this;
-    }
+    LCIter& operator--();
+    LCIter operator--(int);
 
-    LCIter operator--(int)
-    {
-      LCIter temp(*this);
-      --(*this);
-      return temp;
-    }
+    const T& operator*() const;
+    const T* operator->() const;
 
-    const T& operator*() const
-    {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return curr_->val_;
-    }
-
-    bool operator==(const LCIter& y) const
-    {
-      return this->curr_ == y.curr_;
-    }
-
-    bool operator!=(const LCIter& y) const
-    {
-      return !(*this == y);
-    }
+    bool operator==(const LCIter& y) const noexcept;
+    bool operator!=(const LCIter& y) const noexcept;
   protected:
     friend class List< T >;
     detail::Node< T >* curr_;
@@ -81,22 +44,14 @@ namespace kuznetsov {
   public:
     LIter(detail::Node< T >* pn): LCIter< T >(pn)
     {}
-
-    T& operator*()
-    {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return this->curr_->val_;
-    }
+    T& operator*();
+    T* operator->();
   };
 
   template< class T >
   class LRCIter {
   public:
-    LRCIter(detail::Node< T >* pn):
-      curr_(pn)
-    {}
+    LRCIter(detail::Node< T >* pn);
 
     LRCIter& operator++()
     {
@@ -457,5 +412,100 @@ namespace kuznetsov {
   };
 
 }
+
+template< class T >
+kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
+{
+  LCIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
+{
+  LCIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+const T& kuznetsov::LCIter< T >::operator*() const
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return curr_->val_;
+}
+
+template< class T >
+const T* kuznetsov::LCIter< T >::operator->() const
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator==(const LCIter& y) const noexcept
+{
+  return this->curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+T& kuznetsov::LIter< T >::operator*()
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return this->curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LIter< T >::operator->()
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return &this->curr_->val_;
+}
+
+template< class T >
+kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+
+
 #endif
 
