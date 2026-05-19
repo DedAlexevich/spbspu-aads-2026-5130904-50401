@@ -1,7 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cstddef>
-#include <iostream>
+#include <cassert>
+#include <utility>
+#include <stdexcept>
 
 namespace kuznetsov {
   namespace detail {
@@ -212,18 +214,14 @@ kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
 template< class T >
 const T& kuznetsov::LCIter< T >::operator*() const
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return curr_->val_;
 }
 
 template< class T >
 const T* kuznetsov::LCIter< T >::operator->() const
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return &curr_->val_;
 }
 
@@ -281,18 +279,14 @@ kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
 template< class T >
 T& kuznetsov::LIter< T >::operator*()
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return curr_->val_;
 }
 
 template< class T >
 T* kuznetsov::LIter< T >::operator->()
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return &curr_->val_;
 }
 
@@ -350,18 +344,14 @@ kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
 template< class T >
 const T& kuznetsov::LRCIter< T >::operator*() const
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return curr_->val_;
 }
 
 template< class T >
 const T* kuznetsov::LRCIter< T >::operator->() const
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return &curr_->val_;
 }
 
@@ -376,7 +366,7 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 {
   return !(*this == y);
 }
-//-----------------------------------------------------
+
 template< class T >
 kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
   curr_(pn)
@@ -419,18 +409,14 @@ kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
 template< class T >
 T& kuznetsov::LRIter< T >::operator*()
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return curr_->val_;
 }
 
 template< class T >
 T* kuznetsov::LRIter< T >::operator->()
 {
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
+  assert(this->curr_);
   return &curr_->val_;
 }
 
@@ -445,7 +431,7 @@ bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
 {
   return !(*this == y);
 }
-//------------------------------
+
 template< class T >
 kuznetsov::List< T >::List():
   head_(nullptr),
@@ -466,7 +452,6 @@ kuznetsov::List< T >::List(const List& other):
       insert(cend(), current->val_);
       current = current->next_;
     } catch (...) {
-      std::cerr << "Copy construct error\n";
       clear();
       throw;
     }
@@ -504,7 +489,6 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(const List& other)
       insert(cend(), current->val_);
       current = current->next_;
     } catch (...) {
-      std::cerr << "Copy = error\n";
       clear();
       throw;
     }
@@ -755,7 +739,6 @@ bool kuznetsov::List< T >::empty() const
 {
   return !size_;
 }
-
 
 #endif
 

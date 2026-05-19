@@ -241,13 +241,6 @@ BOOST_AUTO_TEST_CASE(ConstReverseIterators)
   BOOST_CHECK_EQUAL(*rit, 1);
 }
 
-BOOST_AUTO_TEST_CASE(IteratorDereferenceOnNull)
-{
-  auto list = kuz::List< int >();
-  auto it = list.begin();
-  BOOST_CHECK_THROW(*it, std::logic_error);
-}
-
 BOOST_AUTO_TEST_CASE(SizeAndEmpty)
 {
   kuz::List< int > list;
