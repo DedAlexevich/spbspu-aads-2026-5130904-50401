@@ -162,7 +162,7 @@ namespace kuznetsov {
     LIter< T > erase(LCIter< T > it);
 
     size_t size() const;
-
+    void swap(List&) noexcept;
     bool empty() const;
 
   private:
@@ -476,20 +476,8 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(const List& other)
   if (this == &other) {
     return *this;
   }
-  clear();
-  if (other.empty()) {
-    return *this;
-  }
-  detail::Node< T >* current = other.head_;
-  do {
-    try {
-      insert(cend(), current->val_);
-      current = current->next_;
-    } catch (...) {
-      clear();
-      throw;
-    }
-  } while (current != other.head_);
+  List cp(other);
+  swap(cp);
 
   return *this;
 }
@@ -732,6 +720,14 @@ bool kuznetsov::List< T >::empty() const
 {
   return !size_;
 }
+
+template< class T >
+void kuznetsov::List< T >::swap(List& oth) noexcept
+{
+  std::swap(oth.head_, head_);
+  std::swap(oth.size_, size_);
+}
+
 
 #endif
 
