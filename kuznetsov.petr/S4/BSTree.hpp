@@ -4,15 +4,16 @@
 #include <cstddef>
 
 namespace kuznetsov {
+  namespace detail {
+    template< class Key, class Value >
+    struct Node {
+      std::pair< const Key, Value > value_;
 
-  template< class Key, class Value >
-  struct Node {
-    std::pair< const Key, Value > t_;
-
-    Node< Key, Value >* parrent_;
-    Node< Key, Value >* lt_;
-    Node< Key, Value >* rt_;
-  };
+      Node< Key, Value >* parrent_;
+      Node< Key, Value >* lt_;
+      Node< Key, Value >* rt_;
+    };
+  }
 
   template< class Key, class Value, bool IsConst>
   struct Iterator;
@@ -22,18 +23,19 @@ namespace kuznetsov {
 
     BSTree();
     BSTree(const BSTree&);
-    BSTree(BSTree&&);
+    BSTree(BSTree&&) noexcept;
     BSTree(std::initializer_list< std::pair< Key, Value > > init);
     ~BSTree();
 
     BSTree& operator=(const BSTree&);
-    BSTree& operator=(BSTree&&);
+    BSTree& operator=(BSTree&&) noexcept;
 
     using iterator = Iterator< Key, Value, false >;
     using const_iterator = Iterator< Key, Value, true >;
 
     void push(Key k, Value v);
-    Value get(Key k);
+    Value& at(Key k);
+    const Value& at(Key k) const;
     void drop(Key k);
 
     const_iterator rotateLeft(const_iterator it);
@@ -50,7 +52,7 @@ namespace kuznetsov {
     bool isEmpty() const noexcept;
     bool contain(Key k) const noexcept;
 
-    void swap();
+    void swap() noexcept;
     void clear();
 
     iterator begin();
@@ -63,11 +65,14 @@ namespace kuznetsov {
 
 
   private:
-    Node< Key, Value >* root_;
+    Compare cmptr_;
+    detail::Node< Key, Value >* root_;
     size_t size_;
   };
-
 }
+
+
+
 
 #endif
 
