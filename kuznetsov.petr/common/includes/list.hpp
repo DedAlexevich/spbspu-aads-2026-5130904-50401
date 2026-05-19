@@ -125,9 +125,8 @@ namespace kuznetsov {
 
     List& operator=(List&& other) noexcept;
 
-    LIter< T > insert(LCIter< T > it, const T& val);
-
-    LIter< T > insert(LCIter< T > it, T&& val);
+    template< class U >
+    LIter< T > insert(LCIter< T > it, U&& val);
 
     T& front();
 
@@ -161,9 +160,9 @@ namespace kuznetsov {
 
     LIter< T > erase(LCIter< T > it);
 
-    size_t size() const;
+    size_t size() const noexcept;
     void swap(List&) noexcept;
-    bool empty() const;
+    bool empty() const noexcept;
 
   private:
     detail::Node< T >* head_;
@@ -496,43 +495,10 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
 }
 
 template< class T >
-kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, const T& val)
+template< class U >
+kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{val, nullptr, nullptr};
-
-  if (head_ == nullptr) {
-    head_ = n;
-    n->next_ = n;
-    n->prev_ = n;
-  } else if (!it.curr_) {
-    detail::Node< T >* tail = head_->prev_;
-
-    n->next_ = head_;
-    n->prev_ = tail;
-    tail->next_ = n;
-    head_->prev_ = n;
-  } else {
-    detail::Node< T >* current = it.curr_;
-    detail::Node< T >* prev = current->prev_;
-
-    n->next_ = current;
-    n->prev_ = prev;
-    prev->next_ = n;
-    current->prev_ = n;
-
-    if (current == head_) {
-      head_ = n;
-    }
-  }
-
-  size_++;
-  return LIter< T >(n);
-}
-
-template< class T >
-kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, T&& val)
-{
-  detail::Node< T >* n = new detail::Node< T >{std::move(val), nullptr, nullptr};
+  detail::Node< T >* n = new detail::Node< T >{std::forward< T >(val), nullptr, nullptr};
 
   if (head_ == nullptr) {
     head_ = n;
@@ -710,13 +676,13 @@ kuznetsov::LIter< T > kuznetsov::List< T >::erase(LCIter< T > it)
 }
 
 template< class T >
-size_t kuznetsov::List< T >::size() const
+size_t kuznetsov::List< T >::size() const noexcept
 {
   return size_;
 }
 
 template< class T >
-bool kuznetsov::List< T >::empty() const
+bool kuznetsov::List< T >::empty() const noexcept
 {
   return !size_;
 }
