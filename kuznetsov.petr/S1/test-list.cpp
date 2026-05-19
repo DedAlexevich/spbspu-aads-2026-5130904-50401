@@ -16,9 +16,9 @@ BOOST_AUTO_TEST_CASE(DefaultConstructor)
 BOOST_AUTO_TEST_CASE(CopyConstructor)
 {
   auto original = kuz::List< int >();
-  original.insert(original.end(), 1);
-  original.insert(original.end(), 2);
-  original.insert(original.end(), 3);
+  original.insert(original.cend(), 1);
+  original.insert(original.cend(), 2);
+  original.insert(original.cend(), 3);
 
   kuz::List< int > copy(original);
 
@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_CASE(CopyConstructorEmpty)
 BOOST_AUTO_TEST_CASE(MoveConstructor)
 {
   auto original = kuz::List< int >();
-  original.insert(original.end(), 10);
-  original.insert(original.end(), 20);
+  original.insert(original.cend(), 10);
+  original.insert(original.cend(), 20);
 
   kuz::List< int > moved(std::move(original));
 
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(MoveConstructor)
 BOOST_AUTO_TEST_CASE(CopyAssignmentOperator)
 {
   auto list1 = kuz::List< int >();
-  list1.insert(list1.end(), 100);
-  list1.insert(list1.end(), 200);
+  list1.insert(list1.cend(), 100);
+  list1.insert(list1.cend(), 200);
 
   auto list2 = kuz::List< int >();
   list2 = list1;
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE(CopyAssignmentOperator)
 BOOST_AUTO_TEST_CASE(MoveAssignmentOperator)
 {
   auto list1 = kuz::List< int >();
-  list1.insert(list1.end(), 300);
-  list1.insert(list1.end(), 400);
+  list1.insert(list1.cend(), 300);
+  list1.insert(list1.cend(), 400);
 
   auto list2 = kuz::List< int >();
   list2 = std::move(list1);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(AddGetSuite)
 BOOST_AUTO_TEST_CASE(InsertIntoEmptyList)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 42);
+  list.insert(list.cend(), 42);
 
   BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(list.front(), 42);
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE(InsertIntoEmptyList)
 BOOST_AUTO_TEST_CASE(InsertAtEnd)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   BOOST_CHECK_EQUAL(list.size(), 3);
   BOOST_CHECK_EQUAL(list.front(), 1);
@@ -125,9 +125,9 @@ BOOST_AUTO_TEST_CASE(InsertAtEnd)
 BOOST_AUTO_TEST_CASE(InsertAtBegin)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
-  list.insert(list.begin(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
+  list.insert(list.cbegin(), 1);
 
   BOOST_CHECK_EQUAL(list.size(), 3);
   BOOST_CHECK_EQUAL(list.front(), 1);
@@ -137,10 +137,10 @@ BOOST_AUTO_TEST_CASE(InsertAtBegin)
 BOOST_AUTO_TEST_CASE(InsertInMiddle)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 3);
 
-  auto it = list.begin();
+  auto it = list.cbegin();
   ++it;
   list.insert(it, 2);
 
@@ -157,8 +157,8 @@ BOOST_AUTO_TEST_CASE(InsertInMiddle)
 BOOST_AUTO_TEST_CASE(FrontNonConst)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 100);
-  list.insert(list.end(), 200);
+  list.insert(list.cend(), 100);
+  list.insert(list.cend(), 200);
 
   list.front() = 999;
   BOOST_CHECK_EQUAL(list.front(), 999);
@@ -167,8 +167,8 @@ BOOST_AUTO_TEST_CASE(FrontNonConst)
 BOOST_AUTO_TEST_CASE(BackNonConst)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 100);
-  list.insert(list.end(), 200);
+  list.insert(list.cend(), 100);
+  list.insert(list.cend(), 200);
 
   list.back() = 888;
   BOOST_CHECK_EQUAL(list.back(), 888);
@@ -184,9 +184,9 @@ BOOST_AUTO_TEST_CASE(FrontBackOnEmptyList)
 BOOST_AUTO_TEST_CASE(IteratorDecrement)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   auto it = list.begin();
   --it;
@@ -200,8 +200,8 @@ BOOST_AUTO_TEST_CASE(IteratorDecrement)
 BOOST_AUTO_TEST_CASE(IteratorComparison)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
 
   auto it1 = list.begin();
   auto it2 = list.begin();
@@ -214,9 +214,9 @@ BOOST_AUTO_TEST_CASE(IteratorComparison)
 BOOST_AUTO_TEST_CASE(ReverseIterators)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   auto rit = list.rbegin();
   BOOST_CHECK_EQUAL(*rit, 3);
@@ -229,9 +229,9 @@ BOOST_AUTO_TEST_CASE(ReverseIterators)
 BOOST_AUTO_TEST_CASE(ConstReverseIterators)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   auto rit = list.rcbegin();
   BOOST_CHECK_EQUAL(*rit, 3);
@@ -254,11 +254,11 @@ BOOST_AUTO_TEST_CASE(SizeAndEmpty)
   BOOST_CHECK(list.empty());
   BOOST_CHECK_EQUAL(list.size(), 0);
 
-  list.insert(list.end(), 1);
+  list.insert(list.cend(), 1);
   BOOST_CHECK(!list.empty());
   BOOST_CHECK_EQUAL(list.size(), 1);
 
-  list.insert(list.end(), 2);
+  list.insert(list.cend(), 2);
   BOOST_CHECK_EQUAL(list.size(), 2);
 }
 
@@ -269,11 +269,11 @@ BOOST_AUTO_TEST_SUITE(DeletionSuite)
 BOOST_AUTO_TEST_CASE(EraseSingleElement)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
-  auto it = list.begin();
+  auto it = list.cbegin();
   ++it;
   list.erase(it);
 
@@ -285,9 +285,9 @@ BOOST_AUTO_TEST_CASE(EraseSingleElement)
 BOOST_AUTO_TEST_CASE(EraseOnlyElement)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 42);
+  list.insert(list.cend(), 42);
 
-  list.erase(list.begin());
+  list.erase(list.cbegin());
 
   BOOST_CHECK(list.empty());
   BOOST_CHECK_EQUAL(list.size(), 0);
@@ -296,15 +296,15 @@ BOOST_AUTO_TEST_CASE(EraseOnlyElement)
 BOOST_AUTO_TEST_CASE(EraseOnEmptyList)
 {
   auto list = kuz::List< int >();
-  BOOST_CHECK_THROW(list.erase(list.begin()), std::logic_error);
+  BOOST_CHECK_THROW(list.erase(list.cbegin()), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(PopFront)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   list.popFront();
 
@@ -315,9 +315,9 @@ BOOST_AUTO_TEST_CASE(PopFront)
 BOOST_AUTO_TEST_CASE(PopBack)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   list.popBack();
 
@@ -328,9 +328,9 @@ BOOST_AUTO_TEST_CASE(PopBack)
 BOOST_AUTO_TEST_CASE(Clear)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   list.clear();
 
@@ -342,12 +342,12 @@ BOOST_AUTO_TEST_CASE(MultipleEraseOperations)
 {
   auto list = kuz::List< int >();
   for (int i = 1; i <= 5; ++i) {
-    list.insert(list.end(), i);
+    list.insert(list.cend(), i);
   }
 
   list.popFront();
   list.popBack();
-  list.erase(list.begin());
+  list.erase(list.cbegin());
 
   BOOST_CHECK_EQUAL(list.size(), 2);
 }
@@ -355,11 +355,11 @@ BOOST_AUTO_TEST_CASE(MultipleEraseOperations)
 BOOST_AUTO_TEST_CASE(EraseReturnsCorrectIterator)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
-  auto it = list.begin();
+  auto it = list.cbegin();
   ++it;
   auto nextIt = list.erase(it);
 
@@ -369,9 +369,9 @@ BOOST_AUTO_TEST_CASE(EraseReturnsCorrectIterator)
 BOOST_AUTO_TEST_CASE(CyclicStructureAfterOperations)
 {
   auto list = kuz::List< int >();
-  list.insert(list.end(), 1);
-  list.insert(list.end(), 2);
-  list.insert(list.end(), 3);
+  list.insert(list.cend(), 1);
+  list.insert(list.cend(), 2);
+  list.insert(list.cend(), 3);
 
   list.popFront();
   list.popBack();

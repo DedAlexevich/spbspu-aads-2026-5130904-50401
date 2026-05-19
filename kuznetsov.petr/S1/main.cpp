@@ -15,9 +15,9 @@ int main()
     auto currSequence = kuz::List< size_t >();
     size_t t = 0;
     while (std::cin >> t) {
-      currSequence.insert(currSequence.end(), t);
+      currSequence.insert(currSequence.cend(), t);
     }
-    list.insert(list.end(), std::make_pair(name, currSequence));
+    list.insert(list.cend(), std::make_pair(name, currSequence));
     if (std::cin.bad()) {
       return 1;
     }
@@ -53,7 +53,7 @@ int main()
 
   auto sums = kuz::List<size_t>();
   for (size_t i = 0; i < countRows; ++i) {
-    sums.insert(sums.end(), 0);
+    sums.insert(sums.cend(), 0);
   }
 
   auto sumIt = sums.begin();

@@ -147,7 +147,7 @@ namespace kuznetsov {
       detail::Node<T>* current = other.head_;
       do {
         try {
-          insert(end(), current->val_);
+          insert(cend(), current->val_);
           current = current->next_;
         } catch (...) {
           std::cerr << "Copy construct error\n";
@@ -182,7 +182,7 @@ namespace kuznetsov {
       detail::Node< T >* current = other.head_;
       do {
         try {
-          insert(end(), current->val_);
+          insert(cend(), current->val_);
           current = current->next_;
         } catch (...) {
           std::cerr << "Copy = error\n";
@@ -490,24 +490,6 @@ template< class T >
 bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
 {
   return !(*this == y);
-}
-
-template< class T >
-T& kuznetsov::LIter< T >::operator*()
-{
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
-  return this->curr_->val_;
-}
-
-template< class T >
-T* kuznetsov::LIter< T >::operator->()
-{
-  if (!this->curr_) {
-    throw std::logic_error("Null iterator");
-  }
-  return &this->curr_->val_;
 }
 
 template< class T >
