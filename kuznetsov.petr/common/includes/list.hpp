@@ -4,12 +4,15 @@
 #include <iostream>
 
 namespace kuznetsov {
-  template< class T >
-  struct Node {
-    T val_;
-    Node< T >* next_;
-    Node< T >* prev_;
-  };
+  namespace detail {
+    template< class T >
+    struct Node {
+      T val_;
+      Node< T >* next_;
+      Node< T >* prev_;
+    };
+  }
+
 
   template< class T >
   class List;
@@ -17,7 +20,7 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
-    LCIter(Node< T >* pn):
+    LCIter(detail::Node< T >* pn):
       curr_(pn)
     {}
 
@@ -70,13 +73,13 @@ namespace kuznetsov {
     }
   protected:
     friend class List< T >;
-    Node< T >* curr_;
+    detail::Node< T >* curr_;
   };
 
   template< class T >
   class LIter: public LCIter< T > {
   public:
-    LIter(Node< T >* pn): LCIter< T >(pn)
+    LIter(detail::Node< T >* pn): LCIter< T >(pn)
     {}
 
     T& operator*()
@@ -91,7 +94,7 @@ namespace kuznetsov {
   template< class T >
   class LRCIter {
   public:
-    LRCIter(Node< T >* pn):
+    LRCIter(detail::Node< T >* pn):
       curr_(pn)
     {}
 
@@ -145,13 +148,13 @@ namespace kuznetsov {
 
   protected:
     friend class List< T >;
-    Node< T >* curr_;
+    detail::Node< T >* curr_;
   };
 
   template< class T >
   class LRIter: public LRCIter< T > {
   public:
-    LRIter(Node< T >* pn):
+    LRIter(detail::Node< T >* pn):
       LRCIter< T >(pn)
     {}
 
@@ -176,7 +179,7 @@ namespace kuznetsov {
       if (other.empty()) {
         return;
       }
-      Node<T>* current = other.head_;
+      detail::Node<T>* current = other.head_;
       do {
         try {
           insert(end(), current->val_);
@@ -211,7 +214,7 @@ namespace kuznetsov {
       if (other.empty()) {
         return *this;
       }
-      Node<T>* current = other.head_;
+      detail::Node< T >* current = other.head_;
       do {
         try {
           insert(end(), current->val_);
@@ -244,22 +247,22 @@ namespace kuznetsov {
 
     LIter< T > insert(LCIter< T > it, const T& val)
     {
-      Node< T >* n = new Node< T >{val, nullptr, nullptr};
+      detail::Node< T >* n = new detail::Node< T >{val, nullptr, nullptr};
 
       if (head_ == nullptr) {
         head_ = n;
         n->next_ = n;
         n->prev_ = n;
       } else if (!it.curr_) {
-        Node< T >* tail = head_->prev_;
+        detail::Node< T >* tail = head_->prev_;
 
         n->next_ = head_;
         n->prev_ = tail;
         tail->next_ = n;
         head_->prev_ = n;
       } else {
-        Node< T >* current = it.curr_;
-        Node< T >* prev = current->prev_;
+        detail::Node< T >* current = it.curr_;
+        detail::Node< T >* prev = current->prev_;
 
         n->next_ = current;
         n->prev_ = prev;
@@ -277,22 +280,22 @@ namespace kuznetsov {
 
     LIter< T > insert(LCIter< T > it, T&& val)
     {
-      Node< T >* n = new Node< T >{std::move(val), nullptr, nullptr};
+      detail::Node< T >* n = new detail::Node< T >{std::move(val), nullptr, nullptr};
 
       if (head_ == nullptr) {
         head_ = n;
         n->next_ = n;
         n->prev_ = n;
       } else if (!it.curr_) {
-        Node< T >* tail = head_->prev_;
+        detail::Node< T >* tail = head_->prev_;
 
         n->next_ = head_;
         n->prev_ = tail;
         tail->next_ = n;
         head_->prev_ = n;
       } else {
-        Node< T >* current = it.curr_;
-        Node< T >* prev = current->prev_;
+        detail::Node< T >* current = it.curr_;
+        detail::Node< T >* prev = current->prev_;
 
         n->next_ = current;
         n->prev_ = prev;
@@ -401,9 +404,9 @@ namespace kuznetsov {
       if (!head_) {
         return;
       }
-      Node< T >* curr = head_;
+      detail::Node< T >* curr = head_;
       do {
-        Node< T >* next = curr->next_;
+        detail::Node< T >* next = curr->next_;
         delete curr;
         curr = next;
       } while (curr != head_);
@@ -416,7 +419,7 @@ namespace kuznetsov {
       if (!head_ || !it.curr_) {
         throw std::logic_error("Empty list or iterator");
       }
-      Node< T >* nextNode = it.curr_->next_;
+      detail::Node< T >* nextNode = it.curr_->next_;
       bool f = (it.curr_ == head_);
 
       if (size_ == 1) {
@@ -449,7 +452,7 @@ namespace kuznetsov {
     }
 
   private:
-    Node< T >* head_;
+    detail::Node< T >* head_;
     size_t size_;
   };
 
