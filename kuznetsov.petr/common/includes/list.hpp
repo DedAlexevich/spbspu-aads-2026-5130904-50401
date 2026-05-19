@@ -460,12 +460,9 @@ kuznetsov::List< T >::List(const List& other):
 
 template< class T >
 kuznetsov::List< T >::List(List&& other) noexcept:
-  head_(other.head_),
-  size_(other.size_)
-{
-  other.head_ = nullptr;
-  other.size_ = 0;
-}
+  head_(std::exchange(other.head_, nullptr)),
+  size_(std::exchange(other.size_, 0))
+{}
 
 template< class T >
 kuznetsov::List< T >::~List() noexcept
@@ -503,14 +500,10 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
   if (this == &other) {
     return *this;
   }
-
   clear();
+  head_ = std::exchange(other.head_, nullptr);
+  size_ = std::exchange(other.size_, 0);
 
-  head_ = other.head_;
-  size_ = other.size_;
-
-  other.head_ = nullptr;
-  other.size_ = 0;
   return *this;
 }
 
