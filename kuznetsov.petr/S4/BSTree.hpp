@@ -46,7 +46,7 @@ namespace kuznetsov {
     const_iterator rotateLargeRight(const_iterator it);
 
     size_t height(const_iterator it);
-    size_t height();
+    size_t height() const noexcept;
 
     size_t getSize() const noexcept;
     bool isEmpty() const noexcept;
@@ -70,6 +70,38 @@ namespace kuznetsov {
     size_t size_;
   };
 }
+
+template< class Key, class Value, class Compare >
+kuznetsov::BSTree< Key, Value, Compare >::BSTree():
+  cmptr_(Compare{}),
+  root_(nullptr),
+  size_(0)
+{}
+
+
+
+
+
+template< class Key, class Value, class Compare >
+kuznetsov::BSTree< Key, Value, Compare >::~BSTree()
+{
+  //TODO
+}
+
+
+template< class Key, class Value, class Compare >
+size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
+{
+  return size_;
+}
+
+template< class Key, class Value, class Compare >
+size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
+{
+  //TODO
+  return 100;
+}
+
 
 
 
