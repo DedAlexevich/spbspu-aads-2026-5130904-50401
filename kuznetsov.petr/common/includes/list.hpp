@@ -84,18 +84,28 @@ namespace kuznetsov {
   };
 
   template< class T >
-  class LRIter: public LRCIter< T > {
+  class LRIter {
   public:
-    LRIter(detail::Node< T >* pn):
-      LRCIter< T >(pn)
-    {}
+    LRIter(detail::Node< T >* pn);
 
-    T& operator*() {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return this->curr_->val_;
-    }
+    LRIter& operator++();
+
+    LRIter operator++(int);
+
+    LRIter& operator--();
+
+    LRIter operator--(int);
+
+    T& operator*();
+    T* operator->();
+
+    bool operator==(const LRIter& y) const noexcept;
+
+    bool operator!=(const LRIter& y) const noexcept;
+
+  protected:
+    friend class List< T >;
+    detail::Node< T >* curr_;
   };
 
   template< class T >
@@ -596,7 +606,75 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 {
   return !(*this == y);
 }
+//-----------------------------------------------------
+template< class T >
+kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
 
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
+{
+  LRIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
+{
+  LRIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+T& kuznetsov::LRIter< T >::operator*()
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LRIter< T >::operator->()
+{
+  if (!this->curr_) {
+    throw std::logic_error("Null iterator");
+  }
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator==(const LRIter& y) const noexcept
+{
+  return curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
+{
+  return !(*this == y);
+}
 
 #endif
 
