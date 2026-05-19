@@ -19,8 +19,6 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
-    LCIter(detail::Node< T >* pn);
-
     LCIter& operator++();
     LCIter operator++(int);
 
@@ -35,13 +33,13 @@ namespace kuznetsov {
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
+
+    LCIter(detail::Node< T >* pn);
   };
 
   template< class T >
   class LIter {
   public:
-    LIter(detail::Node< T >* pn);
-
     LIter& operator++();
     LIter operator++(int);
 
@@ -56,13 +54,13 @@ namespace kuznetsov {
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
+
+    LIter(detail::Node< T >* pn);
   };
 
   template< class T >
   class LRCIter {
   public:
-    LRCIter(detail::Node< T >* pn);
-
     LRCIter& operator++();
 
     LRCIter operator++(int);
@@ -81,13 +79,13 @@ namespace kuznetsov {
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
+
+    LRCIter(detail::Node< T >* pn);
   };
 
   template< class T >
   class LRIter {
   public:
-    LRIter(detail::Node< T >* pn);
-
     LRIter& operator++();
 
     LRIter operator++(int);
@@ -106,6 +104,8 @@ namespace kuznetsov {
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
+
+    LRIter(detail::Node< T >* pn);
   };
 
   template< class T >
