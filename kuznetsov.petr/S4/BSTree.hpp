@@ -52,7 +52,7 @@ namespace kuznetsov {
     bool isEmpty() const noexcept;
     bool contain(Key k) const noexcept;
 
-    void swap() noexcept;
+    void swap(BSTree& oth) noexcept;
     void clear();
 
     iterator begin();
@@ -68,6 +68,8 @@ namespace kuznetsov {
     Compare cmptr_;
     detail::Node< Key, Value >* root_;
     size_t size_;
+
+    void clear(detail::Node< Key, Value >*);
   };
 }
 
@@ -79,13 +81,10 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree():
 {}
 
 
-
-
-
 template< class Key, class Value, class Compare >
 kuznetsov::BSTree< Key, Value, Compare >::~BSTree()
 {
-  //TODO
+  clear();
 }
 
 
@@ -102,9 +101,27 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
   return 100;
 }
 
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
+{
+  std::swap(root_, oth.root_);
+  std::swap(size_, oth.size_);
+}
 
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* node)
+{
+  if(!node) return;
+  clear(node->lt_);
+  clear(node->rt_);
+  delete node;
+}
 
-
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare>::clear()
+{
+  clear(root_);
+}
 
 #endif
 
