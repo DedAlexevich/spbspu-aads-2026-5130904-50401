@@ -19,7 +19,7 @@ namespace kuznetsov {
     };
 
     template< class Key, class Value >
-    Node< Key, Value >* copyTree(const Node< Key, Value >*, const Node< Key, Value >*);
+    Node< Key, Value >* copyTree(const Node< Key, Value >*, Node< Key, Value >*);
   }
 
   template< class Key, class Value, bool IsConst>
@@ -115,7 +115,7 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth,
-                                                                    const Node< Key, Value >* p)
+                                                                    Node< Key, Value >* p)
 {
   if (!oth) {
     return nullptr;
