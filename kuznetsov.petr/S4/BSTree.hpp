@@ -2,6 +2,7 @@
 #define BSTREE_HPP
 #include <utility>
 #include <algorithm>
+#include <stdexcept>
 #include <cstddef>
 
 namespace kuznetsov {
@@ -38,7 +39,8 @@ namespace kuznetsov {
     using iterator = Iterator< Key, Value, false >;
     using const_iterator = Iterator< Key, Value, true >;
 
-    void push(Key k, Value v);
+    template< class UV >
+    void push(const Key& k, UV&& v);
     Value& at(Key k);
     const Value& at(Key k) const;
     void drop(Key k);
@@ -157,6 +159,30 @@ kuznetsov::BSTree< K, V, C >& kuznetsov::BSTree< K, V, C >::operator=(BSTree&& o
   return *this;
 }
 
+template< class Key, class Value, class Compare >
+template< class UV >
+void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
+{
+  if (contain(k)) {
+    throw std::logic_error("Element with such key already exist");
+  }
+  detail::Node< Key, Value >* curr = root_;
+  detail::Node< Key, Value >* p;
+  while (curr) {
+    p = curr;
+    if (cmptr_(k, curr->value_.first)) {
+      curr = curr->lt_;
+    } else {
+      curr = curr->rt_;
+    }
+  }
+  if (cmptr_(k, p->value_.first)) {
+    p->lt_ = new detail::Node< Key, Value >(k, T(std::forward< UV >(v)), p);
+  } else {
+    p->rt_ = new detail::Node< Key, Value >(k, T(std::forward< UV >(v)), p);
+  }
+  ++size_;
+}
 
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept

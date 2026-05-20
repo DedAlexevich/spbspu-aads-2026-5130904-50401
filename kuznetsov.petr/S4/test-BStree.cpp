@@ -50,4 +50,16 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentOperatorTest)
   BOOST_TEST(tr1.getSize() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(PushAndAtTest)
+{
+  kuznetsov::BSTree< int, int, std::less< int > > tr1;
+  BOOST_TEST(tr1.getSize() == 0);
+  tr1.push(143, 2);
+  tr1.push(32, 1);
+  tr1.push(72, 3);
+  BOOST_TEST(tr1.getSize() == 3);
+  BOOST_TEST(tr1.at(143) == 2);
+  BOOST_TEST(tr1.at(32) == 1);
+  BOOST_TEST(tr1.at(72) == 3);
+}
 
