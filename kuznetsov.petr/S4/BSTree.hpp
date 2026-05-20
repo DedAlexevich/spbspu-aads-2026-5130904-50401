@@ -104,6 +104,14 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(const BSTree& oth):
   root_ = detail::copyTree(oth.root_);
 }
 
+
+template< class Key, class Value, class Compare >
+kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
+  cmptr_(oth.cmptr_),
+  root_(std::exchange(oth.root_, nullptr)),
+  size_(std::exchange(oth.size_, 0))
+{}
+
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(Node< Key, Value >* oth,
                                                                     Node< Key, Value >* p)
