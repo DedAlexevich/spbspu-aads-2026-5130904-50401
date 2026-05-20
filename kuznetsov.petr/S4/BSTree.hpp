@@ -1,6 +1,7 @@
 #ifndef BSTREE_HPP
 #define BSTREE_HPP
 #include <utility>
+#include <algorithm>
 #include <cstddef>
 
 namespace kuznetsov {
@@ -9,10 +10,15 @@ namespace kuznetsov {
     struct Node {
       std::pair< const Key, Value > value_;
 
-      Node< Key, Value >* parrent_;
+      Node< Key, Value >* parent_;
       Node< Key, Value >* lt_;
       Node< Key, Value >* rt_;
+
+      Node(const Key& k, const Value& v, Node* p);
     };
+
+    template< class Key, class Value >
+    Node< Key, Value >* copyTree(Node< Key, Value >*, Node< Key, Value >*);
   }
 
   template< class Key, class Value, bool IsConst>
@@ -69,9 +75,18 @@ namespace kuznetsov {
     detail::Node< Key, Value >* root_;
     size_t size_;
 
-    void clear(detail::Node< Key, Value >*);
+    size_t calcHeight(detail::Node< Key, Value >*) const noexcept;
+    void clear(detail::Node< Key, Value >*) noexcept;
   };
 }
+
+template< class Key, class Value >
+kuznetsov::detail::Node< Key, Value >::Node(const Key& k, const Value& v, Node* p):
+  value_(std::make_pair(k, v)),
+  parent_(p),
+  lt_(nullptr),
+  rt_(nullptr)
+{}
 
 template< class Key, class Value, class Compare >
 kuznetsov::BSTree< Key, Value, Compare >::BSTree():
@@ -80,6 +95,32 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree():
   size_(0)
 {}
 
+template< class Key, class Value, class Compare >
+kuznetsov::BSTree< Key, Value, Compare >::BSTree(const BSTree& oth):
+  cmptr_(oth.cmptr_),
+  root_(nullptr),
+  size_(oth.size_)
+{
+  root_ = detail::copyTree(oth.root_);
+}
+
+template< class Key, class Value >
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(Node< Key, Value >* oth,
+                                                                    Node< Key, Value >* p)
+{
+  if (!oth) {
+    return nullptr;
+  }
+  Node< Key, Value >* n = new Node< Key, Value >(oth->value_.first, oth->value_.second, p);
+  try {
+    n->lt_ = copyTree(oth->lt_, n);
+    n->rt_ = copyTree(oth->rt_, n);
+  } catch(...) {
+    delete n;
+    throw;
+  }
+  return n;
+}
 
 template< class Key, class Value, class Compare >
 kuznetsov::BSTree< Key, Value, Compare >::~BSTree()
@@ -97,9 +138,19 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
 {
-  //TODO
-  return 100;
+  return calcHeight(root_);
 }
+
+
+template< class Key, class Value, class Compare >
+size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(detail::Node< Key, Value >* n) const noexcept
+{
+  if (!n) {
+    return 0;
+  }
+  return 1 + std::max(calcHeight(n->lt_), calcHeight(n->rt_));
+}
+
 
 template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
@@ -109,9 +160,11 @@ void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* node)
+void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* node) noexcept
 {
-  if(!node) return;
+  if(!node) {
+    return;
+  }
   clear(node->lt_);
   clear(node->rt_);
   delete node;
