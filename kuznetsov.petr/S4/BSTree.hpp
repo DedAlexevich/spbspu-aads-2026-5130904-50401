@@ -19,7 +19,7 @@ namespace kuznetsov {
     };
 
     template< class Key, class Value >
-    Node< Key, Value >* copyTree(Node< Key, Value >*, Node< Key, Value >*);
+    Node< Key, Value >* copyTree(const Node< Key, Value >*, const Node< Key, Value >*);
   }
 
   template< class Key, class Value, bool IsConst>
@@ -41,9 +41,9 @@ namespace kuznetsov {
 
     template< class UV >
     void push(const Key& k, UV&& v);
-    Value& at(Key k);
-    const Value& at(Key k) const;
-    void drop(Key k);
+    Value& at(const Key& k);
+    const Value& at(const Key& k) const;
+    void drop(const Key& k);
 
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
@@ -102,7 +102,7 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(const BSTree& oth):
   root_(nullptr),
   size_(oth.size_)
 {
-  root_ = detail::copyTree(oth.root_);
+  root_ = detail::copyTree(oth.root_, nullptr);
 }
 
 
@@ -114,8 +114,8 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 {}
 
 template< class Key, class Value >
-kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(Node< Key, Value >* oth,
-                                                                    Node< Key, Value >* p)
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth,
+                                                                    const Node< Key, Value >* p)
 {
   if (!oth) {
     return nullptr;
@@ -177,12 +177,36 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
     }
   }
   if (cmptr_(k, p->value_.first)) {
-    p->lt_ = new detail::Node< Key, Value >(k, T(std::forward< UV >(v)), p);
+    p->lt_ = new detail::Node< Key, Value >(k, Value(std::forward< UV >(v)), p);
   } else {
-    p->rt_ = new detail::Node< Key, Value >(k, T(std::forward< UV >(v)), p);
+    p->rt_ = new detail::Node< Key, Value >(k, Value(std::forward< UV >(v)), p);
   }
   ++size_;
 }
+
+template< class K, class V, class C >
+const V& kuznetsov::BSTree< K, V, C >::at(const K& k) const
+{
+  detail::Node< K, V >* curr = root_;
+  while (curr) {
+    if (cmptr_(k, curr->value_.first)) {
+      curr = curr->lt_;
+    } else if (cmptr_(curr->value_.first, k)) {
+      curr = curr->rt_;
+    } else {
+      return curr->value_.second;
+    }
+  }
+  throw std::logic_error("No element with such case");
+}
+
+template< class K, class V, class C >
+V& kuznetsov::BSTree< K, V, C >::at(const K& k)
+{
+  const BSTree* cthis = this;
+  return const_cast< V& >(cthis->at(k));
+}
+
 
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
