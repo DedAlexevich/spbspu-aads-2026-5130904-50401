@@ -2,6 +2,7 @@
 #define BSTREE_HPP
 #include <utility>
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include <cstddef>
 
@@ -19,7 +20,7 @@ namespace kuznetsov {
     };
 
     template< class Key, class Value >
-    Node< Key, Value >* copyTree(const Node< Key, Value >*, Node< Key, Value >*);
+    Node< Key, Value >* copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p = nullptr);
   }
 
   template< class Key, class Value, bool IsConst>
@@ -102,7 +103,7 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(const BSTree& oth):
   root_(nullptr),
   size_(oth.size_)
 {
-  root_ = detail::copyTree(oth.root_, nullptr);
+  root_ = detail::copyTree(oth.root_);
 }
 
 
@@ -166,6 +167,13 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
   if (contain(k)) {
     throw std::logic_error("Element with such key already exist");
   }
+
+  if (!root_) {
+    root_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), nullptr);
+    ++size_;
+    return;
+  }
+
   detail::Node< Key, Value >* curr = root_;
   detail::Node< Key, Value >* p;
   while (curr) {
@@ -177,9 +185,9 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
     }
   }
   if (cmptr_(k, p->value_.first)) {
-    p->lt_ = new detail::Node< Key, Value >(k, Value(std::forward< UV >(v)), p);
+    p->lt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
   } else {
-    p->rt_ = new detail::Node< Key, Value >(k, Value(std::forward< UV >(v)), p);
+    p->rt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
   }
   ++size_;
 }
@@ -207,6 +215,21 @@ V& kuznetsov::BSTree< K, V, C >::at(const K& k)
   return const_cast< V& >(cthis->at(k));
 }
 
+template< class Key, class Value, class Compare >
+bool kuznetsov::BSTree< Key, Value, Compare >::contain(Key k) const noexcept
+{
+  detail::Node< Key, Value >* curr = root_;
+  while (curr) {
+    if (cmptr_(k, curr->value_.first)) {
+      curr = curr->lt_;
+    } else if (cmptr_(curr->value_.first, k)) {
+      curr = curr->rt_;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
 
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
