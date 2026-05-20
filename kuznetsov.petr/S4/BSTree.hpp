@@ -30,7 +30,6 @@ namespace kuznetsov {
     BSTree();
     BSTree(const BSTree&);
     BSTree(BSTree&&) noexcept;
-    BSTree(std::initializer_list< std::pair< Key, Value > > init);
     ~BSTree();
 
     BSTree& operator=(const BSTree&);
@@ -134,6 +133,28 @@ template< class Key, class Value, class Compare >
 kuznetsov::BSTree< Key, Value, Compare >::~BSTree()
 {
   clear();
+}
+
+template< class K, class V, class C >
+kuznetsov::BSTree< K, V, C >& kuznetsov::BSTree< K, V, C >::operator=(const BSTree& oth)
+{
+  if (this == std::addressof(oth)) {
+    return *this;
+  }
+  BSTree< K, V, C > cp(oth);
+  swap(cp);
+  return *this;
+}
+
+template< class K, class V, class C >
+kuznetsov::BSTree< K, V, C >& kuznetsov::BSTree< K, V, C >::operator=(BSTree&& oth) noexcept
+{
+  if (this == std::addressof(oth)) {
+    return *this;
+  }
+  BSTree< K, V, C > cp(std::move(oth));
+  swap(cp);
+  return *this;
 }
 
 
