@@ -128,6 +128,81 @@ bool kuznetsov::Iterator< K, V, C >::operator!=(const Iterator< K, V, OthConst >
   return curr_ != std::addressof(oth);
 }
 
+template< class Key, class Value, bool IsConst >
+typename kuznetsov::Iterator< Key, Value, IsConst >::reference
+kuznetsov::Iterator< Key, Value, IsConst >::operator*()
+{
+  return curr_->value_;
+}
+
+
+template< class Key, class Value, bool IsConst >
+typename kuznetsov::Iterator< Key, Value, IsConst >::pointer
+kuznetsov::Iterator< Key, Value, IsConst >::operator->()
+{
+  return &curr_->value_;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator++()
+{
+  detail::Node< Key, Value >* next = curr_;
+  if (next->rt) {
+    next = next->rt;
+    next = detail::rightMin(next);
+  } else {
+    detail::Node< Key, Value >* parent = next->parent;
+    while (parent && parent->lt != next) {
+      next = parent;
+      parent = next->parent;
+    }
+    next = parent;
+  }
+  curr_ = next;
+  return *this;
+}
+
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
+{
+  auto it = Iterator< Key, Value, IsConst >(curr_);
+  ++(*this);
+  return it;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator--()
+{
+  detail::Node< Key, Value >* next = curr_;
+  if (next->lt) {
+    next = next->lt;
+    next = maximum(next);
+  } else {
+    detail::Node< Key, Value >* parent = next->parent;
+    while (parent && parent->rt != next) {
+      next = parent;
+      parent = next->parent;
+    }
+    next = parent;
+  }
+  return *this;
+}
+
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
+{
+  auto it = Iterator< Key, Value, IsConst >(curr_);
+  --(*this);
+  return it;
+}
+
+template< class Key, class Value, bool IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >::Iterator(detail::Node< Key, Value >* n):
+  curr_(n)
+{}
+
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >::Node(const Key& k, const Value& v, Node* p):
   value_(std::make_pair(k, v)),
@@ -264,7 +339,7 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
   }
 
   if (curr->lt_ && curr->rt_) {
-    detail::Node< K, V >* succ = detail::leftMax(curr);
+    detail::Node< K, V >* succ = detail::leftMax(curr->lt_);
 
     if (succ->parent_ != curr) {
       succ->parent_->rt_ = succ->lt_;
@@ -390,7 +465,7 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::rightMin(Node< Key, Value >* root)
 {
-  auto curr = root->rt_;
+  auto curr = root;
   while (curr->lt_) {
     curr = curr->lt_;
   }
@@ -400,7 +475,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::rightMin(Node< Key, Va
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::leftMax(Node< Key, Value >* root)
 {
-  auto curr = root->lt_;
+  auto curr = root;
   while (curr->rt_) {
     curr = curr->rt_;
   }
