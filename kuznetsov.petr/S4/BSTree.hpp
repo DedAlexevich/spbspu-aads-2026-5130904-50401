@@ -78,12 +78,14 @@ namespace kuznetsov {
 
 
   private:
+    friend class Iterator< Key, Value, true >;
+    friend class Iterator< Key, Value, false >;
     Compare cmptr_;
     detail::Node< Key, Value >* root_;
     size_t size_;
 
     detail::Node< Key, Value >* find(const Key& key) const noexcept;
-    size_t calcHeight(detail::Node< Key, Value >*) const noexcept;
+    size_t calcHeight(const detail::Node< Key, Value >*) const noexcept;
     void clear(detail::Node< Key, Value >*) noexcept;
   };
 
@@ -118,14 +120,14 @@ template< class K, class V, bool C >
 template< bool OthConst >
 bool kuznetsov::Iterator< K, V, C >::operator==(const Iterator< K, V, OthConst >& oth)
 {
-  return curr_ == std::addressof(oth);
+  return curr_ == oth.curr_;
 }
 
 template< class K, class V, bool C >
 template< bool OthConst >
 bool kuznetsov::Iterator< K, V, C >::operator!=(const Iterator< K, V, OthConst >& oth)
 {
-  return curr_ != std::addressof(oth);
+  return curr_ != oth.curr_;
 }
 
 template< class Key, class Value, bool IsConst >
@@ -330,7 +332,6 @@ V& kuznetsov::BSTree< K, V, C >::at(const K& k)
   const BSTree< K, V, C >* cthis = this;
   return const_cast< V& >(cthis->at(k));
 }
-
 template< class K, class V, class Cmp >
 void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
 {
@@ -427,9 +428,15 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
   return calcHeight(root_);
 }
 
+template< class Key, class Value, class Compare >
+size_t kuznetsov::BSTree< Key, Value, Compare >::height(const_iterator it) const noexcept
+{
+  return calcHeight(&(*it));
+}
+
 
 template< class Key, class Value, class Compare >
-size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(detail::Node< Key, Value >* n) const noexcept
+size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< Key, Value >* n) const noexcept
 {
   if (!n) {
     return 0;
@@ -460,6 +467,8 @@ template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
 {
   clear(root_);
+  root_ = nullptr;
+  size_ = 0;
 }
 
 
@@ -483,6 +492,98 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::leftMax(Node< Key, Val
   return curr;
 }
 
-#endif
+template< class K, class V, class C >
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::rotateLeft(const_iterator it)
+{
+  detail::Node< K, V >* y = it.curr_;
+  if (!y || !y->lt_) {
+    return const_iterator(y);
+  }
 
+  detail::Node< K, V >* x = y->lt_;
+  y->lt_ = x->rt_;
+
+  if (x->rt_) {
+    x->rt_->parent_ = y;
+  }
+
+  x->parent_ = y->parent_;
+
+  if (!y->parent_) {
+    root_ = x;
+  } else if (y->parent_->lt_ == y) {
+    y->parent_->lt_ = x;
+  } else {
+    y->parent_->rt_ = x;
+  }
+
+  x->rt_ = y;
+  y->parent_ = x;
+
+  return const_iterator(x);
+}
+
+template< class K, class V, class Cmp >
+typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
+kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
+{
+  detail::Node< K, V >* y = it.curr_;
+
+  if (!y || !y->lt_) {
+    return const_iterator(y);
+  }
+
+  detail::Node< K, V >* x = y->lt_;
+
+  y->lt_ = x->rt_;
+  if (x->rt_) {
+    x->rt_->parent_ = y;
+  }
+
+  x->parent_ = y->parent_;
+
+  if (!y->parent_) {
+    root_ = x;
+  } else if (y->parent_->lt_ == y) {
+    y->parent_->lt_ = x;
+  } else {
+    y->parent_->rt_ = x;
+  }
+
+  x->rt_ = y;
+  y->parent_ = x;
+
+  return const_iterator(x);
+}
+
+template< class K, class V, class Cmp >
+typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
+kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
+{
+  detail::Node< K, V >* node = it.curr_;
+
+  if (!node || !node->rt_) {
+    return const_iterator(node);
+  }
+
+  rotateRight(const_iterator(node->rt_));
+  return rotateLeft(it);
+}
+
+template< class K, class V, class Cmp >
+typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
+kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
+{
+  detail::Node< K, V >* node = it.curr_;
+
+  if (!node || !node->lt_) {
+    return const_iterator(node);
+  }
+
+  rotateLeft(const_iterator(node->lt_));
+  return rotateRight(it);
+}
+
+
+#endif
 
