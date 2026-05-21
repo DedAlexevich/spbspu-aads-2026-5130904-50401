@@ -147,14 +147,14 @@ template< class Key, class Value, bool IsConst >
 kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator++()
 {
   detail::Node< Key, Value >* next = curr_;
-  if (next->rt) {
-    next = next->rt;
+  if (next->rt_) {
+    next = next->rt_;
     next = detail::rightMin(next);
   } else {
-    detail::Node< Key, Value >* parent = next->parent;
-    while (parent && parent->lt != next) {
+    detail::Node< Key, Value >* parent = next->parent_;
+    while (parent && parent->lt_ != next) {
       next = parent;
-      parent = next->parent;
+      parent = next->parent_;
     }
     next = parent;
   }
@@ -175,17 +175,18 @@ template< class Key, class Value, bool IsConst >
 kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator--()
 {
   detail::Node< Key, Value >* next = curr_;
-  if (next->lt) {
-    next = next->lt;
+  if (next->lt_) {
+    next = next->lt_;
     next = maximum(next);
   } else {
-    detail::Node< Key, Value >* parent = next->parent;
-    while (parent && parent->rt != next) {
+    detail::Node< Key, Value >* parent = next->parent_;
+    while (parent && parent->rt_ != next) {
       next = parent;
-      parent = next->parent;
+      parent = next->parent_;
     }
     next = parent;
   }
+  curr_ = next;
   return *this;
 }
 
