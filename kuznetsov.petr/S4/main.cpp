@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     kuz::record d;
     char c;
     while(true) {
-      while(file.get(c) || c == ' ');
+      while(file.get(c) && c == ' ');
       if (!file || c == '\n') break;
       file.unget();
       file >> key >> value;

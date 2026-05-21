@@ -12,7 +12,7 @@ void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
   if (!ds.contain(title)) {
     throw std::logic_error("Not found dict");
   }
-  const kuz::record& dict = ds.at(title);
+  const record& dict = ds.at(title);
   if (dict.isEmpty()) {
     out << "<EMPTY>\n";
     return;
@@ -38,12 +38,10 @@ void kuznetsov::complement(std::ostream&, std::istream& in, dicts& ds)
   if (!ds.contain(dict1) || !ds.contain(dict2)) {
     throw std::logic_error("Not found dict");
   }
-  if(ds.contain(dict3)) {
-    throw std::logic_error("Such dict already exist");
-  }
-  kuz::record nd;
-  kuz::record& dataset1 = ds.at(dict2);
-  kuz::record& dataset2 = ds.at(dict1);
+
+  record nd;
+  record& dataset1 = ds.at(dict2);
+  record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (!dataset2.contain(it->first)) {
       nd.push(it->first, it->second);
@@ -63,12 +61,9 @@ void kuznetsov::intersect(std::ostream&, std::istream& in, dicts& ds)
   if (!ds.contain(dict1) || !ds.contain(dict2)) {
     throw std::logic_error("Not found dict");
   }
-  if(ds.contain(dict3)) {
-    throw std::logic_error("Such dict already exist");
-  }
-  kuz::record nd;
-  kuz::record& dataset1 = ds.at(dict2);
-  kuz::record& dataset2 = ds.at(dict1);
+  record nd;
+  record& dataset1 = ds.at(dict2);
+  record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (dataset2.contain(it->first)) {
       nd.push(it->first, it->second);
@@ -88,12 +83,9 @@ void kuznetsov::unionDicts(std::ostream&, std::istream& in, dicts& ds)
   if (!ds.contain(dict1) || !ds.contain(dict2)) {
     throw std::logic_error("Not found dict");
   }
-  if(ds.contain(dict3)) {
-    throw std::logic_error("Such dict already exist");
-  }
-  kuz::record nd;
-  kuz::record& dataset1 = ds.at(dict2);
-  kuz::record& dataset2 = ds.at(dict1);
+  record nd;
+  record& dataset1 = ds.at(dict2);
+  record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
       nd.push(it->first, it->second);
   }

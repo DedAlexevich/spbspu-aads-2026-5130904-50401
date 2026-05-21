@@ -287,32 +287,33 @@ template< class Key, class Value, class Compare >
 template< class UV >
 void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
 {
-  if (contain(k)) {
-    throw std::logic_error("Element with such key already exist");
-  }
-
   if (!root_) {
     root_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), nullptr);
     ++size_;
     return;
   }
 
-  detail::Node< Key, Value >* curr = root_;
+  detail::Node< Key, Value >* curr = find(k);
   detail::Node< Key, Value >* p;
-  while (curr) {
-    p = curr;
-    if (cmptr_(k, curr->value_.first)) {
-      curr = curr->lt_;
-    } else {
-      curr = curr->rt_;
+  if (!curr) {
+    curr = root_;
+    while (curr) {
+      p = curr;
+      if (cmptr_(k, curr->value_.first)) {
+        curr = curr->lt_;
+      } else {
+        curr = curr->rt_;
+      }
     }
-  }
-  if (cmptr_(k, p->value_.first)) {
-    p->lt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+    if (cmptr_(k, p->value_.first)) {
+      p->lt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+    } else {
+      p->rt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+    }
+    ++size_;
   } else {
-    p->rt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+    curr->value_.second = std::forward< UV >(v);
   }
-  ++size_;
 }
 
 template< class K, class V, class C >
