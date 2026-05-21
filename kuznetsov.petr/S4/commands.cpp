@@ -84,18 +84,15 @@ void kuznetsov::unionDicts(std::ostream&, std::istream& in, dicts& ds)
     throw std::logic_error("Not found dict");
   }
   record nd;
-  if (ds.contain(dict3)) {
-    nd = ds.at(dict3);
-  }
   record& dataset1 = ds.at(dict2);
   record& dataset2 = ds.at(dict1);
-  for (auto it = dataset2.cbegin(); it != dataset2.cend(); ++it) {
+  for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (!nd.contain(it->first)) {
       nd.push(it->first, it->second);
     }
   }
 
-  for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
+  for (auto it = dataset2.cbegin(); it != dataset2.cend(); ++it) {
       if (!nd.contain(it->first)) {
         nd.push(it->first, it->second);
       }
