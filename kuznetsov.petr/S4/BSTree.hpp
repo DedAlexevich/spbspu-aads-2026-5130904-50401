@@ -11,9 +11,9 @@ namespace kuznetsov {
     struct Node {
       std::pair< const Key, Value > value_;
 
-      Node< Key, Value >* parent_;
-      Node< Key, Value >* lt_;
-      Node< Key, Value >* rt_;
+      Node* parent_;
+      Node* lt_;
+      Node* rt_;
 
       Node(const Key& k, const Value& v, Node* p);
     };
@@ -229,7 +229,6 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(const BSTree& oth):
   root_ = detail::copyTree(oth.root_);
 }
 
-
 template< class Key, class Value, class Compare >
 kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
   cmptr_(oth.cmptr_),
@@ -385,7 +384,6 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
   --size_;
 }
 
-
 template< class K, class V, class Cmp >
 kuznetsov::detail::Node< K, V >* kuznetsov::BSTree< K, V, Cmp >::find(const K& key) const noexcept
 {
@@ -415,7 +413,6 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
   return size_;
 }
 
-
 template< class Key, class Value, class Compare >
 bool kuznetsov::BSTree< Key, Value, Compare >::isEmpty() const noexcept
 {
@@ -434,7 +431,6 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height(const_iterator it) const
   return calcHeight(it.curr_);
 }
 
-
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< Key, Value >* n) const noexcept
 {
@@ -443,7 +439,6 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< 
   }
   return 1 + std::max(calcHeight(n->lt_), calcHeight(n->rt_));
 }
-
 
 template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
@@ -470,7 +465,6 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
   root_ = nullptr;
   size_ = 0;
 }
-
 
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::minimum(Node< Key, Value >* root)
@@ -510,18 +504,15 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
 
   detail::Node< K, V >* x = y->parent_;
 
-  // y должен быть правым ребёнком x
   if (x->rt_ != y) {
     throw std::logic_error("Invalid left rotation");
   }
 
-  // B subtree
   x->rt_ = y->lt_;
   if (y->lt_) {
     y->lt_->parent_ = x;
   }
 
-  // y занимает место x
   y->parent_ = x->parent_;
 
   if (!x->parent_) {
@@ -532,7 +523,6 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
     x->parent_->rt_ = y;
   }
 
-  // x опускается
   y->lt_ = x;
   x->parent_ = y;
 
@@ -551,7 +541,6 @@ kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
 
   detail::Node< K, V >* y = x->parent_;
 
-  // x должен быть левым ребёнком y
   if (y->lt_ != x) {
     throw std::logic_error("Invalid right rotation");
   }
@@ -652,6 +641,4 @@ kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::cend() const
   return Iterator< K, V, true >(nullptr);
 }
 
-
 #endif
-
