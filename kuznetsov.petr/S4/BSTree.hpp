@@ -20,6 +20,13 @@ namespace kuznetsov {
 
     template< class Key, class Value >
     Node< Key, Value >* copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p = nullptr);
+
+    template< class Key, class Value >
+    Node< Key, Value >* rightMin(Node< Key, Value >* root);
+
+    template< class Key, class Value >
+    Node< Key, Value >* leftMax(Node< Key, Value >* root);
+
   }
 
   template< class Key, class Value, bool IsConst>
@@ -214,10 +221,9 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
 {
   detail::Node< K, V >* curr = find(key);
   if (!curr) {
-    throw std::logic_error("Such element doesnt exist");
+    throw std::logic_error("Element with such key doesnt exist");
   }
-
-
+  auto p = curr->parent_;
 }
 
 template< class K, class V, class Cmp >
@@ -288,6 +294,27 @@ template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare>::clear()
 {
   clear(root_);
+}
+
+
+template< class Key, class Value >
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::rightMin(Node< Key, Value >* root)
+{
+  auto curr = root->rt_;
+  while (curr->lt_) {
+    curr = curr->lt_;
+  }
+  return curr;
+}
+
+template< class Key, class Value >
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::leftMax(Node< Key, Value >* root)
+{
+  auto curr = root->lt_;
+  while (curr->rt_) {
+    curr = curr->rt_;
+  }
+  return curr;
 }
 
 #endif
