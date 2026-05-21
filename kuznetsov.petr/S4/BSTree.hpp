@@ -2,7 +2,6 @@
 #define BSTREE_HPP
 #include <utility>
 #include <algorithm>
-#include <iostream>
 #include <stdexcept>
 #include <cstddef>
 
@@ -58,7 +57,7 @@ namespace kuznetsov {
 
     size_t getSize() const noexcept;
     bool isEmpty() const noexcept;
-    bool contain(Key k) const noexcept;
+    bool contain(const Key& k) const noexcept;
 
     void swap(BSTree& oth) noexcept;
     void clear();
@@ -77,6 +76,7 @@ namespace kuznetsov {
     detail::Node< Key, Value >* root_;
     size_t size_;
 
+    detail::Node< Key, Value >* find(const Key& key) const noexcept;
     size_t calcHeight(detail::Node< Key, Value >*) const noexcept;
     void clear(detail::Node< Key, Value >*) noexcept;
   };
@@ -195,17 +195,11 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
 template< class K, class V, class C >
 const V& kuznetsov::BSTree< K, V, C >::at(const K& k) const
 {
-  detail::Node< K, V >* curr = root_;
-  while (curr) {
-    if (cmptr_(k, curr->value_.first)) {
-      curr = curr->lt_;
-    } else if (cmptr_(curr->value_.first, k)) {
-      curr = curr->rt_;
-    } else {
-      return curr->value_.second;
-    }
+  detail::Node< K, V >* curr = find(k);
+  if (!curr) {
+    throw std::logic_error("No element with such case");
   }
-  throw std::logic_error("No element with such case");
+  return curr->value_.second;
 }
 
 template< class K, class V, class C >
@@ -215,20 +209,38 @@ V& kuznetsov::BSTree< K, V, C >::at(const K& k)
   return const_cast< V& >(cthis->at(k));
 }
 
-template< class Key, class Value, class Compare >
-bool kuznetsov::BSTree< Key, Value, Compare >::contain(Key k) const noexcept
+template< class K, class V, class Cmp >
+void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
 {
-  detail::Node< Key, Value >* curr = root_;
+  detail::Node< K, V >* curr = find(key);
+  if (!curr) {
+    throw std::logic_error("Such element doesnt exist");
+  }
+
+
+}
+
+template< class K, class V, class Cmp >
+kuznetsov::detail::Node< K, V >* kuznetsov::BSTree< K, V, Cmp >::find(const K& key) const noexcept
+{
+  detail::Node< K, V >* curr = root_;
   while (curr) {
-    if (cmptr_(k, curr->value_.first)) {
+    if (cmptr_(key, curr->value_.first)) {
       curr = curr->lt_;
-    } else if (cmptr_(curr->value_.first, k)) {
+    } else if (cmptr_(curr->value_.first, key)) {
       curr = curr->rt_;
     } else {
-      return true;
+      return curr;
     }
   }
-  return false;
+  return nullptr;
+}
+
+template< class Key, class Value, class Compare >
+bool kuznetsov::BSTree< Key, Value, Compare >::contain(const Key& k) const noexcept
+{
+  detail::Node< Key, Value >* curr = find(k);
+  return curr != nullptr;
 }
 
 template< class Key, class Value, class Compare >
