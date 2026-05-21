@@ -38,7 +38,7 @@ namespace kuznetsov {
     BSTree();
     BSTree(const BSTree&);
     BSTree(BSTree&&) noexcept;
-    ~BSTree();
+    ~BSTree() noexcept;
 
     BSTree& operator=(const BSTree&);
     BSTree& operator=(BSTree&&) noexcept;
@@ -55,11 +55,10 @@ namespace kuznetsov {
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
 
-
     const_iterator rotateLargeLeft(const_iterator it);
     const_iterator rotateLargeRight(const_iterator it);
 
-    size_t height(const_iterator it);
+    size_t height(const_iterator it) const noexcept;
     size_t height() const noexcept;
 
     size_t getSize() const noexcept;
@@ -67,7 +66,7 @@ namespace kuznetsov {
     bool contain(const Key& k) const noexcept;
 
     void swap(BSTree& oth) noexcept;
-    void clear();
+    void clear() noexcept;
 
     iterator begin();
     const_iterator begin() const;
@@ -87,6 +86,46 @@ namespace kuznetsov {
     size_t calcHeight(detail::Node< Key, Value >*) const noexcept;
     void clear(detail::Node< Key, Value >*) noexcept;
   };
+
+  template< class Key, class Value, bool IsConst>
+  struct Iterator {
+    using type_t = detail::Node< Key, Value >;
+    using reference = typename std::conditional< IsConst, const type_t&, type_t& >::type;
+    using pointer = typename std::conditional< IsConst, const type_t*, type_t* >::type;
+
+    Iterator& operator++();
+    Iterator& operator--();
+
+    Iterator operator++(int);
+    Iterator operator--(int);
+
+    reference operator*();
+    pointer operator->();
+
+    template< bool OthConst >
+    bool operator==(const Iterator< Key, Value, OthConst >&);
+
+    template< bool OthConst >
+    bool operator!=(const Iterator< Key, Value, OthConst >&);
+
+  private:
+    Iterator(detail::Node< Key, Value >*);
+    detail::Node< Key, Value >* curr_;
+  };
+}
+
+template< class K, class V, bool C >
+template< bool OthConst >
+bool kuznetsov::Iterator< K, V, C >::operator==(const Iterator< K, V, OthConst >& oth)
+{
+  return curr_ == std::addressof(oth);
+}
+
+template< class K, class V, bool C >
+template< bool OthConst >
+bool kuznetsov::Iterator< K, V, C >::operator!=(const Iterator< K, V, OthConst >& oth)
+{
+  return curr_ != std::addressof(oth);
 }
 
 template< class Key, class Value >
@@ -140,7 +179,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< K
 }
 
 template< class Key, class Value, class Compare >
-kuznetsov::BSTree< Key, Value, Compare >::~BSTree()
+kuznetsov::BSTree< Key, Value, Compare >::~BSTree() noexcept
 {
   clear();
 }
@@ -299,6 +338,13 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
   return size_;
 }
 
+
+template< class Key, class Value, class Compare >
+bool kuznetsov::BSTree< Key, Value, Compare >::isEmpty() const noexcept
+{
+  return !size_;
+}
+
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
 {
@@ -335,7 +381,7 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* 
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare>::clear()
+void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
 {
   clear(root_);
 }
