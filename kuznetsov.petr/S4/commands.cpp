@@ -1,0 +1,110 @@
+#include "commands.hpp"
+#include <iostream>
+
+void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
+{
+  namespace kuz = kuznetsov;
+  std::string title;
+  in >> title;
+  if (in.fail()) {
+    throw std::logic_error("Smth went wrong");
+  }
+  if (!ds.contain(title)) {
+    throw std::logic_error("Not found dict");
+  }
+  const kuz::record& dict = ds.at(title);
+  if (dict.isEmpty()) {
+    out << "<EMPTY>\n";
+    return;
+  }
+  out << title << ' ';
+  auto it = dict.cbegin();
+  out << it->first << ' ' << it->second;
+  ++it;
+  for (; it != dict.cend(); ++it) {
+    out << ' ' << it->first << ' ' << it->second;
+  }
+  out << '\n';
+}
+
+void kuznetsov::complement(std::ostream&, std::istream& in, dicts& ds)
+{
+  namespace kuz = kuznetsov;
+  std::string dict3, dict2, dict1;
+  in >> dict3 >> dict2 >> dict1;
+  if (in.fail()) {
+    throw std::logic_error("Smth went wrong");
+  }
+  if (!ds.contain(dict1) || !ds.contain(dict2)) {
+    throw std::logic_error("Not found dict");
+  }
+  if(ds.contain(dict3)) {
+    throw std::logic_error("Such dict already exist");
+  }
+  kuz::record nd;
+  kuz::record& dataset1 = ds.at(dict2);
+  kuz::record& dataset2 = ds.at(dict1);
+  for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
+    if (!dataset2.contain(it->first)) {
+      nd.push(it->first, it->second);
+    }
+  }
+  ds.push(dict3, nd);
+}
+
+void kuznetsov::intersect(std::ostream&, std::istream& in, dicts& ds)
+{
+  namespace kuz = kuznetsov;
+  std::string dict3, dict2, dict1;
+  in >> dict3 >> dict2 >> dict1;
+  if (in.fail()) {
+    throw std::logic_error("Smth went wrong");
+  }
+  if (!ds.contain(dict1) || !ds.contain(dict2)) {
+    throw std::logic_error("Not found dict");
+  }
+  if(ds.contain(dict3)) {
+    throw std::logic_error("Such dict already exist");
+  }
+  kuz::record nd;
+  kuz::record& dataset1 = ds.at(dict2);
+  kuz::record& dataset2 = ds.at(dict1);
+  for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
+    if (dataset2.contain(it->first)) {
+      nd.push(it->first, it->second);
+    }
+  }
+  ds.push(dict3, nd);
+}
+
+void kuznetsov::unionDicts(std::ostream&, std::istream& in, dicts& ds)
+{
+  namespace kuz = kuznetsov;
+  std::string dict3, dict2, dict1;
+  in >> dict3 >> dict2 >> dict1;
+  if (in.fail()) {
+    throw std::logic_error("Smth went wrong");
+  }
+  if (!ds.contain(dict1) || !ds.contain(dict2)) {
+    throw std::logic_error("Not found dict");
+  }
+  if(ds.contain(dict3)) {
+    throw std::logic_error("Such dict already exist");
+  }
+  kuz::record nd;
+  kuz::record& dataset1 = ds.at(dict2);
+  kuz::record& dataset2 = ds.at(dict1);
+  for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
+      nd.push(it->first, it->second);
+  }
+
+  for (auto it = dataset2.cbegin(); it != dataset1.cend(); ++it) {
+    try {
+      nd.push(it->first, it->second);
+    } catch(...) {}
+  }
+  ds.push(dict3, nd);
+}
+
+
+
