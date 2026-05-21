@@ -63,3 +63,27 @@ BOOST_AUTO_TEST_CASE(PushAndAtTest)
   BOOST_TEST(tr1.at(72) == 3);
 }
 
+BOOST_AUTO_TEST_CASE(DropTest)
+{
+  kuznetsov::BSTree< int, int, std::less< int > > tr1;
+  int ks[] {10, 5, 15, 2, 9, 13};
+  int vs[] {1, 2, 3, 4, 5, 6};
+  for (size_t i = 0; i < 6; ++i) {
+    tr1.push(ks[i], vs[i]);
+  }
+  BOOST_TEST(tr1.getSize() == 6);
+  for (size_t i = 0; i < 6; ++i) {
+    tr1.drop(ks[i]);
+    BOOST_TEST(tr1.getSize() == 6 - i - 1);
+    for (size_t j = 0; j < 6; ++j) {
+      if (j <= i) {
+        BOOST_CHECK_THROW(tr1.at(ks[j]), std::logic_error);
+      } else {
+        BOOST_TEST(tr1.at(ks[j]) == vs[j]);
+      }
+    }
+  }
+  BOOST_CHECK_THROW(tr1.drop(10), std::logic_error);
+}
+
+

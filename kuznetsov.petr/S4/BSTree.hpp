@@ -212,7 +212,7 @@ const V& kuznetsov::BSTree< K, V, C >::at(const K& k) const
 template< class K, class V, class C >
 V& kuznetsov::BSTree< K, V, C >::at(const K& k)
 {
-  const BSTree* cthis = this;
+  const BSTree< K, V, C >* cthis = this;
   return const_cast< V& >(cthis->at(k));
 }
 
@@ -223,8 +223,52 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
   if (!curr) {
     throw std::logic_error("Element with such key doesnt exist");
   }
-  auto p = curr->parent_;
+
+  if (curr->lt_ && curr->rt_) {
+    detail::Node< K, V >* succ = detail::leftMax(curr);
+
+    if (succ->parent_ != curr) {
+      succ->parent_->rt_ = succ->lt_;
+      if (succ->lt_) {
+        succ->lt_->parent_ = succ->parent_;
+      }
+      succ->lt_ = curr->lt_;
+      curr->lt_->parent_ = succ;
+    }
+    succ->rt_ = curr->rt_;
+    curr->rt_->parent_ = succ;
+    succ->parent_ = curr->parent_;
+    if (curr->parent_) {
+      if (curr->parent_->lt_ == curr) {
+        curr->parent_->lt_ = succ;
+      } else {
+        curr->parent_->rt_ = succ;
+      }
+    } else {
+      root_ = succ;
+    }
+  } else {
+    detail::Node< K, V >* child = curr->lt_ ? curr->lt_ : curr->rt_;
+    if (curr->parent_) {
+      if (curr->parent_->lt_ == curr) {
+        curr->parent_->lt_ = child;
+      } else {
+        curr->parent_->rt_ = child;
+      }
+      if (child) {
+        child->parent_ = curr->parent_;
+      }
+    } else {
+      root_ = child;
+      if (child) {
+        child->parent_ = nullptr;
+      }
+    }
+  }
+  delete curr;
+  --size_;
 }
+
 
 template< class K, class V, class Cmp >
 kuznetsov::detail::Node< K, V >* kuznetsov::BSTree< K, V, Cmp >::find(const K& key) const noexcept
