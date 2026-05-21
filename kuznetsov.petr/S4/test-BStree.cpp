@@ -86,4 +86,30 @@ BOOST_AUTO_TEST_CASE(DropTest)
   BOOST_CHECK_THROW(tr1.drop(10), std::logic_error);
 }
 
+BOOST_AUTO_TEST_CASE(HeightAndIteratorTest)
+{
+  kuznetsov::BSTree< int, int, std::less< int > > tr1;
+  BOOST_CHECK(tr1.begin() == tr1.end());
+  int ks[] {10, 5, 15, 2, 9, 13};
+  int vs[] {1, 2, 3, 4, 5, 6};
+  int hs[] {1, 2, 1, 3, 1, 2};
+  for (size_t i = 0; i < 6; ++i) {
+    tr1.push(ks[i], vs[i]);
+  }
+  int sks[] {2, 5, 9, 10, 13, 15};
+  int svs[] {4, 2, 5, 1, 6, 3};
+  BOOST_TEST(tr1.height() == 3);
+  auto it = tr1.cbegin();
+  size_t i = 0;
+  for (; it != tr1.cend(); ++it) {
+    BOOST_TEST(tr1.height(it) == hs[i]);
+    BOOST_TEST(it->first == sks[i]);
+    BOOST_TEST(it->second == svs[i]);
+    BOOST_TEST((*it).first == sks[i]);
+    BOOST_TEST((*it).second == svs[i]);
+    ++i;
+  }
+}
+
+
 

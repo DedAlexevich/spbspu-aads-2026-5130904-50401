@@ -78,8 +78,6 @@ namespace kuznetsov {
 
 
   private:
-    friend class Iterator< Key, Value, true >;
-    friend class Iterator< Key, Value, false >;
     Compare cmptr_;
     detail::Node< Key, Value >* root_;
     size_t size_;
@@ -91,7 +89,7 @@ namespace kuznetsov {
 
   template< class Key, class Value, bool IsConst>
   struct Iterator {
-    using type_t = detail::Node< Key, Value >;
+    using type_t = std::pair< const Key, Value >;
     using reference = typename std::conditional< IsConst, const type_t&, type_t& >::type;
     using pointer = typename std::conditional< IsConst, const type_t*, type_t* >::type;
 
@@ -111,6 +109,7 @@ namespace kuznetsov {
     bool operator!=(const Iterator< Key, Value, OthConst >&);
 
   private:
+    template<class, class, class> friend class BSTree;
     Iterator(detail::Node< Key, Value >*);
     detail::Node< Key, Value >* curr_;
   };
@@ -431,7 +430,7 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height() const noexcept
 template< class Key, class Value, class Compare >
 size_t kuznetsov::BSTree< Key, Value, Compare >::height(const_iterator it) const noexcept
 {
-  return calcHeight(&(*it));
+  return calcHeight(it.curr_);
 }
 
 
@@ -475,6 +474,9 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::minimum(Node< Key, Value >* root)
 {
+  if (!root) {
+    return nullptr;
+  }
   auto curr = root;
   while (curr->lt_) {
     curr = curr->lt_;
@@ -485,6 +487,9 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::minimum(Node< Key, Val
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::maximum(Node< Key, Value >* root)
 {
+  if (!root) {
+    return nullptr;
+  }
   auto curr = root;
   while (curr->rt_) {
     curr = curr->rt_;
