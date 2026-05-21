@@ -22,10 +22,10 @@ namespace kuznetsov {
     Node< Key, Value >* copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p = nullptr);
 
     template< class Key, class Value >
-    Node< Key, Value >* rightMin(Node< Key, Value >* root);
+    Node< Key, Value >* minimum(Node< Key, Value >* root);
 
     template< class Key, class Value >
-    Node< Key, Value >* leftMax(Node< Key, Value >* root);
+    Node< Key, Value >* maximum(Node< Key, Value >* root);
 
   }
 
@@ -151,7 +151,7 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
   detail::Node< Key, Value >* next = curr_;
   if (next->rt_) {
     next = next->rt_;
-    next = detail::rightMin(next);
+    next = detail::minimum(next);
   } else {
     detail::Node< Key, Value >* parent = next->parent_;
     while (parent && parent->lt_ != next) {
@@ -341,7 +341,7 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
   }
 
   if (curr->lt_ && curr->rt_) {
-    detail::Node< K, V >* succ = detail::leftMax(curr->lt_);
+    detail::Node< K, V >* succ = detail::maximum(curr->lt_);
 
     if (succ->parent_ != curr) {
       succ->parent_->rt_ = succ->lt_;
@@ -473,7 +473,7 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
 
 
 template< class Key, class Value >
-kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::rightMin(Node< Key, Value >* root)
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::minimum(Node< Key, Value >* root)
 {
   auto curr = root;
   while (curr->lt_) {
@@ -483,7 +483,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::rightMin(Node< Key, Va
 }
 
 template< class Key, class Value >
-kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::leftMax(Node< Key, Value >* root)
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::maximum(Node< Key, Value >* root)
 {
   auto curr = root;
   while (curr->rt_) {
@@ -582,6 +582,42 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
 
   rotateLeft(const_iterator(node->lt_));
   return rotateRight(it);
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, false> kuznetsov::BSTree< K, V, C >::begin()
+{
+  return Iterator< K, V, false >(detail::minimum(root_));
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::begin() const
+{
+  return Iterator< K, V, true >(detail::minimum(root_));
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::cbegin() const
+{
+  return Iterator< K, V, true >(detail::minimum(root_));
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, false > kuznetsov::BSTree< K, V, C >::end()
+{
+  return Iterator< K, V, false >(nullptr);
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::end() const
+{
+  return Iterator< K, V, true >(nullptr);
+}
+
+template< class K, class V, class C >
+kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::cend() const
+{
+  return Iterator< K, V, true >(nullptr);
 }
 
 
