@@ -1,15 +1,19 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cstddef>
-#include <iostream>
+#include <cassert>
+#include <utility>
+#include <stdexcept>
 
 namespace kuznetsov {
-  template< class T >
-  struct Node {
-    T val_;
-    Node< T >* next_;
-    Node< T >* prev_;
-  };
+  namespace detail {
+    template< class T >
+    struct Node {
+      T val_;
+      Node< T >* next_;
+      Node< T >* prev_;
+    };
+  }
 
   template< class T >
   class List;
@@ -17,442 +21,679 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
-    LCIter(Node< T >* pn):
-      curr_(pn)
-    {}
+    LCIter& operator++();
+    LCIter operator++(int);
 
-    LCIter& operator++()
-    {
-      if (curr_) {
-        curr_ = curr_->next_;
-      }
-      return *this;
-    }
+    LCIter& operator--();
+    LCIter operator--(int);
 
-    LCIter operator++(int)
-    {
-      LCIter temp(*this);
-      ++(*this);
-      return temp;
-    }
+    const T& operator*() const;
+    const T* operator->() const;
 
-    LCIter& operator--()
-    {
-      if (curr_) {
-        curr_ = curr_->prev_;
-      }
-      return *this;
-    }
-
-    LCIter operator--(int)
-    {
-      LCIter temp(*this);
-      --(*this);
-      return temp;
-    }
-
-    const T& operator*() const
-    {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return curr_->val_;
-    }
-
-    bool operator==(const LCIter& y) const
-    {
-      return this->curr_ == y.curr_;
-    }
-
-    bool operator!=(const LCIter& y) const
-    {
-      return !(*this == y);
-    }
-  protected:
+    bool operator==(const LCIter& y) const noexcept;
+    bool operator!=(const LCIter& y) const noexcept;
+  private:
     friend class List< T >;
-    Node< T >* curr_;
+    detail::Node< T >* curr_;
+
+    LCIter(detail::Node< T >* pn);
   };
 
   template< class T >
-  class LIter: public LCIter< T > {
+  class LIter {
   public:
-    LIter(Node< T >* pn): LCIter< T >(pn)
-    {}
+    LIter& operator++();
+    LIter operator++(int);
 
-    T& operator*()
-    {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return this->curr_->val_;
-    }
+    LIter& operator--();
+    LIter operator--(int);
+
+    T& operator*();
+    T* operator->();
+
+    bool operator==(const LIter& y) const noexcept;
+    bool operator!=(const LIter& y) const noexcept;
+  private:
+    friend class List< T >;
+    detail::Node< T >* curr_;
+
+    LIter(detail::Node< T >* pn);
   };
 
   template< class T >
   class LRCIter {
   public:
-    LRCIter(Node< T >* pn):
-      curr_(pn)
-    {}
+    LRCIter& operator++();
 
-    LRCIter& operator++()
-    {
-      if (curr_) {
-        curr_ = curr_->prev_;
-      }
-      return *this;
-    }
+    LRCIter operator++(int);
 
-    LRCIter operator++(int)
-    {
-      LRCIter temp(*this);
-      ++(*this);
-      return temp;
-    }
+    LRCIter& operator--();
 
-    LRCIter& operator--()
-    {
-      if (curr_) {
-        curr_ = curr_->next_;
-      }
-      return *this;
-    }
+    LRCIter operator--(int);
 
-    LRCIter operator--(int)
-    {
-      LRCIter temp(*this);
-      --(*this);
-      return temp;
-    }
+    const T& operator*() const;
+    const T* operator->() const;
 
-    const T& operator*() const
-    {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return curr_->val_;
-    }
+    bool operator==(const LRCIter& y) const noexcept;
 
-    bool operator==(const LRCIter& y) const
-    {
-      return curr_ == y.curr_;
-    }
+    bool operator!=(const LRCIter& y) const noexcept;
 
-    bool operator!=(const LRCIter& y) const
-    {
-      return !(*this == y);
-    }
-
-  protected:
+  private:
     friend class List< T >;
-    Node< T >* curr_;
+    detail::Node< T >* curr_;
+
+    LRCIter(detail::Node< T >* pn);
   };
 
   template< class T >
-  class LRIter: public LRCIter< T > {
+  class LRIter {
   public:
-    LRIter(Node< T >* pn):
-      LRCIter< T >(pn)
-    {}
+    LRIter& operator++();
 
-    T& operator*() {
-      if (!this->curr_) {
-        throw std::logic_error("Null iterator");
-      }
-      return this->curr_->val_;
-    }
+    LRIter operator++(int);
+
+    LRIter& operator--();
+
+    LRIter operator--(int);
+
+    T& operator*();
+    T* operator->();
+
+    bool operator==(const LRIter& y) const noexcept;
+
+    bool operator!=(const LRIter& y) const noexcept;
+
+  private:
+    friend class List< T >;
+    detail::Node< T >* curr_;
+
+    LRIter(detail::Node< T >* pn);
   };
 
   template< class T >
   class List {
   public:
-    List(): head_(nullptr), size_(0)
-    {}
+    List();
 
-    List(const List& other):
-      head_(nullptr),
-      size_(0)
-    {
-      if (other.empty()) {
-        return;
-      }
-      Node<T>* current = other.head_;
-      do {
-        try {
-          insert(end(), current->val_);
-          current = current->next_;
-        } catch (...) {
-          std::cerr << "Copy construct error\n";
-          clear();
-          throw;
-        }
-      } while (current != other.head_);
-    }
+    List(const List& other);
 
-    List(List&& other) noexcept :
-      head_(other.head_),
-      size_(other.size_)
-    {
-      other.head_ = nullptr;
-      other.size_ = 0;
-    }
+    List(List&& other) noexcept;
 
-    ~List()
-    {
-      clear();
-    }
+    ~List() noexcept;
 
-    List& operator=(const List& other)
-    {
-      if (this == &other) {
-        return *this;
-      }
-      clear();
-      if (other.empty()) {
-        return *this;
-      }
-      Node<T>* current = other.head_;
-      do {
-        try {
-          insert(end(), current->val_);
-          current = current->next_;
-        } catch (...) {
-          std::cerr << "Copy = error\n";
-          clear();
-          throw;
-        }
-      } while (current != other.head_);
+    List& operator=(const List& other);
 
-      return *this;
-    }
+    List& operator=(List&& other) noexcept;
 
-    List& operator=(List&& other) noexcept
-    {
-      if (this == &other) {
-        return *this;
-      }
+    template< class U >
+    LIter< T > insert(LCIter< T > it, U&& val);
 
-      clear();
+    T& front();
 
-      head_ = other.head_;
-      size_ = other.size_;
+    T& back();
 
-      other.head_ = nullptr;
-      other.size_ = 0;
-      return *this;
-    }
+    const T& front() const;
 
-    LIter< T > insert(LCIter< T > it, const T& val)
-    {
-      Node< T >* n = new Node< T >{val, nullptr, nullptr};
+    const T& back() const;
 
-      if (head_ == nullptr) {
-        head_ = n;
-        n->next_ = n;
-        n->prev_ = n;
-      } else if (!it.curr_) {
-        Node< T >* tail = head_->prev_;
+    void popFront();
 
-        n->next_ = head_;
-        n->prev_ = tail;
-        tail->next_ = n;
-        head_->prev_ = n;
-      } else {
-        Node< T >* current = it.curr_;
-        Node< T >* prev = current->prev_;
+    void popBack();
 
-        n->next_ = current;
-        n->prev_ = prev;
-        prev->next_ = n;
-        current->prev_ = n;
+    LIter< T > begin();
 
-        if (current == head_) {
-          head_ = n;
-        }
-      }
+    LIter< T > end();
 
-      size_++;
-      return LIter< T >(n);
-    }
+    LCIter< T > cbegin() const;
 
-    LIter< T > insert(LCIter< T > it, T&& val)
-    {
-      Node< T >* n = new Node< T >{std::move(val), nullptr, nullptr};
+    LCIter< T > cend() const;
 
-      if (head_ == nullptr) {
-        head_ = n;
-        n->next_ = n;
-        n->prev_ = n;
-      } else if (!it.curr_) {
-        Node< T >* tail = head_->prev_;
+    LRIter< T > rbegin();
 
-        n->next_ = head_;
-        n->prev_ = tail;
-        tail->next_ = n;
-        head_->prev_ = n;
-      } else {
-        Node< T >* current = it.curr_;
-        Node< T >* prev = current->prev_;
+    LRIter< T > rend();
 
-        n->next_ = current;
-        n->prev_ = prev;
-        prev->next_ = n;
-        current->prev_ = n;
+    LRCIter< T > rcbegin() const;
 
-        if (current == head_) {
-          head_ = n;
-        }
-      }
+    LRCIter< T > rcend() const;
 
-      size_++;
-      return LIter< T >(n);
-    }
+    void clear();
 
-    T& front()
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      return head_->val_;
-    }
+    LIter< T > erase(LCIter< T > it);
 
-    T& back()
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      return head_->prev_->val_;
-    }
-
-    const T& front() const
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      return head_->val_;
-    }
-
-    const T& back() const
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      return head_->prev_->val_;
-    }
-
-    void popFront()
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      erase(cbegin());
-    }
-
-    void popBack()
-    {
-      if (!head_) {
-        throw std::logic_error("Empty list");
-      }
-      erase(LCIter< T >(head_->prev_));
-    }
-
-    LIter< T > begin()
-    {
-      return LIter< T >(head_);
-    }
-
-    LIter< T > end()
-    {
-      return LIter< T >(nullptr);
-    }
-
-    LCIter< T > cbegin() const
-    {
-      return LCIter< T >(head_);
-    }
-
-    LCIter< T > cend() const
-    {
-      return LCIter< T >(nullptr);
-    }
-
-    LRIter< T > rbegin()
-    {
-      return LRIter< T >(head_->prev_);
-    }
-
-    LRIter< T > rend()
-    {
-      return LRIter< T >(nullptr);
-    }
-
-    LRCIter< T > rcbegin() const
-    {
-      return LRCIter< T >(head_->prev_);
-    }
-
-    LRCIter< T > rcend() const
-    {
-      return LRCIter< T >(nullptr);
-    }
-
-    void clear()
-    {
-      if (!head_) {
-        return;
-      }
-      Node< T >* curr = head_;
-      do {
-        Node< T >* next = curr->next_;
-        delete curr;
-        curr = next;
-      } while (curr != head_);
-      size_ = 0;
-      head_ = nullptr;
-    }
-
-    LIter< T > erase(LCIter< T > it)
-    {
-      if (!head_ || !it.curr_) {
-        throw std::logic_error("Empty list or iterator");
-      }
-      Node< T >* nextNode = it.curr_->next_;
-      bool f = (it.curr_ == head_);
-
-      if (size_ == 1) {
-        delete it.curr_;
-        head_ = nullptr;
-        size_ = 0;
-        return LIter< T >(nullptr);
-      }
-
-      it.curr_->prev_->next_ = it.curr_->next_;
-      it.curr_->next_->prev_ = it.curr_->prev_;
-      delete it.curr_;
-      --size_;
-
-      if (f) {
-        head_ = nextNode;
-      }
-
-      return LIter< T >(nextNode);
-    }
-
-    size_t size() const
-    {
-      return size_;
-    }
-
-    bool empty() const
-    {
-      return !size_;
-    }
+    size_t size() const noexcept;
+    void swap(List&) noexcept;
+    bool empty() const noexcept;
 
   private:
-    Node< T >* head_;
+    detail::Node< T >* head_;
     size_t size_;
   };
 
 }
+
+template< class T >
+kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
+{
+  LCIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
+{
+  LCIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+const T& kuznetsov::LCIter< T >::operator*() const
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+const T* kuznetsov::LCIter< T >::operator->() const
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator==(const LCIter& y) const noexcept
+{
+  return this->curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int)
+{
+  LIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
+{
+  LIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+T& kuznetsov::LIter< T >::operator*()
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LIter< T >::operator->()
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LIter< T >::operator==(const LIter& y) const noexcept
+{
+  return this->curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int)
+{
+  LRCIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
+{
+  LRCIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+const T& kuznetsov::LRCIter< T >::operator*() const
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+const T* kuznetsov::LRCIter< T >::operator->() const
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LRCIter< T >::operator==(const LRCIter& y) const noexcept
+{
+  return curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
+{
+  LRIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
+{
+  LRIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+T& kuznetsov::LRIter< T >::operator*()
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LRIter< T >::operator->()
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator==(const LRIter& y) const noexcept
+{
+  return curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::List< T >::List():
+  head_(nullptr),
+  size_(0)
+{}
+
+template< class T >
+kuznetsov::List< T >::List(const List& other):
+  head_(nullptr),
+  size_(0)
+{
+  if (other.empty()) {
+    return;
+  }
+  detail::Node<T>* current = other.head_;
+  do {
+    try {
+      insert(cend(), current->val_);
+      current = current->next_;
+    } catch (...) {
+      clear();
+      throw;
+    }
+  } while (current != other.head_);
+}
+
+template< class T >
+kuznetsov::List< T >::List(List&& other) noexcept:
+  head_(std::exchange(other.head_, nullptr)),
+  size_(std::exchange(other.size_, 0))
+{}
+
+template< class T >
+kuznetsov::List< T >::~List() noexcept
+{
+  clear();
+}
+
+template< class T >
+kuznetsov::List< T >& kuznetsov::List< T >::operator=(const List& other)
+{
+  if (this == &other) {
+    return *this;
+  }
+  List cp(other);
+  swap(cp);
+
+  return *this;
+}
+
+template< class T >
+kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
+{
+  if (this == &other) {
+    return *this;
+  }
+  clear();
+  head_ = std::exchange(other.head_, nullptr);
+  size_ = std::exchange(other.size_, 0);
+
+  return *this;
+}
+
+template< class T >
+template< class U >
+kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
+{
+  detail::Node< T >* n = new detail::Node< T >{std::forward< T >(val), nullptr, nullptr};
+
+  if (head_ == nullptr) {
+    head_ = n;
+    n->next_ = n;
+    n->prev_ = n;
+  } else if (!it.curr_) {
+    detail::Node< T >* tail = head_->prev_;
+
+    n->next_ = head_;
+    n->prev_ = tail;
+    tail->next_ = n;
+    head_->prev_ = n;
+  } else {
+    detail::Node< T >* current = it.curr_;
+    detail::Node< T >* prev = current->prev_;
+
+    n->next_ = current;
+    n->prev_ = prev;
+    prev->next_ = n;
+    current->prev_ = n;
+
+    if (current == head_) {
+      head_ = n;
+    }
+  }
+
+  size_++;
+  return LIter< T >(n);
+}
+
+template< class T >
+T& kuznetsov::List< T >::front()
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  return head_->val_;
+}
+
+template< class T >
+T& kuznetsov::List< T >::back()
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  return head_->prev_->val_;
+}
+
+template< class T >
+const T& kuznetsov::List< T >::front() const
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  return head_->val_;
+}
+
+template< class T >
+const T& kuznetsov::List< T >::back() const
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  return head_->prev_->val_;
+}
+
+template< class T >
+void kuznetsov::List< T >::popFront()
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  erase(cbegin());
+}
+
+template< class T >
+void kuznetsov::List< T >::popBack()
+{
+  if (!head_) {
+    throw std::logic_error("Empty list");
+  }
+  erase(LCIter< T >(head_->prev_));
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::List< T >::begin()
+{
+  return LIter< T >(head_);
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::List< T >::end()
+{
+  return LIter< T >(nullptr);
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::List< T >::cbegin() const
+{
+  return LCIter< T >(head_);
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::List< T >::cend() const
+{
+  return LCIter< T >(nullptr);
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::List< T >::rbegin()
+{
+  return LRIter< T >(head_->prev_);
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::List< T >::rend()
+{
+  return LRIter< T >(nullptr);
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::List< T >::rcbegin() const
+{
+  return LRCIter< T >(head_->prev_);
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::List< T >::rcend() const
+{
+  return LRCIter< T >(nullptr);
+}
+
+template< class T >
+void kuznetsov::List< T >::clear()
+{
+  if (!head_) {
+    return;
+  }
+  detail::Node< T >* curr = head_;
+  do {
+    detail::Node< T >* next = curr->next_;
+    delete curr;
+    curr = next;
+  } while (curr != head_);
+  size_ = 0;
+  head_ = nullptr;
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::List< T >::erase(LCIter< T > it)
+{
+  if (!head_ || !it.curr_) {
+    throw std::logic_error("Empty list or iterator");
+  }
+  detail::Node< T >* nextNode = it.curr_->next_;
+  bool f = (it.curr_ == head_);
+
+  if (size_ == 1) {
+    delete it.curr_;
+    head_ = nullptr;
+    size_ = 0;
+    return LIter< T >(nullptr);
+  }
+
+  it.curr_->prev_->next_ = it.curr_->next_;
+  it.curr_->next_->prev_ = it.curr_->prev_;
+  delete it.curr_;
+  --size_;
+
+  if (f) {
+    head_ = nextNode;
+  }
+
+  return LIter< T >(nextNode);
+}
+
+template< class T >
+size_t kuznetsov::List< T >::size() const noexcept
+{
+  return size_;
+}
+
+template< class T >
+bool kuznetsov::List< T >::empty() const noexcept
+{
+  return !size_;
+}
+
+template< class T >
+void kuznetsov::List< T >::swap(List& oth) noexcept
+{
+  std::swap(oth.head_, head_);
+  std::swap(oth.size_, size_);
+}
+
+
 #endif
 
