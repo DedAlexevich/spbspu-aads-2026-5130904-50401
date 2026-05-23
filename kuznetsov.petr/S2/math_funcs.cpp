@@ -98,10 +98,11 @@ kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
   return a >> b;
 }
 
-void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
+kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
 {
   std::string current;
   Queue< std::string > expression;
+  stackOfInfixExpression res;
   int a = in.get();
   while (a != -1) {
     if (a == '\n') {
@@ -129,6 +130,7 @@ void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
     res.push(expression);
     expression.clear();
   }
+  return res;
 }
 
 kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)

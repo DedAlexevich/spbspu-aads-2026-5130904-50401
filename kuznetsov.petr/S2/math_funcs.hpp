@@ -20,7 +20,7 @@ namespace kuznetsov {
   lli_t bitShiftToRight(const lli_t& a, const lli_t& b);
 
   using stackOfinfixExpression = Stack< Queue< std::string > >;
-  void getExpressions(std::istream& in, stackOfinfixExpression& res);
+  stackOfInfixExpression getExpressions(std::istream& in);
   lli_t calculatePostfix(Queue< std::string > postfix);
   Queue< lli_t > calculateStackOfInfix(stackOfinfixExpression infix);
 }

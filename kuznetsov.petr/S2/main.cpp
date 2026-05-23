@@ -6,17 +6,18 @@ int main(int argc, char* argv[])
 {
   namespace kuz = kuznetsov;
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
-  try {
-    if (argc > 1) {
-      std::ifstream d(argv[1]);
-      if (!d) {
-        std::cerr << "Cant open file\n";
-        return 1;
-      }
-      kuz::getExpressions(d, mathExpressions);
-    } else {
-      kuz::getExpressions(std::cin, mathExpressions);
+  std::ifstream file;
+  std::istream* source = &std::cin;
+  if (argc > 1) {
+    file.open(argv[1]);
+    if (!file) {
+      std::cerr << "Cant open file\n";
+      return 1;
     }
+    source = &file;
+  }
+  try {
+    mathExpressions = kuznetsov::getExpressions(*source);
   } catch (...) {
     std::cerr << "Input error\n";
     mathExpressions.clear();
