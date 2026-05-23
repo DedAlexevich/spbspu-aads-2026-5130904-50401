@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE S1
 #include <boost/test/included/unit_test.hpp>
 #include <stdexcept>
-#include <../common/includes/list.hpp>
+#include <list.hpp>
 
 namespace kuz = kuznetsov;
 BOOST_AUTO_TEST_SUITE(SpecialMethodsSuite)

@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "list.hpp"
+#include <list.hpp>
 
 namespace kuznetsov {
   template< class T >
@@ -29,7 +29,7 @@ namespace kuznetsov {
 
     void push(const T& val)
     {
-      list_.insert(list_.begin(), val);
+      list_.insert(list_.cbegin(), val);
     }
     void pop()
     {

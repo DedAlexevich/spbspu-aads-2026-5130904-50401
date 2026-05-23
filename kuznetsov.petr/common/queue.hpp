@@ -38,13 +38,13 @@ const T& kuznetsov::Queue< T >::front() const
 template< class T >
 void kuznetsov::Queue< T >::push(const T& val)
 {
-  list_.insert(list_.end(), val);
+  list_.insert(list_.cend(), val);
 }
 
 template< class T >
 void kuznetsov::Queue< T >::push(T&& val)
 {
-  list_.insert(std::move(val));
+  list_.insert(list_.cend(),std::move(val));
 }
 
 template< class T >
