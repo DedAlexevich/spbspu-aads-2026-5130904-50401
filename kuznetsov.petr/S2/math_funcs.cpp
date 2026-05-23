@@ -179,7 +179,7 @@ kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
   return evalStack.top();
 }
 
-kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfinfixExpression infix)
+kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
 {
   Queue< std::string > postfix;
   Queue< lli_t > res;
