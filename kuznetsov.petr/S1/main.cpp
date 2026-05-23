@@ -1,7 +1,7 @@
 #include <iostream>
 #include <utility>
 #include <limits>
-#include <../common/includes/list.hpp>
+#include <list.hpp>
 
 int main()
 {
