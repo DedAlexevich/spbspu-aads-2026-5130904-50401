@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
-#include "../common/includes/stack.hpp"
-#include "../common/includes/queue.hpp"
+#include <stack.hpp>
+#include <queue.hpp>
 #include "math_funcs.hpp"
 
 
@@ -27,6 +27,5 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
   res.pop();
   BOOST_CHECK(result == "5 16 55");
 }
-
 
 

@@ -13,9 +13,9 @@ namespace kuznetsov {
 
     void pop();
 
-    bool empty() const;
+    bool empty() const noexcept;
 
-    size_t size() const;
+    size_t size() const noexcept;
 
     void clear() noexcept;
   private:
@@ -54,13 +54,13 @@ void kuznetsov::Queue< T >::pop()
 }
 
 template< class T >
-bool kuznetsov::Queue< T >::empty() const
+bool kuznetsov::Queue< T >::empty() const noexcept
 {
   return list_.empty();
 }
 
 template< class T >
-size_t kuznetsov::Queue< T >::size() const
+size_t kuznetsov::Queue< T >::size() const noexcept
 {
   return list_.size();
 }

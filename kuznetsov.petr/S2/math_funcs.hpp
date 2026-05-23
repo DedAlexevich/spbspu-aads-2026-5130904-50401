@@ -6,8 +6,10 @@
 #include <queue.hpp>
 
 namespace kuznetsov {
-  bool isOperand(const std::string& c);
-  size_t getPriority(const std::string& c);
+  namespace detail {
+    bool isOperand(const std::string& c);
+    size_t getPriority(const std::string& c);
+  }
   using lli_t = long long;
 
   lli_t add(const lli_t& a, const lli_t& b);

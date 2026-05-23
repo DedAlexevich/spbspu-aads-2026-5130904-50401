@@ -1,11 +1,12 @@
 #include "math_funcs.hpp"
 #include <limits>
+#include <stdexcept>
 #include <climits>
 
 const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
 const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
 
-bool kuznetsov::isOperand(const std::string& c)
+bool kuznetsov::detail::isOperand(const std::string& c)
 {
   std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
   for (size_t i = 0; i < 8; ++i) {
@@ -16,7 +17,7 @@ bool kuznetsov::isOperand(const std::string& c)
   return true;
 }
 
-size_t kuznetsov::getPriority(const std::string& c)
+size_t kuznetsov::detail::getPriority(const std::string& c)
 {
   if (c == ">>") {
     return 0;
@@ -138,7 +139,7 @@ kuznetsov::lli_t kuznetsov::calculate(Queue<std::string> postfix)
     std::string sym = postfix.front();
     postfix.pop();
 
-    if (isOperand(sym)) {
+    if (detail::isOperand(sym)) {
       evalStack.push(std::stoll(sym));
     } else {
       if (evalStack.size() < 2) {
@@ -195,11 +196,11 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
           temp.pop();
         }
         temp.pop();
-      } else if (isOperand(sym)) {
+      } else if (detail::isOperand(sym)) {
         postfix.push(sym);
       } else {
         while (!temp.empty() && temp.top() != "(") {
-          if (getPriority(sym) <= getPriority(temp.top())) {
+          if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
             postfix.push(temp.top());
             temp.pop();
           } else {
