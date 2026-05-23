@@ -9,6 +9,7 @@ namespace kuznetsov {
     const T& front() const;
 
     void push(const T& val);
+    void push(T&& val);
 
     void pop();
 
@@ -38,6 +39,12 @@ template< class T >
 void kuznetsov::Queue< T >::push(const T& val)
 {
   list_.insert(list_.end(), val);
+}
+
+template< class T >
+void kuznetsov::Queue< T >::push(T&& val)
+{
+  list_.insert(std::move(val));
 }
 
 template< class T >
