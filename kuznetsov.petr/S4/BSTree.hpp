@@ -499,7 +499,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
   detail::Node< K, V >* y = it.curr_;
 
   if (!y || !y->parent_) {
-    return iterator(y);
+    return const_iterator(y);
   }
 
   detail::Node< K, V >* x = y->parent_;
@@ -526,7 +526,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
   y->lt_ = x;
   x->parent_ = y;
 
-  return iterator(y);
+  return const_iterator(y);
 }
 
 template< class K, class V, class Cmp >
@@ -536,7 +536,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
   detail::Node< K, V >* x = it.curr_;
 
   if (!x || !x->parent_) {
-    return iterator(x);
+    return const_iterator(x);
   }
 
   detail::Node< K, V >* y = x->parent_;
@@ -563,7 +563,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
   x->rt_ = y;
   y->parent_ = x;
 
-  return iterator(x);
+  return const_iterator(x);
 }
 
 template< class K, class V, class Cmp >
@@ -601,8 +601,8 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
     throw std::logic_error("Not a large right rotation configuration");
   }
 
-  rotateLeft(iterator(b));
-  return rotateRight(iterator(b));
+  rotateLeft(const_iterator(b));
+  return rotateRight(const_iterator(b));
 }
 
 template< class K, class V, class C >
