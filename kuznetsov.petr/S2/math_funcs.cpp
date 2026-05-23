@@ -6,15 +6,15 @@
 const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
 const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
 
-bool kuznetsov::detail::isOperand(const std::string& c)
+bool kuznetsov::detail::isOperation(const std::string& c)
 {
   std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
   for (size_t i = 0; i < 8; ++i) {
     if (c == operators[i]) {
-      return false;
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 size_t kuznetsov::detail::getPriority(const std::string& c)
@@ -139,7 +139,7 @@ kuznetsov::lli_t kuznetsov::calculate(Queue<std::string> postfix)
     std::string sym = postfix.front();
     postfix.pop();
 
-    if (detail::isOperand(sym)) {
+    if (!detail::isOperation(sym)) {
       evalStack.push(std::stoll(sym));
     } else {
       if (evalStack.size() < 2) {
@@ -196,7 +196,7 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
           temp.pop();
         }
         temp.pop();
-      } else if (detail::isOperand(sym)) {
+      } else if (!detail::isOperation(sym)) {
         postfix.push(sym);
       } else {
         while (!temp.empty() && temp.top() != "(") {
@@ -219,3 +219,4 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
     postfix.clear();
   }
 }
+

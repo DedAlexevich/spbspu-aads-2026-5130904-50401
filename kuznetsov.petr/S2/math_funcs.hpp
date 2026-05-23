@@ -7,7 +7,7 @@
 
 namespace kuznetsov {
   namespace detail {
-    bool isOperand(const std::string& c);
+    bool isOperation(const std::string& c);
     size_t getPriority(const std::string& c);
   }
   using lli_t = long long;
