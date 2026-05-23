@@ -14,8 +14,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
 
-  kuz::Queue< kuz::lli_t > res;
-  kuz::calculateStackOfInfix(mathExpressions, res);
+  kuz::Queue< kuz::lli_t > res = kuz::calculateStackOfInfix(mathExpressions);
   std::string result = "";
   result += std::to_string(res.front());
   res.pop();
@@ -35,8 +34,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightZeroOperandTest)
   std::istringstream input(inp);
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
-  kuz::Queue< kuz::lli_t > res;
-  kuz::calculateStackOfInfix(mathExpressions, res);
+  kuz::Queue< kuz::lli_t > res = kuz::calculateStackOfInfix(mathExpressions);
   BOOST_CHECK_EQUAL(res.front(), 0);
   res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);
@@ -52,8 +50,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightLargeShiftTest)
   std::istringstream input(inp);
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
-  kuz::Queue< kuz::lli_t > res;
-  kuz::calculateStackOfInfix(mathExpressions, res);
+  kuz::Queue< kuz::lli_t > res = kuz::calculateStackOfInfix(mathExpressions);
   BOOST_CHECK_EQUAL(res.front(), 0);
   res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);
@@ -69,8 +66,7 @@ BOOST_AUTO_TEST_CASE(BitShiftBoundaryTest)
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
 
-  kuz::Queue< kuz::lli_t > res;
-  kuz::calculateStackOfInfix(mathExpressions, res);
+  kuz::Queue< kuz::lli_t > res = kuz::calculateStackOfInfix(mathExpressions);
 
   BOOST_CHECK_EQUAL(res.front(), 0);  res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);  res.pop();
@@ -87,8 +83,7 @@ BOOST_AUTO_TEST_CASE(BitShiftNegativeThrowsTest)
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
 
-  kuz::Queue< kuz::lli_t > res;
-  BOOST_CHECK_THROW(kuz::calculateStackOfInfix(mathExpressions, res), std::logic_error);
+  BOOST_CHECK_THROW(kuz::calculateStackOfInfix(mathExpressions), std::logic_error);
 }
 
 

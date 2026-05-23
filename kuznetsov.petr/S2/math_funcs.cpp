@@ -177,9 +177,10 @@ kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
   return evalStack.top();
 }
 
-void kuznetsov::calculateStackOfInfix(stackOfinfixExpression infix, Queue< lli_t >& res)
+kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfinfixExpression infix)
 {
   Queue< std::string > postfix;
+  Queue< lli_t > res;
   Stack< std::string > temp;
   while (!infix.empty()) {
     Queue< std::string > curr = infix.top();
@@ -217,5 +218,6 @@ void kuznetsov::calculateStackOfInfix(stackOfinfixExpression infix, Queue< lli_t
     res.push(calculatePostfix(postfix));
     postfix.clear();
   }
+  return res;
 }
 

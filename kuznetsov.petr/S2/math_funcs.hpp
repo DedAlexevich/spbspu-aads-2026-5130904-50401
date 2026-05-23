@@ -22,7 +22,7 @@ namespace kuznetsov {
   using stackOfinfixExpression = Stack< Queue< std::string > >;
   void getExpressions(std::istream& in, stackOfinfixExpression& res);
   lli_t calculatePostfix(Queue< std::string > postfix);
-  void calculateStackOfInfix(stackOfinfixExpression infix, Queue< lli_t >& res);
+  Queue< lli_t > calculateStackOfInfix(stackOfinfixExpression infix);
 }
 
 #endif

@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   kuz::Queue< kuz::lli_t > res;
 
   try {
-    kuz::calculateStackOfInfix(mathExpressions, res);
+    res = kuz::calculateStackOfInfix(mathExpressions);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;
