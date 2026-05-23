@@ -131,8 +131,7 @@ void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
   }
 }
 
-
-kuznetsov::lli_t kuznetsov::calculate(Queue< std::string > postfix)
+kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
 {
   Stack< lli_t > evalStack;
   while (!postfix.empty()) {
@@ -178,7 +177,7 @@ kuznetsov::lli_t kuznetsov::calculate(Queue< std::string > postfix)
   return evalStack.top();
 }
 
-void kuznetsov::calculate(stackOfinfixExpression infix, Queue< lli_t >& res)
+void kuznetsov::calculateStackOfInfix(stackOfinfixExpression infix, Queue< lli_t >& res)
 {
   Queue< std::string > postfix;
   Stack< std::string > temp;
@@ -215,7 +214,7 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue< lli_t >& res)
       temp.pop();
     }
     temp.clear();
-    res.push(calculate(postfix));
+    res.push(calculatePostfix(postfix));
     postfix.clear();
   }
 }

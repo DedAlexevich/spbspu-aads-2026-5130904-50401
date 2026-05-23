@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
   kuz::getExpressions(input, mathExpressions);
 
   kuz::Queue< kuz::lli_t > res;
-  kuz::calculate(mathExpressions, res);
+  kuz::calculateStackOfInfix(mathExpressions, res);
   std::string result = "";
   result += std::to_string(res.front());
   res.pop();
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightZeroOperandTest)
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
   kuz::Queue< kuz::lli_t > res;
-  kuz::calculate(mathExpressions, res);
+  kuz::calculateStackOfInfix(mathExpressions, res);
   BOOST_CHECK_EQUAL(res.front(), 0);
   res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightLargeShiftTest)
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
   kuz::getExpressions(input, mathExpressions);
   kuz::Queue< kuz::lli_t > res;
-  kuz::calculate(mathExpressions, res);
+  kuz::calculateStackOfInfix(mathExpressions, res);
   BOOST_CHECK_EQUAL(res.front(), 0);
   res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(BitShiftBoundaryTest)
   kuz::getExpressions(input, mathExpressions);
 
   kuz::Queue< kuz::lli_t > res;
-  kuz::calculate(mathExpressions, res);
+  kuz::calculateStackOfInfix(mathExpressions, res);
 
   BOOST_CHECK_EQUAL(res.front(), 0);  res.pop();
   BOOST_CHECK_EQUAL(res.front(), 0);  res.pop();
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(BitShiftNegativeThrowsTest)
   kuz::getExpressions(input, mathExpressions);
 
   kuz::Queue< kuz::lli_t > res;
-  BOOST_CHECK_THROW(kuz::calculate(mathExpressions, res), std::logic_error);
+  BOOST_CHECK_THROW(kuz::calculateStackOfInfix(mathExpressions, res), std::logic_error);
 }
 
 
