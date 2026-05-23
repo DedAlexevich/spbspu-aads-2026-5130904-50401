@@ -498,7 +498,7 @@ template< class T >
 template< class U >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{std::forward< T >(val), nullptr, nullptr};
+  detail::Node< T >* n = new detail::Node< T >{static_cast< T >(std::forward< U >(val)), nullptr, nullptr};
 
   if (head_ == nullptr) {
     head_ = n;
