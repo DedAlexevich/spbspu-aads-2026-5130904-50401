@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "math_funcs.hpp"
-#include "../common/includes/stack.hpp"
-#include "../common/includes/queue.hpp"
 
 int main(int argc, char* argv[])
 {

@@ -2,8 +2,8 @@
 #define MATH_FUNCS_HPP
 #include <cstddef>
 #include <string>
-#include "../common/includes/stack.hpp"
-#include "../common/includes/queue.hpp"
+#include <stack.hpp>
+#include <queue.hpp>
 
 namespace kuznetsov {
   bool isOperand(const std::string& c);
