@@ -531,6 +531,20 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other) noexcept
   move(pos.curr_, other, first, last, other.size_);
 }
 
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > it) noexcept
+{
+  if (it.curr_ == nullptr) {
+    return;
+  }
+  if (std::addressof(other) == this && pos.curr_ == it.curr_) {
+    return;
+  }
+  move(pos.curr_, other, it.curr_, it.curr_, 1);
+}
+
+
+
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
   curr_(pn)
