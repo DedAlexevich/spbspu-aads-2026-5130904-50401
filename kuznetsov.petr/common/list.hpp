@@ -510,6 +510,16 @@ void kuznetsov::List<T>::detachList(node_t* first, node_t* last, size_t count) n
   size_ -= count;
 }
 
+template < class T >
+void kuznetsov::List<T>::move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept
+{
+  if (count == 0) {
+    return;
+  }
+  src.detachList(first, last, count);
+  this->attachList(pos, first, last, count);
+}
+
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
   curr_(pn)
