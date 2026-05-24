@@ -185,7 +185,7 @@ namespace kuznetsov {
     size_t size_;
 
     void attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept;
-    void detachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept;
+    void detachList(node_t* first, node_t* last, size_t count) noexcept;
     void move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept;
 
   };
@@ -482,9 +482,36 @@ void kuznetsov::List<T>::attachList(node_t* pos, node_t* first, node_t* last, si
   size_ += count;
 }
 
+template < class T >
+void kuznetsov::List<T>::detachList(node_t* first, node_t* last, size_t count) noexcept
+{
+  if (!size_) {
+    return;
+  }
+  if (count == size_) {
+    head_ = nullptr;
+    size_ = 0;
+    return;
+  }
+  node_t* prevFirst = first->prev_;
+  node_t* afterLast = last->next_;
+  prevFirst->next_ = afterLast;
+  afterLast->prev_ = prevFirst;
+  node_t* p = first;
+  while (true) {
+    if (p == head_) {
+      head_ = prevFirst;
+      break;
+    } else if (p == last) {
+      break;
+    }
+    p = p->next_;
+  }
+  size_ -= count;
+}
 
 template< class T >
-kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
+kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
   curr_(pn)
 {}
 
