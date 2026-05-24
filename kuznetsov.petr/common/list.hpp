@@ -164,6 +164,21 @@ namespace kuznetsov {
     void swap(List&) noexcept;
     bool empty() const noexcept;
 
+    void splice(LCIter< T > pos, List& other) noexcept;
+    void splice(LCIter< T > pos, List& other, LCIter< T > it) noexcept;
+    void splice(LCIter< T > pos, List& other, LCIter< T > first, LCIter< T > last) noexcept;
+
+    template< class Compare >
+    void sort(Compare cmp);
+    void sort();
+
+    template< class Compare >
+    void merge(List& other, Compare cmp);
+    void merge(List& other);
+
+    template< class Predict >
+    LIter< T > partition(Predict pred);
+
   private:
     detail::Node< T >* head_;
     size_t size_;
