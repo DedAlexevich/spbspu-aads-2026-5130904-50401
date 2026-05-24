@@ -457,6 +457,32 @@ void kuznetsov::List< T >::swap(List& oth) noexcept
   std::swap(oth.size_, size_);
 }
 
+template < class T >
+void kuznetsov::List<T>::attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept
+{
+  if (count == 0) {
+    return;
+  }
+  if (head_ == nullptr) {
+    first->prev_ = last;
+    last->next_ = first;
+    head_ = first;
+    size_ = count;
+    return;
+  }
+  node_t* anch = pos ? pos : head_;
+  node_t* prevAnch = anch->prev_;
+  prevAnch->next_ = first;
+  first->prev_ = prevAnch;
+  anch->prev_ = last;
+  last->next_ = anch;
+  if (pos == head_) {
+    head_ = first;
+  }
+  size_ += count;
+}
+
+
 template< class T >
 kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
   curr_(pn)
