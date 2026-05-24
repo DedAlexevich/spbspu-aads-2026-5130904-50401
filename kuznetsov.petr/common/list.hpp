@@ -458,7 +458,7 @@ void kuznetsov::List< T >::swap(List& oth) noexcept
 }
 
 template < class T >
-void kuznetsov::List<T>::attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept
+void kuznetsov::List< T >::attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept
 {
   if (count == 0) {
     return;
@@ -483,7 +483,7 @@ void kuznetsov::List<T>::attachList(node_t* pos, node_t* first, node_t* last, si
 }
 
 template < class T >
-void kuznetsov::List<T>::detachList(node_t* first, node_t* last, size_t count) noexcept
+void kuznetsov::List< T >::detachList(node_t* first, node_t* last, size_t count) noexcept
 {
   if (!size_) {
     return;
@@ -511,13 +511,24 @@ void kuznetsov::List<T>::detachList(node_t* first, node_t* last, size_t count) n
 }
 
 template < class T >
-void kuznetsov::List<T>::move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept
+void kuznetsov::List< T >::move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept
 {
   if (count == 0) {
     return;
   }
   src.detachList(first, last, count);
   this->attachList(pos, first, last, count);
+}
+
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List& other) noexcept
+{
+  if (std::addressof(other) == this || other.empty()) {
+    return;
+  }
+  node_t* first = other.head_;
+  node_t* last = other.head_->prev_;
+  move(pos.curr_, other, first, last, other.size_);
 }
 
 template< class T >
