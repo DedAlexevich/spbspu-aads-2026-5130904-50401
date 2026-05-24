@@ -170,11 +170,9 @@ namespace kuznetsov {
 
     template< class Compare >
     void sort(Compare cmp) noexcept;
-    void sort() noexcept;
 
     template< class Compare >
     void merge(List& other, Compare cmp) noexcept;
-    void merge(List& other) noexcept;
 
     template< class Predict >
     LIter< T > partition(Predict pred) noexcept;
@@ -525,7 +523,56 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > firs
   move(pos.curr_, other, fst, lst, cnt);
 }
 
+template < class T >
+template < class Compare >
+void kuznetsov::List< T >::merge(List& other, Compare cmp) noexcept
+{
+  if (std::addressof(other) == this || other.empty()) {
+    return;
+  }
+  if (empty()) {
+    swap(other);
+    return;
+  }
+  node_t* i = head_;
+  size_t processed = 0;
+  size_t origSize = size_;
+  while (processed < origSize && !other.empty()) {
+    if (cmp(other.head_->val_, i->val_)) {
+      node_t* node = other.head_;
+      move(i, other, node, node, 1);
+    } else {
+      i = i->next_;
+      ++processed;
+    }
+  }
+  if (!other.empty()) {
+    node_t* oFirst = other.head_;
+    node_t* oLast = other.head_->prev_;
+    size_t cnt = other.size_;
+    move(nullptr, other, oFirst, oLast, cnt);
+  }
+}
 
+template < class T >
+template < class Compare >
+void kuznetsov::List< T >::sort(Compare cmp) noexcept
+{
+  if (size_ <= 1) {
+    return;
+  }
+  size_t half = size_ / 2;
+  node_t* mid = head_;
+  for (size_t i = 0; i < half; ++i) {
+    mid = mid->next_;
+  }
+  List other;
+  node_t* tail = head_->prev_;
+  other.move(nullptr, *this, mid, tail, size_ - half);
+  this->sort(cmp);
+  other.sort(cmp);
+  this->merge(other, cmp);
+}
 
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
