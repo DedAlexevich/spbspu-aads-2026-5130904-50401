@@ -168,11 +168,18 @@ namespace kuznetsov {
     void splice(LCIter< T > pos, List& other, LCIter< T > it) noexcept;
     void splice(LCIter< T > pos, List& other, LCIter< T > first, LCIter< T > last) noexcept;
 
+    void splice(LCIter< T > pos, List&& other) noexcept;
+    void splice(LCIter< T > pos, List&& other, LCIter< T > it) noexcept;
+    void splice(LCIter< T > pos, List&& other, LCIter< T > first, LCIter< T > last) noexcept;
+
     template< class Compare >
     void sort(Compare cmp) noexcept;
 
     template< class Compare >
     void merge(List& other, Compare cmp) noexcept;
+
+    template< class Compare >
+    void merge(List&& other, Compare cmp) noexcept;
 
     template< class Predict >
     LIter< T > partition(Predict pred) noexcept;
@@ -514,12 +521,11 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > firs
   node_t* p = fst;
   while (true) {
     ++cnt;
-    if (p == last) {
+    if (p == lst) {
       break;
     }
     p = p->next_;
   }
-  ++cnt;
   move(pos.curr_, other, fst, lst, cnt);
 }
 
@@ -572,6 +578,31 @@ void kuznetsov::List< T >::sort(Compare cmp) noexcept
   this->sort(cmp);
   other.sort(cmp);
   this->merge(other, cmp);
+}
+
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other) noexcept
+{
+  splice(pos, other);
+}
+
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other, LCIter< T > it) noexcept
+{
+  splice(pos, other, it);
+}
+
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other, LCIter< T > first, LCIter< T > last) noexcept
+{
+  splice(pos, other, first, last);
+}
+
+template < class T >
+template < class Compare >
+void kuznetsov::List<T>::merge(List&& other, Compare cmp) noexcept
+{
+  merge(other, cmp);
 }
 
 template < class T >
