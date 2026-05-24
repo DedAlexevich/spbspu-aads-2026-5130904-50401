@@ -156,7 +156,7 @@ namespace kuznetsov {
 
     LRCIter< T > rcend() const;
 
-    void clear();
+    void clear() noexcept;
 
     LIter< T > erase(LCIter< T > it);
 
@@ -498,7 +498,7 @@ template< class T >
 template< class U >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{static_cast< T >(std::forward< U >(val)), nullptr, nullptr};
+  detail::Node< T >* n = new detail::Node< T >{T(std::forward< U >(val)), nullptr, nullptr};
 
   if (head_ == nullptr) {
     head_ = n;
@@ -610,6 +610,7 @@ kuznetsov::LCIter< T > kuznetsov::List< T >::cend() const
 template< class T >
 kuznetsov::LRIter< T > kuznetsov::List< T >::rbegin()
 {
+  assert(head_ != nullptr);
   return LRIter< T >(head_->prev_);
 }
 
@@ -622,6 +623,7 @@ kuznetsov::LRIter< T > kuznetsov::List< T >::rend()
 template< class T >
 kuznetsov::LRCIter< T > kuznetsov::List< T >::rcbegin() const
 {
+  assert(head_ != nullptr);
   return LRCIter< T >(head_->prev_);
 }
 
@@ -632,7 +634,7 @@ kuznetsov::LRCIter< T > kuznetsov::List< T >::rcend() const
 }
 
 template< class T >
-void kuznetsov::List< T >::clear()
+void kuznetsov::List< T >::clear() noexcept
 {
   if (!head_) {
     return;

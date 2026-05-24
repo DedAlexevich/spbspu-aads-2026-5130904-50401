@@ -51,7 +51,7 @@ int main()
     return 0;
   }
 
-  auto sums = kuz::List<size_t>();
+  auto sums = kuz::List< size_t >();
   for (size_t i = 0; i < countRows; ++i) {
     sums.insert(sums.cend(), 0);
   }
@@ -71,7 +71,7 @@ int main()
           std::cout << ' ';
         }
         std::cout << *it;
-        if (MAX - *it < + *sumIt) {
+        if (MAX - *it < *sumIt) {
           std::cout << '\n';
           std::cerr << "Overflow\n";
           return 1;
