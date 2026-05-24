@@ -1,5 +1,5 @@
-#include "./graph.hpp"
-#include "../common/includes/top-it-iters.hpp"
+#include "graph.hpp"
+#include <top-it-iters.hpp>
 
 kuznetsov::Graph::Graph():
   table_(),

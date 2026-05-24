@@ -1,7 +1,7 @@
-#include "./commands.hpp"
+#include "commands.hpp"
 #include <iostream>
 #include <utility>
-#include "../common/includes/top-it-vector.hpp"
+#include <top-it-vector.hpp>
 
 struct PairComparator {
   using pair_t = std::pair< std::string, size_t >;

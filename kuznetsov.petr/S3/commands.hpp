@@ -1,7 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <string>
-#include "./graph.hpp"
+#include "graph.hpp"
 
 namespace kuznetsov {
   using table = HashTable< std::string, Graph, SipHasher< std::string >, KeyComparator >;
