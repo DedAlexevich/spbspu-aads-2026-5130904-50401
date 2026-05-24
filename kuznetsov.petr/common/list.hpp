@@ -543,7 +543,26 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > it) 
   move(pos.curr_, other, it.curr_, it.curr_, 1);
 }
 
-
+template < class T >
+void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > first, LCIter< T > last) noexcept
+{
+  if (first == last || other.empty()) {
+    return;
+  }
+  node_t* fst = first.curr_;
+  node_t* lst = last.curr_ ? last.curr_->prev_ : other.head_->prev_;
+  size_t cnt = 0;
+  node_t* p = fst;
+  while (true) {
+    ++cnt;
+    if (p == last) {
+      break;
+    }
+    p = p->next_;
+  }
+  ++cnt;
+  move(pos.curr_, other, fst, lst, cnt);
+}
 
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
