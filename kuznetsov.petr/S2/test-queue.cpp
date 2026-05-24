@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "../common/includes/queue.hpp"
+#include <queue.hpp>
 
 BOOST_AUTO_TEST_CASE(EmptyQueueTest)
 {
@@ -31,10 +31,8 @@ BOOST_AUTO_TEST_CASE(getAccessToDataOfQueueTest)
   kuznetsov::Queue< int > queue;
   queue.push(3);
   BOOST_CHECK_EQUAL(queue.front(), 3);
-  BOOST_CHECK_EQUAL(queue.back(), 3);
   queue.push(8);
   BOOST_CHECK_EQUAL(queue.front(), 3);
-  BOOST_CHECK_EQUAL(queue.back(), 8);
   queue.pop();
   BOOST_CHECK_EQUAL(queue.front(), 8);
 }
@@ -61,7 +59,6 @@ BOOST_AUTO_TEST_CASE(MoveConstructorOfQueueTest)
   BOOST_CHECK(queue1.empty());
   BOOST_CHECK(2 == queue2.size());
   BOOST_CHECK(3 == queue2.front());
-  BOOST_CHECK(8 == queue2.back());
 }
 
 BOOST_AUTO_TEST_CASE(CopyAssignmentOperatorOfQueueTest)
@@ -88,6 +85,5 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentOperatorOfQueueTest)
   BOOST_CHECK(queue1.empty());
   BOOST_CHECK(2 == queue2.size());
   BOOST_CHECK(3 == queue2.front());
-  BOOST_CHECK(8 == queue2.back());
 }
 

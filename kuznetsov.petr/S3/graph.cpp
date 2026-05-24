@@ -1,5 +1,5 @@
-#include "./graph.hpp"
-#include "../common/includes/top-it-iters.hpp"
+#include "graph.hpp"
+#include <top-it-iters.hpp>
 
 kuznetsov::Graph::Graph():
   table_(),
@@ -62,11 +62,11 @@ void kuznetsov::Graph::removeEdge(const std::string& v1, const std::string& v2, 
 {
   auto k = std::make_pair(v1, v2);
   if (table_.has(k)) {
-    auto slot = table_.at(k);
+    Vector< size_t >& slot = table_.at(k);
     if (slot.getSize() > 1) {
       for (auto it = slot.cbegin(); it != slot.cend(); ++it) {
         if ((*it) == w) {
-          slot.erase(it);
+          it = slot.erase(it);
           return;
         }
       }
