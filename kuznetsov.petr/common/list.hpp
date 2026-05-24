@@ -574,6 +574,37 @@ void kuznetsov::List< T >::sort(Compare cmp) noexcept
   this->merge(other, cmp);
 }
 
+template < class T >
+template < class Predict >
+kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
+{
+  if (empty()) {
+    return LIter< T >(nullptr);
+  }
+  if (size_ == 1) {
+    if (pred(head_->val_)) {
+      return LIter< T >(nullptr);
+    }
+    return LIter< T >(head_);
+  }
+  List rejected;
+  node_t* i = head_;
+  size_t remaining = size_;
+  while (remaining > 0) {
+    node_t* next = i->next_;
+    if (!pred(i->val_)) {
+      rejected.move(nullptr, *this, i, i, 1);
+    }
+    i = next;
+    --remaining;
+  }
+  node_t* firstRejected = rejected.head_;
+  if (!rejected.empty()) {
+    move(nullptr, rejected, rejected.head_,rejected.head_->prev_, rejected.size_);
+  }
+  return LIter< T >(firstRejected);
+}
+
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
   curr_(pn)
