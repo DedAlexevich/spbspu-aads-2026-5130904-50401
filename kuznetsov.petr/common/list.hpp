@@ -260,33 +260,7 @@ template< class U >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
   detail::Node< T >* n = new detail::Node< T >{T(std::forward< U >(val)), nullptr, nullptr};
-
-  if (head_ == nullptr) {
-    head_ = n;
-    n->next_ = n;
-    n->prev_ = n;
-  } else if (!it.curr_) {
-    detail::Node< T >* tail = head_->prev_;
-
-    n->next_ = head_;
-    n->prev_ = tail;
-    tail->next_ = n;
-    head_->prev_ = n;
-  } else {
-    detail::Node< T >* current = it.curr_;
-    detail::Node< T >* prev = current->prev_;
-
-    n->next_ = current;
-    n->prev_ = prev;
-    prev->next_ = n;
-    current->prev_ = n;
-
-    if (current == head_) {
-      head_ = n;
-    }
-  }
-
-  size_++;
+  attachList(it.curr_, n, n, 1);
   return LIter< T >(n);
 }
 
@@ -417,24 +391,11 @@ kuznetsov::LIter< T > kuznetsov::List< T >::erase(LCIter< T > it)
     throw std::logic_error("Empty list or iterator");
   }
   detail::Node< T >* nextNode = it.curr_->next_;
-  bool f = (it.curr_ == head_);
-
-  if (size_ == 1) {
-    delete it.curr_;
-    head_ = nullptr;
-    size_ = 0;
+  detachList(it.curr_, it.curr_, 1);
+  delete it.curr_;
+  if (!size_) {
     return LIter< T >(nullptr);
   }
-
-  it.curr_->prev_->next_ = it.curr_->next_;
-  it.curr_->next_->prev_ = it.curr_->prev_;
-  delete it.curr_;
-  --size_;
-
-  if (f) {
-    head_ = nextNode;
-  }
-
   return LIter< T >(nextNode);
 }
 
@@ -500,7 +461,7 @@ void kuznetsov::List< T >::detachList(node_t* first, node_t* last, size_t count)
   node_t* p = first;
   while (true) {
     if (p == head_) {
-      head_ = prevFirst;
+      head_ = afterLast;
       break;
     } else if (p == last) {
       break;
@@ -563,6 +524,8 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > firs
   ++cnt;
   move(pos.curr_, other, fst, lst, cnt);
 }
+
+
 
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
