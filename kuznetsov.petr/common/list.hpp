@@ -169,281 +169,27 @@ namespace kuznetsov {
     void splice(LCIter< T > pos, List& other, LCIter< T > first, LCIter< T > last) noexcept;
 
     template< class Compare >
-    void sort(Compare cmp);
-    void sort();
+    void sort(Compare cmp) noexcept;
+    void sort() noexcept;
 
     template< class Compare >
-    void merge(List& other, Compare cmp);
-    void merge(List& other);
+    void merge(List& other, Compare cmp) noexcept;
+    void merge(List& other) noexcept;
 
     template< class Predict >
-    LIter< T > partition(Predict pred);
+    LIter< T > partition(Predict pred) noexcept;
 
   private:
-    detail::Node< T >* head_;
+    using node_t = detail::Node< T >;
+    node_t* head_;
     size_t size_;
+
+    void attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept;
+    void detachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept;
+    void move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept;
+
   };
 
-}
-
-template< class T >
-kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
-  curr_(pn)
-{}
-
-template< class T >
-kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
-{
-  if (curr_) {
-    curr_ = curr_->next_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
-{
-  LCIter temp(*this);
-  ++(*this);
-  return temp;
-}
-
-template< class T >
-kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
-{
-  if (curr_) {
-    curr_ = curr_->prev_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
-{
-  LCIter temp(*this);
-  --(*this);
-  return temp;
-}
-
-template< class T >
-const T& kuznetsov::LCIter< T >::operator*() const
-{
-  assert(this->curr_);
-  return curr_->val_;
-}
-
-template< class T >
-const T* kuznetsov::LCIter< T >::operator->() const
-{
-  assert(this->curr_);
-  return &curr_->val_;
-}
-
-template< class T >
-bool kuznetsov::LCIter< T >::operator==(const LCIter& y) const noexcept
-{
-  return this->curr_ == y.curr_;
-}
-
-template< class T >
-bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
-{
-  return !(*this == y);
-}
-
-template< class T >
-kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
-  curr_(pn)
-{}
-
-template< class T >
-kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
-{
-  if (curr_) {
-    curr_ = curr_->next_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int)
-{
-  LIter temp(*this);
-  ++(*this);
-  return temp;
-}
-
-template< class T >
-kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
-{
-  if (curr_) {
-    curr_ = curr_->prev_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
-{
-  LIter temp(*this);
-  --(*this);
-  return temp;
-}
-
-template< class T >
-T& kuznetsov::LIter< T >::operator*()
-{
-  assert(this->curr_);
-  return curr_->val_;
-}
-
-template< class T >
-T* kuznetsov::LIter< T >::operator->()
-{
-  assert(this->curr_);
-  return &curr_->val_;
-}
-
-template< class T >
-bool kuznetsov::LIter< T >::operator==(const LIter& y) const noexcept
-{
-  return this->curr_ == y.curr_;
-}
-
-template< class T >
-bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
-{
-  return !(*this == y);
-}
-
-template< class T >
-kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
-  curr_(pn)
-{}
-
-template< class T >
-kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
-{
-  if (curr_) {
-    curr_ = curr_->prev_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int)
-{
-  LRCIter temp(*this);
-  ++(*this);
-  return temp;
-}
-
-template< class T >
-kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
-{
-  if (curr_) {
-    curr_ = curr_->next_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
-{
-  LRCIter temp(*this);
-  --(*this);
-  return temp;
-}
-
-template< class T >
-const T& kuznetsov::LRCIter< T >::operator*() const
-{
-  assert(this->curr_);
-  return curr_->val_;
-}
-
-template< class T >
-const T* kuznetsov::LRCIter< T >::operator->() const
-{
-  assert(this->curr_);
-  return &curr_->val_;
-}
-
-template< class T >
-bool kuznetsov::LRCIter< T >::operator==(const LRCIter& y) const noexcept
-{
-  return curr_ == y.curr_;
-}
-
-template< class T >
-bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
-{
-  return !(*this == y);
-}
-
-template< class T >
-kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
-  curr_(pn)
-{}
-
-template< class T >
-kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
-{
-  if (curr_) {
-    curr_ = curr_->prev_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
-{
-  LRIter temp(*this);
-  ++(*this);
-  return temp;
-}
-
-template< class T >
-kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
-{
-  if (curr_) {
-    curr_ = curr_->next_;
-  }
-  return *this;
-}
-
-template< class T >
-kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
-{
-  LRIter temp(*this);
-  --(*this);
-  return temp;
-}
-
-template< class T >
-T& kuznetsov::LRIter< T >::operator*()
-{
-  assert(this->curr_);
-  return curr_->val_;
-}
-
-template< class T >
-T* kuznetsov::LRIter< T >::operator->()
-{
-  assert(this->curr_);
-  return &curr_->val_;
-}
-
-template< class T >
-bool kuznetsov::LRIter< T >::operator==(const LRIter& y) const noexcept
-{
-  return curr_ == y.curr_;
-}
-
-template< class T >
-bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
-{
-  return !(*this == y);
 }
 
 template< class T >
@@ -711,6 +457,265 @@ void kuznetsov::List< T >::swap(List& oth) noexcept
   std::swap(oth.size_, size_);
 }
 
+template< class T >
+kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
+{
+  LCIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
+{
+  LCIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+const T& kuznetsov::LCIter< T >::operator*() const
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+const T* kuznetsov::LCIter< T >::operator->() const
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator==(const LCIter& y) const noexcept
+{
+  return this->curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int)
+{
+  LIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
+{
+  LIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+T& kuznetsov::LIter< T >::operator*()
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LIter< T >::operator->()
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LIter< T >::operator==(const LIter& y) const noexcept
+{
+  return this->curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int)
+{
+  LRCIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
+{
+  LRCIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+const T& kuznetsov::LRCIter< T >::operator*() const
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+const T* kuznetsov::LRCIter< T >::operator->() const
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LRCIter< T >::operator==(const LRCIter& y) const noexcept
+{
+  return curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
+{
+  return !(*this == y);
+}
+
+template< class T >
+kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
+  curr_(pn)
+{}
+
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
+{
+  if (curr_) {
+    curr_ = curr_->prev_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
+{
+  LRIter temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class T >
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
+{
+  if (curr_) {
+    curr_ = curr_->next_;
+  }
+  return *this;
+}
+
+template< class T >
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
+{
+  LRIter temp(*this);
+  --(*this);
+  return temp;
+}
+
+template< class T >
+T& kuznetsov::LRIter< T >::operator*()
+{
+  assert(this->curr_);
+  return curr_->val_;
+}
+
+template< class T >
+T* kuznetsov::LRIter< T >::operator->()
+{
+  assert(this->curr_);
+  return &curr_->val_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator==(const LRIter& y) const noexcept
+{
+  return curr_ == y.curr_;
+}
+
+template< class T >
+bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
+{
+  return !(*this == y);
+}
 
 #endif
 
