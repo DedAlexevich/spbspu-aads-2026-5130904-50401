@@ -1,24 +1,23 @@
 #include <iostream>
 #include <fstream>
 #include "math_funcs.hpp"
-#include "../common/includes/stack.hpp"
-#include "../common/includes/queue.hpp"
 
 int main(int argc, char* argv[])
 {
   namespace kuz = kuznetsov;
   kuz::Stack< kuz::Queue< std::string > > mathExpressions;
-  try {
-    if (argc > 1) {
-      std::ifstream d(argv[1]);
-      if (!d) {
-        std::cerr << "Cant open file\n";
-        return 1;
-      }
-      kuz::getExpressions(d, mathExpressions);
-    } else {
-      kuz::getExpressions(std::cin, mathExpressions);
+  std::ifstream file;
+  std::istream* source = &std::cin;
+  if (argc > 1) {
+    file.open(argv[1]);
+    if (!file) {
+      std::cerr << "Cant open file\n";
+      return 1;
     }
+    source = &file;
+  }
+  try {
+    mathExpressions = kuznetsov::getExpressions(*source);
   } catch (...) {
     std::cerr << "Input error\n";
     mathExpressions.clear();
@@ -33,7 +32,7 @@ int main(int argc, char* argv[])
   kuz::Queue< kuz::lli_t > res;
 
   try {
-    kuz::calculate(mathExpressions, res);
+    res = kuz::calculateStackOfInfix(mathExpressions);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;

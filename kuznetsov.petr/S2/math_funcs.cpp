@@ -1,22 +1,23 @@
 #include "math_funcs.hpp"
 #include <limits>
+#include <stdexcept>
 #include <climits>
-
+#include <iostream>
 const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
 const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
 
-bool kuznetsov::isOperand(const std::string& c)
+bool kuznetsov::detail::isOperation(const std::string& c)
 {
   std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
   for (size_t i = 0; i < 8; ++i) {
     if (c == operators[i]) {
-      return false;
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
-size_t kuznetsov::getPriority(const std::string& c)
+size_t kuznetsov::detail::getPriority(const std::string& c)
 {
   if (c == ">>") {
     return 0;
@@ -87,20 +88,21 @@ kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
 
 kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
 {
-  if (b == 0) {
+  if (b < 0) {
     throw std::logic_error("Bit right shift by value less then zero");
   }
   const int totalBits = sizeof(lli_t) * CHAR_BIT;
-  if (b > totalBits || a == 0) {
+  if (b >= totalBits || a == 0) {
     return 0;
   }
   return a >> b;
 }
 
-void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
+kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
 {
   std::string current;
   Queue< std::string > expression;
+  stackOfInfixExpression res;
   int a = in.get();
   while (a != -1) {
     if (a == '\n') {
@@ -128,17 +130,17 @@ void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
     res.push(expression);
     expression.clear();
   }
+  return res;
 }
 
-
-kuznetsov::lli_t kuznetsov::calculate(Queue<std::string> postfix)
+kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
 {
-  Stack<lli_t> evalStack;
+  Stack< lli_t > evalStack;
   while (!postfix.empty()) {
     std::string sym = postfix.front();
     postfix.pop();
 
-    if (isOperand(sym)) {
+    if (!detail::isOperation(sym)) {
       evalStack.push(std::stoll(sym));
     } else {
       if (evalStack.size() < 2) {
@@ -177,12 +179,13 @@ kuznetsov::lli_t kuznetsov::calculate(Queue<std::string> postfix)
   return evalStack.top();
 }
 
-void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
+kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
 {
-  Queue<std::string> postfix;
-  Stack<std::string> temp;
+  Queue< std::string > postfix;
+  Queue< lli_t > res;
+  Stack< std::string > temp;
   while (!infix.empty()) {
-    Queue<std::string> curr = infix.top();
+    Queue< std::string > curr = infix.top();
     infix.pop();
     while (!curr.empty()) {
       std::string sym = curr.front();
@@ -195,11 +198,11 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
           temp.pop();
         }
         temp.pop();
-      } else if (isOperand(sym)) {
+      } else if (!detail::isOperation(sym)) {
         postfix.push(sym);
       } else {
         while (!temp.empty() && temp.top() != "(") {
-          if (getPriority(sym) <= getPriority(temp.top())) {
+          if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
             postfix.push(temp.top());
             temp.pop();
           } else {
@@ -214,7 +217,9 @@ void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
       temp.pop();
     }
     temp.clear();
-    res.push(calculate(postfix));
+    res.push(calculatePostfix(postfix));
     postfix.clear();
   }
+  return res;
 }
+
