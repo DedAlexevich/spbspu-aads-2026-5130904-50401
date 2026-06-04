@@ -1,5 +1,6 @@
 #define BOOST_TEST_MODULE S4
 #include <boost/test/included/unit_test.hpp>
+
 #include "./BSTree.hpp"
 
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
@@ -66,8 +67,8 @@ BOOST_AUTO_TEST_CASE(PushAndAtTest)
 BOOST_AUTO_TEST_CASE(DropTest)
 {
   kuznetsov::BSTree< int, int, std::less< int > > tr1;
-  int ks[] {10, 5, 15, 2, 9, 13};
-  int vs[] {1, 2, 3, 4, 5, 6};
+  int ks[]{ 10, 5, 15, 2, 9, 13 };
+  int vs[]{ 1, 2, 3, 4, 5, 6 };
   for (size_t i = 0; i < 6; ++i) {
     tr1.push(ks[i], vs[i]);
   }
@@ -90,14 +91,14 @@ BOOST_AUTO_TEST_CASE(HeightAndIteratorTest)
 {
   kuznetsov::BSTree< int, int, std::less< int > > tr1;
   BOOST_CHECK(tr1.begin() == tr1.end());
-  int ks[] {10, 5, 15, 2, 9, 13};
-  int vs[] {1, 2, 3, 4, 5, 6};
-  int hs[] {1, 2, 1, 3, 1, 2};
+  int ks[]{ 10, 5, 15, 2, 9, 13 };
+  int vs[]{ 1, 2, 3, 4, 5, 6 };
+  int hs[]{ 1, 2, 1, 3, 1, 2 };
   for (size_t i = 0; i < 6; ++i) {
     tr1.push(ks[i], vs[i]);
   }
-  int sks[] {2, 5, 9, 10, 13, 15};
-  int svs[] {4, 2, 5, 1, 6, 3};
+  int sks[]{ 2, 5, 9, 10, 13, 15 };
+  int svs[]{ 4, 2, 5, 1, 6, 3 };
   BOOST_TEST(tr1.height() == 3);
   auto it = tr1.cbegin();
   size_t i = 0;
@@ -136,7 +137,7 @@ BOOST_AUTO_TEST_CASE(leftRotateTest)
   model.push(13, 1);
   auto ittest = testing.cbegin();
   auto modelTest = model.cbegin();
-  for (;ittest != testing.cend(); ++ittest, ++modelTest) {
+  for (; ittest != testing.cend(); ++ittest, ++modelTest) {
     BOOST_TEST(testing.height(ittest) == model.height(modelTest));
   }
 }
@@ -164,7 +165,7 @@ BOOST_AUTO_TEST_CASE(rightRotateTest)
   BOOST_CHECK_THROW(testing.rotateRight(it), std::logic_error);
   auto ittest = testing.cbegin();
   auto modelTest = model.cbegin();
-  for (;ittest != testing.cend(); ++ittest, ++modelTest) {
+  for (; ittest != testing.cend(); ++ittest, ++modelTest) {
     BOOST_TEST(testing.height(ittest) == model.height(modelTest));
   }
 }
@@ -196,7 +197,7 @@ BOOST_AUTO_TEST_CASE(leftLargeRotateTest)
   model.push(18, 1);
   auto ittest = testing.cbegin();
   auto modelTest = model.cbegin();
-  for (;ittest != testing.cend(); ++ittest, ++modelTest) {
+  for (; ittest != testing.cend(); ++ittest, ++modelTest) {
     BOOST_TEST(testing.height(ittest) == model.height(modelTest));
   }
 }
@@ -228,8 +229,7 @@ BOOST_AUTO_TEST_CASE(rightLargeRotateTest)
   model.push(8, 1);
   auto ittest = testing.cbegin();
   auto modelTest = model.cbegin();
-  for (;ittest != testing.cend(); ++ittest, ++modelTest) {
+  for (; ittest != testing.cend(); ++ittest, ++modelTest) {
     BOOST_TEST(testing.height(ittest) == model.height(modelTest));
   }
 }
-

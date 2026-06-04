@@ -1,9 +1,9 @@
 #ifndef BSTREE_HPP
 #define BSTREE_HPP
-#include <utility>
 #include <algorithm>
-#include <stdexcept>
 #include <cstddef>
+#include <stdexcept>
+#include <utility>
 
 namespace kuznetsov {
   namespace detail {
@@ -29,12 +29,11 @@ namespace kuznetsov {
 
   }
 
-  template< class Key, class Value, bool IsConst>
+  template< class Key, class Value, bool IsConst >
   struct Iterator;
 
   template< class Key, class Value, class Compare >
   struct BSTree {
-
     BSTree();
     BSTree(const BSTree&);
     BSTree(BSTree&&) noexcept;
@@ -87,7 +86,7 @@ namespace kuznetsov {
     void clear(detail::Node< Key, Value >*) noexcept;
   };
 
-  template< class Key, class Value, bool IsConst>
+  template< class Key, class Value, bool IsConst >
   struct Iterator {
     using type_t = std::pair< const Key, Value >;
     using reference = typename std::conditional< IsConst, const type_t&, type_t& >::type;
@@ -109,7 +108,8 @@ namespace kuznetsov {
     bool operator!=(const Iterator< Key, Value, OthConst >&);
 
   private:
-    template<class, class, class> friend class BSTree;
+    template< class, class, class >
+    friend class BSTree;
     Iterator(detail::Node< Key, Value >*);
     detail::Node< Key, Value >* curr_;
   };
@@ -135,7 +135,6 @@ kuznetsov::Iterator< Key, Value, IsConst >::operator*()
 {
   return curr_->value_;
 }
-
 
 template< class Key, class Value, bool IsConst >
 typename kuznetsov::Iterator< Key, Value, IsConst >::pointer
@@ -163,9 +162,9 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
   return *this;
 }
 
-
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
+kuznetsov::Iterator< Key, Value, IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
 {
   auto it = Iterator< Key, Value, IsConst >(curr_);
   ++(*this);
@@ -191,9 +190,9 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
   return *this;
 }
 
-
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
+kuznetsov::Iterator< Key, Value, IsConst >
+kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
 {
   auto it = Iterator< Key, Value, IsConst >(curr_);
   --(*this);
@@ -238,7 +237,7 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth,
-                                                                    Node< Key, Value >* p)
+                                                                   Node< Key, Value >* p)
 {
   if (!oth) {
     return nullptr;
@@ -247,7 +246,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< K
   try {
     n->lt_ = copyTree(oth->lt_, n);
     n->rt_ = copyTree(oth->rt_, n);
-  } catch(...) {
+  } catch (...) {
     delete n;
     throw;
   }
@@ -432,7 +431,8 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height(const_iterator it) const
 }
 
 template< class Key, class Value, class Compare >
-size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< Key, Value >* n) const noexcept
+size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(
+    const detail::Node< Key, Value >* n) const noexcept
 {
   if (!n) {
     return 0;
@@ -448,9 +448,9 @@ void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* node) noexcept
+void kuznetsov::BSTree< Key, Value, Compare >::clear(detail::Node< Key, Value >* node) noexcept
 {
-  if(!node) {
+  if (!node) {
     return;
   }
   clear(node->lt_);
@@ -459,7 +459,7 @@ void kuznetsov::BSTree< Key, Value, Compare>::clear(detail::Node< Key, Value >* 
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare>::clear() noexcept
+void kuznetsov::BSTree< Key, Value, Compare >::clear() noexcept
 {
   clear(root_);
   root_ = nullptr;
@@ -606,7 +606,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, false> kuznetsov::BSTree< K, V, C >::begin()
+kuznetsov::Iterator< K, V, false > kuznetsov::BSTree< K, V, C >::begin()
 {
   return Iterator< K, V, false >(detail::minimum(root_));
 }

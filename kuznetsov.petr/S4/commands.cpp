@@ -93,12 +93,9 @@ void kuznetsov::unionDicts(std::ostream&, std::istream& in, dicts& ds)
   }
 
   for (auto it = dataset2.cbegin(); it != dataset2.cend(); ++it) {
-      if (!nd.contain(it->first)) {
-        nd.push(it->first, it->second);
-      }
+    if (!nd.contain(it->first)) {
+      nd.push(it->first, it->second);
+    }
   }
   ds.push(dict3, nd);
 }
-
-
-

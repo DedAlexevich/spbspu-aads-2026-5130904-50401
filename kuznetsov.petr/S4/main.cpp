@@ -1,6 +1,7 @@
+#include <fstream>
 #include <iostream>
 #include <limits>
-#include <fstream>
+
 #include "commands.hpp"
 
 int main(int argc, char** argv)
@@ -25,9 +26,11 @@ int main(int argc, char** argv)
   while (file >> token) {
     kuz::record d;
     char c;
-    while(true) {
-      while(file.get(c) && c == ' ');
-      if (!file || c == '\n') break;
+    while (true) {
+      while (file.get(c) && c == ' ');
+      if (!file || c == '\n') {
+        break;
+      }
       file.unget();
       file >> key >> value;
       d.push(key, value);
@@ -42,10 +45,10 @@ int main(int argc, char** argv)
   commands.push("intersect", kuz::intersect);
   commands.push("union", kuz::unionDicts);
 
-  while(std::cin >> token) {
+  while (std::cin >> token) {
     try {
       commands.at(token)(std::cout, std::cin, dcts);
-    } catch(...) {
+    } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::streamsize n = std::numeric_limits< std::streamsize >::max();
@@ -53,4 +56,3 @@ int main(int argc, char** argv)
     }
   }
 }
-

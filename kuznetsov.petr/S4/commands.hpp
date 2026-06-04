@@ -1,7 +1,8 @@
 #ifndef COMMANDSS4_HPP
 #define COMMANDSS4_HPP
-#include <iosfwd>
 #include <cstddef>
+#include <iosfwd>
+
 #include "BSTree.hpp"
 
 namespace kuznetsov {
@@ -14,4 +15,3 @@ namespace kuznetsov {
   void unionDicts(std::ostream&, std::istream&, dicts& ds);
 }
 #endif
-
