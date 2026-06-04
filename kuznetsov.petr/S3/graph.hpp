@@ -1,9 +1,11 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
-#include <utility>
-#include <string>
 #include <cstddef>
+#include <string>
+#include <utility>
+
 #include <top-it-vector.hpp>
+
 #include "HashTable.hpp"
 #include "Hasher.hpp"
 namespace kuznetsov {
@@ -38,4 +40,3 @@ namespace kuznetsov {
 }
 
 #endif
-
