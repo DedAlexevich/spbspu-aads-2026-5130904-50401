@@ -280,6 +280,15 @@ kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 }
 
 template< class T >
+template< class... Args >
+kuznetsov::LIter< T > kuznetsov::List< T >::emplace(LCIter< T > pos, Args&&... args)
+{
+  detail::Node< T >* n = new detail::Node< T >{ T(std::forward< Args >(args)), nullptr, nullptr };
+  attachList(pos.curr_, n, n, 1);
+  return LIter< T >(n);
+}
+
+template< class T >
 T& kuznetsov::List< T >::front()
 {
   if (!head_) {
