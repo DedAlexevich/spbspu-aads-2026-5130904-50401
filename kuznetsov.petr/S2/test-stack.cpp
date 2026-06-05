@@ -91,3 +91,35 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentOperatorOfStackTest)
   BOOST_CHECK(3 == stack2.top());
 }
 
+namespace kuznetsov {
+  namespace test {
+    struct TestData {
+      TestData(int a, int b):
+        a_(a),
+        b_(b)
+      {
+      }
+      int sum()
+      {
+        return a_ + b_;
+      }
+    private:
+      int a_, b_;
+    };
+
+  }
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceTestInStack)
+{
+  namespace kuz = kuznetsov;
+  kuz::Stack< kuz::test::TestData > s;
+  s.emplace(1, 2);
+  s.emplace(2, 3);
+  s.emplace(3, 4);
+  s.emplace(4, 5);
+  for (int i = 5; i > 1; --i) {
+    BOOST_CHECK(s.top().sum() == i + i - 1);
+    s.pop();
+  }
+}
