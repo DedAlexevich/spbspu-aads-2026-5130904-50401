@@ -1,9 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include <cstddef>
 #include <cassert>
-#include <utility>
+#include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace kuznetsov {
   namespace detail {
@@ -128,6 +128,15 @@ namespace kuznetsov {
     template< class U >
     LIter< T > insert(LCIter< T > it, U&& val);
 
+    template< class... Args >
+    LIter< T > emplace(LCIter< T > pos, Args&&... args);
+
+    template< class... Args >
+    void emplace_front(Args&&... args);
+
+    template< class... Args >
+    void emplace_back(Args&&... args);
+
     T& front();
 
     T& back();
@@ -174,7 +183,8 @@ namespace kuznetsov {
 template< class T >
 kuznetsov::LCIter< T >::LCIter(kuznetsov::detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
@@ -239,7 +249,8 @@ bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
 template< class T >
 kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
@@ -304,7 +315,8 @@ bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
 template< class T >
 kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
@@ -369,7 +381,8 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 template< class T >
 kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
@@ -435,7 +448,8 @@ template< class T >
 kuznetsov::List< T >::List():
   head_(nullptr),
   size_(0)
-{}
+{
+}
 
 template< class T >
 kuznetsov::List< T >::List(const List& other):
@@ -445,7 +459,7 @@ kuznetsov::List< T >::List(const List& other):
   if (other.empty()) {
     return;
   }
-  detail::Node<T>* current = other.head_;
+  detail::Node< T >* current = other.head_;
   do {
     try {
       insert(cend(), current->val_);
@@ -461,7 +475,8 @@ template< class T >
 kuznetsov::List< T >::List(List&& other) noexcept:
   head_(std::exchange(other.head_, nullptr)),
   size_(std::exchange(other.size_, 0))
-{}
+{
+}
 
 template< class T >
 kuznetsov::List< T >::~List() noexcept
@@ -498,7 +513,7 @@ template< class T >
 template< class U >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{T(std::forward< U >(val)), nullptr, nullptr};
+  detail::Node< T >* n = new detail::Node< T >{ T(std::forward< U >(val)), nullptr, nullptr };
 
   if (head_ == nullptr) {
     head_ = n;
@@ -696,6 +711,4 @@ void kuznetsov::List< T >::swap(List& oth) noexcept
   std::swap(oth.size_, size_);
 }
 
-
 #endif
-
