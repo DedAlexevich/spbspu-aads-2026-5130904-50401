@@ -1,4 +1,6 @@
 #define BOOST_TEST_MODULE S1
+#include <functional>
+#include <initializer_list>
 #include <boost/test/included/unit_test.hpp>
 #include <stdexcept>
 #include <list.hpp>
@@ -375,3 +377,222 @@ BOOST_AUTO_TEST_CASE(CyclicStructureAfterOperations)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
+namespace kuznetsov{
+  template< class T >
+  List< T > makeList(std::initializer_list< T > il) {
+    List< T > l;
+    for (const auto& v : il) {
+      l.insert(l.cend(), v);
+    }
+    return l;
+  }
+
+  template< class T >
+  bool listEquals(const List< T >& l, std::initializer_list< T > expected) {
+    if (l.size() != expected.size()) {
+      return false;
+    }
+    if (l.empty()) {
+      return true;
+    }
+    auto h = l.cbegin();
+    auto it = h;
+    auto eit = expected.begin();
+    if (*it != *eit) {
+      return false;
+    }
+    ++it;
+    ++eit;
+    while (it != h) {
+      if (*it != *eit) {
+        return false;
+      }
+      ++it;
+      ++eit;
+    }
+    return true;
+  }
+}
+
+BOOST_AUTO_TEST_SUITE(SpliceSuite)
+
+BOOST_AUTO_TEST_CASE(SpliceWholeAtEnd)
+{
+  auto a = kuznetsov::makeList< int >({1, 2});
+  auto b = kuznetsov::makeList< int >({3, 4});
+  a.splice(a.cend(), b);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4}));
+  BOOST_CHECK(b.empty());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceWholeAtBegin)
+{
+  auto a = kuznetsov::makeList< int >({3, 4});
+  auto b = kuznetsov::makeList< int >({1, 2});
+  a.splice(a.cbegin(), b);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4}));
+  BOOST_CHECK_EQUAL(a.front(), 1);
+  BOOST_CHECK_EQUAL(a.back(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(SpliceWholeInMiddle)
+{
+  auto a = kuznetsov::makeList< int >({1, 4});
+  auto b = kuznetsov::makeList< int >({2, 3});
+  auto pos = a.cbegin();
+  ++pos;
+  a.splice(pos, b);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceOneAtEnd)
+{
+  auto a = kuznetsov::makeList< int >({1, 2});
+  auto b = kuznetsov::makeList< int >({9, 10, 11});
+  auto bit = b.cbegin();
+  ++bit;
+  a.splice(a.cend(), b, bit);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 10}));
+  BOOST_CHECK(kuznetsov::listEquals< int >(b, {9, 11}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceOneAtBegin)
+{
+  auto a = kuznetsov::makeList< int >({1, 2});
+  auto b = kuznetsov::makeList< int >({9, 10});
+  a.splice(a.cbegin(), b, b.cbegin());
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {9, 1, 2}));
+  BOOST_CHECK(kuznetsov::listEquals< int >(b, {10}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceOneSelfMove)
+{
+  auto a = kuznetsov::makeList< int >({1, 2, 3, 4});
+  auto last = a.cbegin();
+  ++last;
+  ++last;
+  ++last;
+  a.splice(a.cbegin(), a, last);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {4, 1, 2, 3}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeBasic)
+{
+  auto a = kuznetsov::makeList< int >({1, 5});
+  auto b = kuznetsov::makeList< int >({2, 3, 4, 99});
+  auto pos = a.cbegin();
+  ++pos;
+  auto first = b.cbegin();
+  auto last = b.cbegin();
+  ++last;
+  ++last;
+  ++last;
+  a.splice(pos, b, first, last);
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4, 5}));
+  BOOST_CHECK(kuznetsov::listEquals< int >(b, {99}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeToEnd)
+{
+  auto a = kuznetsov::makeList< int >({1});
+  auto b = kuznetsov::makeList< int >({2, 3, 4});
+  auto first = b.cbegin();
+  ++first;
+  a.splice(a.cend(), b, first, b.cend());
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 3, 4}));
+  BOOST_CHECK(kuznetsov::listEquals< int >(b, {2}));
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeWholeOther)
+{
+  auto a = kuznetsov::makeList< int >({});
+  auto b = kuznetsov::makeList< int >({1, 2, 3});
+  a.splice(a.cend(), b, b.cbegin(), b.cend());
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3}));
+  BOOST_CHECK(b.empty());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeEmpty)
+{
+  auto a = kuznetsov::makeList< int >({1});
+  auto b = kuznetsov::makeList< int >({2, 3});
+  a.splice(a.cend(), b, b.cbegin(), b.cbegin());
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1}));
+  BOOST_CHECK(kuznetsov::listEquals< int >(b, {2, 3}));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(MergeSuite)
+
+BOOST_AUTO_TEST_CASE(MergeBasic)
+{
+  auto a = kuznetsov::makeList< int >({1, 3, 5, 7});
+  auto b = kuznetsov::makeList< int >({2, 4, 6, 8});
+  a.merge(b, std::less< int >{});
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4, 5, 6, 7, 8}));
+  BOOST_CHECK(b.empty());
+}
+
+BOOST_AUTO_TEST_CASE(MergeWithEmptyOther)
+{
+  auto a = kuznetsov::makeList< int >({1, 2, 3});
+  auto b = kuznetsov::makeList< int >({});
+  a.merge(b, std::less< int >{});
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3}));
+}
+
+BOOST_AUTO_TEST_CASE(MergeRvalueOverload)
+{
+  auto a = kuznetsov::makeList< int >({1, 3});
+  a.merge(kuznetsov::makeList< int >({2, 4}), std::less< int >{});
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4}));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(SortSuite)
+
+BOOST_AUTO_TEST_CASE(SortReversed)
+{
+  auto a = kuznetsov::makeList< int >({5, 4, 3, 2, 1});
+  a.sort(std::less< int >{});
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 2, 3, 4, 5}));
+}
+
+BOOST_AUTO_TEST_CASE(SortWithDuplicates)
+{
+  auto a = kuznetsov::makeList< int >({3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5});
+  a.sort(std::less< int >{});
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9}));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(PartitionSuite)
+
+BOOST_AUTO_TEST_CASE(PartitionBasic)
+{
+  auto a = kuznetsov::makeList< int >({1, 2, 3, 4, 5, 6});
+  auto it = a.partition([](int x) { return x % 2 == 0; });
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {2, 4, 6, 1, 3, 5}));
+  BOOST_CHECK_EQUAL(*it, 1);
+}
+
+BOOST_AUTO_TEST_CASE(PartitionAllSatisfy)
+{
+  auto a = kuznetsov::makeList< int >({2, 4, 6});
+  auto it = a.partition([](int x) { return x % 2 == 0; });
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {2, 4, 6}));
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(PartitionPreservesOrderWithinGroups)
+{
+  auto a = kuznetsov::makeList< int >({1, 4, 2, 3, 6, 5});
+  auto it = a.partition([](int x) { return x % 2 == 0; });
+  BOOST_CHECK(kuznetsov::listEquals< int >(a, {4, 2, 6, 1, 3, 5}));
+  BOOST_CHECK_EQUAL(*it, 1);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

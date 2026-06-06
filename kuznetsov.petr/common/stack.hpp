@@ -15,7 +15,8 @@ namespace kuznetsov {
 
     void push(const T& val);
     void push(T&& val);
-
+    template< class... Args >
+    void emplace(Args&&... args);
     void pop();
 
     void clear() noexcept;
@@ -23,7 +24,6 @@ namespace kuznetsov {
   private:
     List< T > list_;
   };
-
 
 }
 
@@ -64,6 +64,13 @@ void kuznetsov::Stack< T >::push(T&& val)
 }
 
 template< class T >
+template< class... Args >
+void kuznetsov::Stack< T >::emplace(Args&&... args)
+{
+  list_.emplaceFront(std::forward< Args >(args)...);
+}
+
+template< class T >
 void kuznetsov::Stack< T >::pop()
 {
   list_.popFront();
@@ -75,5 +82,3 @@ void kuznetsov::Stack< T >::clear() noexcept
   list_.clear();
 }
 #endif
-
-
