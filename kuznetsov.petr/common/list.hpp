@@ -1,17 +1,17 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include <cstddef>
 #include <cassert>
-#include <utility>
+#include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace kuznetsov {
   namespace detail {
     template< class T >
     struct Node {
-      T val_;
-      Node< T >* next_;
-      Node< T >* prev_;
+      T val;
+      Node< T >* next;
+      Node< T >* prev;
     };
   }
 
@@ -192,7 +192,6 @@ namespace kuznetsov {
     void attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept;
     void detachList(node_t* first, node_t* last, size_t count) noexcept;
     void move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept;
-
   };
 
 }
@@ -201,7 +200,8 @@ template< class T >
 kuznetsov::List< T >::List():
   head_(nullptr),
   size_(0)
-{}
+{
+}
 
 template< class T >
 kuznetsov::List< T >::List(const List& other):
@@ -211,11 +211,11 @@ kuznetsov::List< T >::List(const List& other):
   if (other.empty()) {
     return;
   }
-  detail::Node<T>* current = other.head_;
+  detail::Node< T >* current = other.head_;
   do {
     try {
-      insert(cend(), current->val_);
-      current = current->next_;
+      insert(cend(), current->val);
+      current = current->next;
     } catch (...) {
       clear();
       throw;
@@ -227,7 +227,8 @@ template< class T >
 kuznetsov::List< T >::List(List&& other) noexcept:
   head_(std::exchange(other.head_, nullptr)),
   size_(std::exchange(other.size_, 0))
-{}
+{
+}
 
 template< class T >
 kuznetsov::List< T >::~List() noexcept
@@ -264,7 +265,7 @@ template< class T >
 template< class U >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, U&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{T(std::forward< U >(val)), nullptr, nullptr};
+  detail::Node< T >* n = new detail::Node< T >{ T(std::forward< U >(val)), nullptr, nullptr };
   attachList(it.curr_, n, n, 1);
   return LIter< T >(n);
 }
@@ -275,7 +276,7 @@ T& kuznetsov::List< T >::front()
   if (!head_) {
     throw std::logic_error("Empty list");
   }
-  return head_->val_;
+  return head_->val;
 }
 
 template< class T >
@@ -284,7 +285,7 @@ T& kuznetsov::List< T >::back()
   if (!head_) {
     throw std::logic_error("Empty list");
   }
-  return head_->prev_->val_;
+  return head_->prev->val;
 }
 
 template< class T >
@@ -293,7 +294,7 @@ const T& kuznetsov::List< T >::front() const
   if (!head_) {
     throw std::logic_error("Empty list");
   }
-  return head_->val_;
+  return head_->val;
 }
 
 template< class T >
@@ -302,7 +303,7 @@ const T& kuznetsov::List< T >::back() const
   if (!head_) {
     throw std::logic_error("Empty list");
   }
-  return head_->prev_->val_;
+  return head_->prev->val;
 }
 
 template< class T >
@@ -320,7 +321,7 @@ void kuznetsov::List< T >::popBack()
   if (!head_) {
     throw std::logic_error("Empty list");
   }
-  erase(LCIter< T >(head_->prev_));
+  erase(LCIter< T >(head_->prev));
 }
 
 template< class T >
@@ -351,7 +352,7 @@ template< class T >
 kuznetsov::LRIter< T > kuznetsov::List< T >::rbegin()
 {
   assert(head_ != nullptr);
-  return LRIter< T >(head_->prev_);
+  return LRIter< T >(head_->prev);
 }
 
 template< class T >
@@ -364,7 +365,7 @@ template< class T >
 kuznetsov::LRCIter< T > kuznetsov::List< T >::rcbegin() const
 {
   assert(head_ != nullptr);
-  return LRCIter< T >(head_->prev_);
+  return LRCIter< T >(head_->prev);
 }
 
 template< class T >
@@ -381,7 +382,7 @@ void kuznetsov::List< T >::clear() noexcept
   }
   detail::Node< T >* curr = head_;
   do {
-    detail::Node< T >* next = curr->next_;
+    detail::Node< T >* next = curr->next;
     delete curr;
     curr = next;
   } while (curr != head_);
@@ -395,7 +396,7 @@ kuznetsov::LIter< T > kuznetsov::List< T >::erase(LCIter< T > it)
   if (!head_ || !it.curr_) {
     throw std::logic_error("Empty list or iterator");
   }
-  detail::Node< T >* nextNode = it.curr_->next_;
+  detail::Node< T >* nextNode = it.curr_->next;
   detachList(it.curr_, it.curr_, 1);
   delete it.curr_;
   if (!size_) {
@@ -423,32 +424,32 @@ void kuznetsov::List< T >::swap(List& oth) noexcept
   std::swap(oth.size_, size_);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::attachList(node_t* pos, node_t* first, node_t* last, size_t count) noexcept
 {
   if (count == 0) {
     return;
   }
   if (head_ == nullptr) {
-    first->prev_ = last;
-    last->next_ = first;
+    first->prev = last;
+    last->next = first;
     head_ = first;
     size_ = count;
     return;
   }
   node_t* anch = pos ? pos : head_;
-  node_t* prevAnch = anch->prev_;
-  prevAnch->next_ = first;
-  first->prev_ = prevAnch;
-  anch->prev_ = last;
-  last->next_ = anch;
+  node_t* prevAnch = anch->prev;
+  prevAnch->next = first;
+  first->prev = prevAnch;
+  anch->prev = last;
+  last->next = anch;
   if (pos == head_) {
     head_ = first;
   }
   size_ += count;
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::detachList(node_t* first, node_t* last, size_t count) noexcept
 {
   if (!size_) {
@@ -459,10 +460,10 @@ void kuznetsov::List< T >::detachList(node_t* first, node_t* last, size_t count)
     size_ = 0;
     return;
   }
-  node_t* prevFirst = first->prev_;
-  node_t* afterLast = last->next_;
-  prevFirst->next_ = afterLast;
-  afterLast->prev_ = prevFirst;
+  node_t* prevFirst = first->prev;
+  node_t* afterLast = last->next;
+  prevFirst->next = afterLast;
+  afterLast->prev = prevFirst;
   node_t* p = first;
   while (true) {
     if (p == head_) {
@@ -471,12 +472,12 @@ void kuznetsov::List< T >::detachList(node_t* first, node_t* last, size_t count)
     } else if (p == last) {
       break;
     }
-    p = p->next_;
+    p = p->next;
   }
   size_ -= count;
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::move(node_t* pos, List& src, node_t* first, node_t* last, size_t count) noexcept
 {
   if (count == 0) {
@@ -486,18 +487,18 @@ void kuznetsov::List< T >::move(node_t* pos, List& src, node_t* first, node_t* l
   this->attachList(pos, first, last, count);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List& other) noexcept
 {
   if (std::addressof(other) == this || other.empty()) {
     return;
   }
   node_t* first = other.head_;
-  node_t* last = other.head_->prev_;
+  node_t* last = other.head_->prev;
   move(pos.curr_, other, first, last, other.size_);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > it) noexcept
 {
   if (it.curr_ == nullptr) {
@@ -509,14 +510,14 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > it) 
   move(pos.curr_, other, it.curr_, it.curr_, 1);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > first, LCIter< T > last) noexcept
 {
   if (first == last || other.empty()) {
     return;
   }
   node_t* fst = first.curr_;
-  node_t* lst = last.curr_ ? last.curr_->prev_ : other.head_->prev_;
+  node_t* lst = last.curr_ ? last.curr_->prev : other.head_->prev;
   size_t cnt = 0;
   node_t* p = fst;
   while (true) {
@@ -524,13 +525,13 @@ void kuznetsov::List< T >::splice(LCIter< T > pos, List& other, LCIter< T > firs
     if (p == lst) {
       break;
     }
-    p = p->next_;
+    p = p->next;
   }
   move(pos.curr_, other, fst, lst, cnt);
 }
 
-template < class T >
-template < class Compare >
+template< class T >
+template< class Compare >
 void kuznetsov::List< T >::merge(List& other, Compare cmp) noexcept
 {
   if (std::addressof(other) == this || other.empty()) {
@@ -544,24 +545,24 @@ void kuznetsov::List< T >::merge(List& other, Compare cmp) noexcept
   size_t processed = 0;
   size_t origSize = size_;
   while (processed < origSize && !other.empty()) {
-    if (cmp(other.head_->val_, i->val_)) {
+    if (cmp(other.head_->val, i->val)) {
       node_t* node = other.head_;
       move(i, other, node, node, 1);
     } else {
-      i = i->next_;
+      i = i->next;
       ++processed;
     }
   }
   if (!other.empty()) {
     node_t* oFirst = other.head_;
-    node_t* oLast = other.head_->prev_;
+    node_t* oLast = other.head_->prev;
     size_t cnt = other.size_;
     move(nullptr, other, oFirst, oLast, cnt);
   }
 }
 
-template < class T >
-template < class Compare >
+template< class T >
+template< class Compare >
 void kuznetsov::List< T >::sort(Compare cmp) noexcept
 {
   if (size_ <= 1) {
@@ -570,50 +571,50 @@ void kuznetsov::List< T >::sort(Compare cmp) noexcept
   size_t half = size_ / 2;
   node_t* mid = head_;
   for (size_t i = 0; i < half; ++i) {
-    mid = mid->next_;
+    mid = mid->next;
   }
   List other;
-  node_t* tail = head_->prev_;
+  node_t* tail = head_->prev;
   other.move(nullptr, *this, mid, tail, size_ - half);
   this->sort(cmp);
   other.sort(cmp);
   this->merge(other, cmp);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other) noexcept
 {
   splice(pos, other);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other, LCIter< T > it) noexcept
 {
   splice(pos, other, it);
 }
 
-template < class T >
+template< class T >
 void kuznetsov::List< T >::splice(LCIter< T > pos, List&& other, LCIter< T > first, LCIter< T > last) noexcept
 {
   splice(pos, other, first, last);
 }
 
-template < class T >
-template < class Compare >
-void kuznetsov::List<T>::merge(List&& other, Compare cmp) noexcept
+template< class T >
+template< class Compare >
+void kuznetsov::List< T >::merge(List&& other, Compare cmp) noexcept
 {
   merge(other, cmp);
 }
 
-template < class T >
-template < class Predict >
+template< class T >
+template< class Predict >
 kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
 {
   if (empty()) {
     return LIter< T >(nullptr);
   }
   if (size_ == 1) {
-    if (pred(head_->val_)) {
+    if (pred(head_->val)) {
       return LIter< T >(nullptr);
     }
     return LIter< T >(head_);
@@ -622,8 +623,8 @@ kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
   node_t* i = head_;
   size_t remaining = size_;
   while (remaining > 0) {
-    node_t* next = i->next_;
-    if (!pred(i->val_)) {
+    node_t* next = i->next;
+    if (!pred(i->val)) {
       rejected.move(nullptr, *this, i, i, 1);
     }
     i = next;
@@ -631,7 +632,7 @@ kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
   }
   node_t* firstRejected = rejected.head_;
   if (!rejected.empty()) {
-    move(nullptr, rejected, rejected.head_,rejected.head_->prev_, rejected.size_);
+    move(nullptr, rejected, rejected.head_, rejected.head_->prev, rejected.size_);
   }
   return LIter< T >(firstRejected);
 }
@@ -639,13 +640,14 @@ kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
 {
   if (curr_) {
-    curr_ = curr_->next_;
+    curr_ = curr_->next;
   }
   return *this;
 }
@@ -662,7 +664,7 @@ template< class T >
 kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
 {
   if (curr_) {
-    curr_ = curr_->prev_;
+    curr_ = curr_->prev;
   }
   return *this;
 }
@@ -679,14 +681,14 @@ template< class T >
 const T& kuznetsov::LCIter< T >::operator*() const
 {
   assert(this->curr_);
-  return curr_->val_;
+  return curr_->val;
 }
 
 template< class T >
 const T* kuznetsov::LCIter< T >::operator->() const
 {
   assert(this->curr_);
-  return &curr_->val_;
+  return &curr_->val;
 }
 
 template< class T >
@@ -704,13 +706,14 @@ bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
 template< class T >
 kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
 {
   if (curr_) {
-    curr_ = curr_->next_;
+    curr_ = curr_->next;
   }
   return *this;
 }
@@ -727,7 +730,7 @@ template< class T >
 kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
 {
   if (curr_) {
-    curr_ = curr_->prev_;
+    curr_ = curr_->prev;
   }
   return *this;
 }
@@ -744,14 +747,14 @@ template< class T >
 T& kuznetsov::LIter< T >::operator*()
 {
   assert(this->curr_);
-  return curr_->val_;
+  return curr_->val;
 }
 
 template< class T >
 T* kuznetsov::LIter< T >::operator->()
 {
   assert(this->curr_);
-  return &curr_->val_;
+  return &curr_->val;
 }
 
 template< class T >
@@ -769,13 +772,14 @@ bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
 template< class T >
 kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
 {
   if (curr_) {
-    curr_ = curr_->prev_;
+    curr_ = curr_->prev;
   }
   return *this;
 }
@@ -792,7 +796,7 @@ template< class T >
 kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
 {
   if (curr_) {
-    curr_ = curr_->next_;
+    curr_ = curr_->next;
   }
   return *this;
 }
@@ -809,14 +813,14 @@ template< class T >
 const T& kuznetsov::LRCIter< T >::operator*() const
 {
   assert(this->curr_);
-  return curr_->val_;
+  return curr_->val;
 }
 
 template< class T >
 const T* kuznetsov::LRCIter< T >::operator->() const
 {
   assert(this->curr_);
-  return &curr_->val_;
+  return &curr_->val;
 }
 
 template< class T >
@@ -834,13 +838,14 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 template< class T >
 kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
   curr_(pn)
-{}
+{
+}
 
 template< class T >
 kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
 {
   if (curr_) {
-    curr_ = curr_->prev_;
+    curr_ = curr_->prev;
   }
   return *this;
 }
@@ -857,7 +862,7 @@ template< class T >
 kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
 {
   if (curr_) {
-    curr_ = curr_->next_;
+    curr_ = curr_->next;
   }
   return *this;
 }
@@ -874,14 +879,14 @@ template< class T >
 T& kuznetsov::LRIter< T >::operator*()
 {
   assert(this->curr_);
-  return curr_->val_;
+  return curr_->val;
 }
 
 template< class T >
 T* kuznetsov::LRIter< T >::operator->()
 {
   assert(this->curr_);
-  return &curr_->val_;
+  return &curr_->val;
 }
 
 template< class T >
@@ -897,4 +902,3 @@ bool kuznetsov::LRIter< T >::operator!=(const LRIter& y) const noexcept
 }
 
 #endif
-
