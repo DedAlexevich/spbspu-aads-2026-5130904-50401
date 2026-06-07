@@ -85,15 +85,12 @@ int main()
   }
 
   sumIt = sums.begin();
-  bool first = true;
-  do {
-    if (!first) {
-      std::cout << ' ';
-    }
-    std::cout << *sumIt;
-    first = false;
+  std::cout << *sumIt;
+  ++sumIt;
+  while (sumIt != sums.begin()) {
+    std::cout << ' ' << *sumIt;
     ++sumIt;
-  } while (sumIt != sums.begin());
+  }
   std::cout << '\n';
   return 0;
 }
