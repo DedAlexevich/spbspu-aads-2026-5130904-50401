@@ -273,17 +273,13 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
 template< class T >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, T&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{ std::move(val), nullptr, nullptr };
-  attachList(it.curr_, n, n, 1);
-  return LIter< T >(n);
+  return emplace(it, std::move(val));
 }
 
 template< class T >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, const T& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{ val, nullptr, nullptr };
-  attachList(it.curr_, n, n, 1);
-  return LIter< T >(n);
+  return emplace(it, val);
 }
 
 template< class T >
