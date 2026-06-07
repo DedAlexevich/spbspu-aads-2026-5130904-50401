@@ -21,14 +21,14 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
-    LCIter& operator++();
-    LCIter operator++(int);
+    LCIter& operator++() noexcept;
+    LCIter operator++(int) noexcept;
 
-    LCIter& operator--();
-    LCIter operator--(int);
+    LCIter& operator--() noexcept;
+    LCIter operator--(int) noexcept;
 
-    const T& operator*() const;
-    const T* operator->() const;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     bool operator==(const LCIter& y) const noexcept;
     bool operator!=(const LCIter& y) const noexcept;
@@ -36,20 +36,20 @@ namespace kuznetsov {
     friend class List< T >;
     detail::Node< T >* curr_;
 
-    LCIter(detail::Node< T >* pn);
+    LCIter(detail::Node< T >* pn) noexcept;
   };
 
   template< class T >
   class LIter {
   public:
-    LIter& operator++();
-    LIter operator++(int);
+    LIter& operator++() noexcept;
+    LIter operator++(int) noexcept;
 
-    LIter& operator--();
-    LIter operator--(int);
+    LIter& operator--() noexcept;
+    LIter operator--(int) noexcept;
 
-    T& operator*();
-    T* operator->();
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     bool operator==(const LIter& y) const noexcept;
     bool operator!=(const LIter& y) const noexcept;
@@ -57,22 +57,22 @@ namespace kuznetsov {
     friend class List< T >;
     detail::Node< T >* curr_;
 
-    LIter(detail::Node< T >* pn);
+    LIter(detail::Node< T >* pn) noexcept;
   };
 
   template< class T >
   class LRCIter {
   public:
-    LRCIter& operator++();
+    LRCIter& operator++() noexcept;
 
-    LRCIter operator++(int);
+    LRCIter operator++(int) noexcept;
 
-    LRCIter& operator--();
+    LRCIter& operator--() noexcept;
 
-    LRCIter operator--(int);
+    LRCIter operator--(int) noexcept;
 
-    const T& operator*() const;
-    const T* operator->() const;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     bool operator==(const LRCIter& y) const noexcept;
 
@@ -82,22 +82,22 @@ namespace kuznetsov {
     friend class List< T >;
     detail::Node< T >* curr_;
 
-    LRCIter(detail::Node< T >* pn);
+    LRCIter(detail::Node< T >* pn) noexcept;
   };
 
   template< class T >
   class LRIter {
   public:
-    LRIter& operator++();
+    LRIter& operator++() noexcept;
 
-    LRIter operator++(int);
+    LRIter operator++(int) noexcept;
 
-    LRIter& operator--();
+    LRIter& operator--() noexcept;
 
-    LRIter operator--(int);
+    LRIter operator--(int) noexcept;
 
-    T& operator*();
-    T* operator->();
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     bool operator==(const LRIter& y) const noexcept;
 
@@ -107,13 +107,13 @@ namespace kuznetsov {
     friend class List< T >;
     detail::Node< T >* curr_;
 
-    LRIter(detail::Node< T >* pn);
+    LRIter(detail::Node< T >* pn) noexcept;
   };
 
   template< class T >
   class List {
   public:
-    List();
+    List() noexcept;
 
     List(const List& other);
 
@@ -140,21 +140,21 @@ namespace kuznetsov {
 
     void popBack();
 
-    LIter< T > begin();
+    LIter< T > begin() noexcept;
 
-    LIter< T > end();
+    LIter< T > end() noexcept;
 
-    LCIter< T > cbegin() const;
+    LCIter< T > cbegin() const noexcept;
 
-    LCIter< T > cend() const;
+    LCIter< T > cend() const noexcept;
 
-    LRIter< T > rbegin();
+    LRIter< T > rbegin() noexcept;
 
-    LRIter< T > rend();
+    LRIter< T > rend() noexcept;
 
-    LRCIter< T > rcbegin() const;
+    LRCIter< T > rcbegin() const noexcept;
 
-    LRCIter< T > rcend() const;
+    LRCIter< T > rcend() const noexcept;
 
     void clear() noexcept;
 
@@ -197,7 +197,7 @@ namespace kuznetsov {
 }
 
 template< class T >
-kuznetsov::List< T >::List():
+kuznetsov::List< T >::List() noexcept:
   head_(nullptr),
   size_(0)
 {
@@ -332,51 +332,51 @@ void kuznetsov::List< T >::popBack()
 }
 
 template< class T >
-kuznetsov::LIter< T > kuznetsov::List< T >::begin()
+kuznetsov::LIter< T > kuznetsov::List< T >::begin() noexcept
 {
   return LIter< T >(head_);
 }
 
 template< class T >
-kuznetsov::LIter< T > kuznetsov::List< T >::end()
+kuznetsov::LIter< T > kuznetsov::List< T >::end() noexcept
 {
   return LIter< T >(nullptr);
 }
 
 template< class T >
-kuznetsov::LCIter< T > kuznetsov::List< T >::cbegin() const
+kuznetsov::LCIter< T > kuznetsov::List< T >::cbegin() const noexcept
 {
   return LCIter< T >(head_);
 }
 
 template< class T >
-kuznetsov::LCIter< T > kuznetsov::List< T >::cend() const
+kuznetsov::LCIter< T > kuznetsov::List< T >::cend() const noexcept
 {
   return LCIter< T >(nullptr);
 }
 
 template< class T >
-kuznetsov::LRIter< T > kuznetsov::List< T >::rbegin()
+kuznetsov::LRIter< T > kuznetsov::List< T >::rbegin() noexcept
 {
   assert(head_ != nullptr);
   return LRIter< T >(head_->prev);
 }
 
 template< class T >
-kuznetsov::LRIter< T > kuznetsov::List< T >::rend()
+kuznetsov::LRIter< T > kuznetsov::List< T >::rend() noexcept
 {
   return LRIter< T >(nullptr);
 }
 
 template< class T >
-kuznetsov::LRCIter< T > kuznetsov::List< T >::rcbegin() const
+kuznetsov::LRCIter< T > kuznetsov::List< T >::rcbegin() const noexcept
 {
   assert(head_ != nullptr);
   return LRCIter< T >(head_->prev);
 }
 
 template< class T >
-kuznetsov::LRCIter< T > kuznetsov::List< T >::rcend() const
+kuznetsov::LRCIter< T > kuznetsov::List< T >::rcend() const noexcept
 {
   return LRCIter< T >(nullptr);
 }
@@ -645,13 +645,13 @@ kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
 }
 
 template< class T >
-kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn):
+kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
 {
 }
 
 template< class T >
-kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++() noexcept
 {
   if (curr_) {
     curr_ = curr_->next;
@@ -660,7 +660,7 @@ kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++()
 }
 
 template< class T >
-kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int) noexcept
 {
   LCIter temp(*this);
   ++(*this);
@@ -668,7 +668,7 @@ kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator++(int)
 }
 
 template< class T >
-kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
+kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--() noexcept
 {
   if (curr_) {
     curr_ = curr_->prev;
@@ -677,7 +677,7 @@ kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator--()
 }
 
 template< class T >
-kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
+kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int) noexcept
 {
   LCIter temp(*this);
   --(*this);
@@ -685,14 +685,14 @@ kuznetsov::LCIter< T > kuznetsov::LCIter< T >::operator--(int)
 }
 
 template< class T >
-const T& kuznetsov::LCIter< T >::operator*() const
+const T& kuznetsov::LCIter< T >::operator*() const noexcept
 {
   assert(this->curr_);
   return curr_->val;
 }
 
 template< class T >
-const T* kuznetsov::LCIter< T >::operator->() const
+const T* kuznetsov::LCIter< T >::operator->() const noexcept
 {
   assert(this->curr_);
   return &curr_->val;
@@ -711,13 +711,13 @@ bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
 }
 
 template< class T >
-kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn):
+kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn) noexcept:
   curr_(pn)
 {
 }
 
 template< class T >
-kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++() noexcept
 {
   if (curr_) {
     curr_ = curr_->next;
@@ -726,7 +726,7 @@ kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++()
 }
 
 template< class T >
-kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int)
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int) noexcept
 {
   LIter temp(*this);
   ++(*this);
@@ -734,7 +734,7 @@ kuznetsov::LIter< T > kuznetsov::LIter< T >::operator++(int)
 }
 
 template< class T >
-kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
+kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--() noexcept
 {
   if (curr_) {
     curr_ = curr_->prev;
@@ -743,7 +743,7 @@ kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator--()
 }
 
 template< class T >
-kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
+kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int) noexcept
 {
   LIter temp(*this);
   --(*this);
@@ -751,14 +751,14 @@ kuznetsov::LIter< T > kuznetsov::LIter< T >::operator--(int)
 }
 
 template< class T >
-T& kuznetsov::LIter< T >::operator*()
+T& kuznetsov::LIter< T >::operator*() noexcept
 {
   assert(this->curr_);
   return curr_->val;
 }
 
 template< class T >
-T* kuznetsov::LIter< T >::operator->()
+T* kuznetsov::LIter< T >::operator->() noexcept
 {
   assert(this->curr_);
   return &curr_->val;
@@ -777,13 +777,13 @@ bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
 }
 
 template< class T >
-kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn):
+kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
 {
 }
 
 template< class T >
-kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++() noexcept
 {
   if (curr_) {
     curr_ = curr_->prev;
@@ -792,7 +792,7 @@ kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++()
 }
 
 template< class T >
-kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int)
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int) noexcept
 {
   LRCIter temp(*this);
   ++(*this);
@@ -800,7 +800,7 @@ kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator++(int)
 }
 
 template< class T >
-kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
+kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--() noexcept
 {
   if (curr_) {
     curr_ = curr_->next;
@@ -809,7 +809,7 @@ kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator--()
 }
 
 template< class T >
-kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
+kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int) noexcept
 {
   LRCIter temp(*this);
   --(*this);
@@ -817,14 +817,14 @@ kuznetsov::LRCIter< T > kuznetsov::LRCIter< T >::operator--(int)
 }
 
 template< class T >
-const T& kuznetsov::LRCIter< T >::operator*() const
+const T& kuznetsov::LRCIter< T >::operator*() const noexcept
 {
   assert(this->curr_);
   return curr_->val;
 }
 
 template< class T >
-const T* kuznetsov::LRCIter< T >::operator->() const
+const T* kuznetsov::LRCIter< T >::operator->() const noexcept
 {
   assert(this->curr_);
   return &curr_->val;
@@ -843,13 +843,13 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 }
 
 template< class T >
-kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn):
+kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
 {
 }
 
 template< class T >
-kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++() noexcept
 {
   if (curr_) {
     curr_ = curr_->prev;
@@ -858,7 +858,7 @@ kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++()
 }
 
 template< class T >
-kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int) noexcept
 {
   LRIter temp(*this);
   ++(*this);
@@ -866,7 +866,7 @@ kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator++(int)
 }
 
 template< class T >
-kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
+kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--() noexcept
 {
   if (curr_) {
     curr_ = curr_->next;
@@ -875,7 +875,7 @@ kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator--()
 }
 
 template< class T >
-kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
+kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int) noexcept
 {
   LRIter temp(*this);
   --(*this);
@@ -883,14 +883,14 @@ kuznetsov::LRIter< T > kuznetsov::LRIter< T >::operator--(int)
 }
 
 template< class T >
-T& kuznetsov::LRIter< T >::operator*()
+T& kuznetsov::LRIter< T >::operator*() noexcept
 {
   assert(this->curr_);
   return curr_->val;
 }
 
 template< class T >
-T* kuznetsov::LRIter< T >::operator->()
+T* kuznetsov::LRIter< T >::operator->() noexcept
 {
   assert(this->curr_);
   return &curr_->val;
