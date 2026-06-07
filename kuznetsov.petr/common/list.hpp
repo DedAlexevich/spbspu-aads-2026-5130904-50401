@@ -239,7 +239,7 @@ kuznetsov::List< T >::~List() noexcept
 template< class T >
 kuznetsov::List< T >& kuznetsov::List< T >::operator=(const List& other)
 {
-  if (this == &other) {
+  if (this == std::addressof(other)) {
     return *this;
   }
   List cp(other);
@@ -251,7 +251,7 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(const List& other)
 template< class T >
 kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
 {
-  if (this == &other) {
+  if (this == std::addressof(other)) {
     return *this;
   }
   clear();
@@ -695,7 +695,7 @@ template< class T >
 const T* kuznetsov::LCIter< T >::operator->() const noexcept
 {
   assert(this->curr_);
-  return &curr_->val;
+  return std::addressof(curr_->val);
 }
 
 template< class T >
@@ -761,7 +761,7 @@ template< class T >
 T* kuznetsov::LIter< T >::operator->() noexcept
 {
   assert(this->curr_);
-  return &curr_->val;
+  return std::addressof(curr_->val);
 }
 
 template< class T >
@@ -827,7 +827,7 @@ template< class T >
 const T* kuznetsov::LRCIter< T >::operator->() const noexcept
 {
   assert(this->curr_);
-  return &curr_->val;
+  return std::addressof(curr_->val);
 }
 
 template< class T >
@@ -893,7 +893,7 @@ template< class T >
 T* kuznetsov::LRIter< T >::operator->() noexcept
 {
   assert(this->curr_);
-  return &curr_->val;
+  return std::addressof(curr_->val);
 }
 
 template< class T >
