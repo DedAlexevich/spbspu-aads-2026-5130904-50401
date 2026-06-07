@@ -30,10 +30,10 @@ int main()
   }
 
   auto listBegin = list.cbegin();
-  std::cout << (*listBegin).first;
+  std::cout << listBegin->first;
   listBegin++;
   for (size_t i = 1; i < list.size(); ++i) {
-    std::cout << ' ' << (*listBegin).first;
+    std::cout << ' ' << listBegin->first;
     listBegin++;
   }
 
@@ -41,7 +41,7 @@ int main()
   size_t countRows = 0;
   listBegin = list.cbegin();
   do {
-    countRows = std::max(countRows, (*listBegin).second.size());
+    countRows = std::max(countRows, listBegin->second.size());
     listBegin++;
   } while (listBegin != list.cbegin());
 
@@ -60,7 +60,7 @@ int main()
     bool first = true;
     listBegin = list.cbegin();
     do {
-      const kuz::List< size_t >& seq = (*listBegin).second;
+      const kuz::List< size_t >& seq = listBegin->second;
       if (row < seq.size()) {
         auto it = seq.cbegin();
         for (size_t i = 0; i < row; ++i) {
