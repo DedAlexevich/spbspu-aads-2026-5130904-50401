@@ -25,7 +25,16 @@ namespace kuznetsov {
   lli_t mod(const lli_t& a, const lli_t& b);
   lli_t bitShiftToRight(const lli_t& a, const lli_t& b);
 
-  using stackOfInfixExpression = Stack< Queue< std::string > >;
+  struct InfixExpression {
+    void pushToken(const std::string& token);
+    bool empty() const noexcept;
+    lli_t evaluate() const;
+  private:
+    Queue< std::string > tokens_;
+    Queue< std::string > toPostfix() const;
+  };
+
+  using stackOfInfixExpression = Stack< InfixExpression >;
   stackOfInfixExpression getExpressions(std::istream& in);
   lli_t calculatePostfix(Queue< std::string > postfix);
   Queue< lli_t > calculateStackOfInfix(stackOfInfixExpression infix);
