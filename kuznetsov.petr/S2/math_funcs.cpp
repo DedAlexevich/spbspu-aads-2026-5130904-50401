@@ -27,7 +27,7 @@ size_t kuznetsov::detail::getPriority(const std::string& c)
   }
 }
 
-kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::add(const lli_t& a, const lli_t& b)
 {
   if (a > 0 && b > 0 && a > MAX - b) {
     throw std::overflow_error("Add overflow");
@@ -37,7 +37,7 @@ kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
   return a + b;
 }
 
-kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::sub(const lli_t& a, const lli_t& b)
 {
   if (a < 0 && b > 0 && a < MIN + b) {
     throw std::overflow_error("Sub overflow");
@@ -47,7 +47,7 @@ kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
   return a - b;
 }
 
-kuznetsov::lli_t kuznetsov::mul(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::mul(const lli_t& a, const lli_t& b)
 {
   if (!a || !b) {
     return 0;
@@ -64,7 +64,7 @@ kuznetsov::lli_t kuznetsov::mul(const lli_t& a, const lli_t& b)
   return a * b;
 }
 
-kuznetsov::lli_t kuznetsov::div(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::div(const lli_t& a, const lli_t& b)
 {
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
@@ -75,7 +75,7 @@ kuznetsov::lli_t kuznetsov::div(const lli_t& a, const lli_t& b)
   return a / b;
 }
 
-kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::mod(const lli_t& a, const lli_t& b)
 {
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
@@ -85,7 +85,7 @@ kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
   return r;
 }
 
-kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::detail::bitShiftToRight(const lli_t& a, const lli_t& b)
 {
   if (b < 0) {
     throw std::logic_error("Bit right shift by value less then zero");
@@ -197,17 +197,17 @@ kuznetsov::lli_t kuznetsov::InfixExpression::evaluate() const
       evalStack.pop();
       lli_t result = 0;
       if (sym == "+") {
-        result = add(a, b);
+        result = detail::add(a, b);
       } else if (sym == "-") {
-        result = sub(a, b);
+        result = detail::sub(a, b);
       } else if (sym == "*") {
-        result = mul(a, b);
+        result = detail::mul(a, b);
       } else if (sym == "/") {
-        result = div(a, b);
+        result = detail::div(a, b);
       } else if (sym == "%") {
-        result = mod(a, b);
+        result = detail::mod(a, b);
       } else if (sym == ">>") {
-        result = bitShiftToRight(a, b);
+        result = detail::bitShiftToRight(a, b);
       } else {
         throw std::logic_error("Unknown operator: " + sym);
       }
