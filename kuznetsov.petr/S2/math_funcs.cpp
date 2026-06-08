@@ -178,46 +178,48 @@ kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
   return evalStack.top();
 }
 
-kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
+kuznetsov::Queue< std::string > kuznetsov::infixToPostfix(Queue< std::string > infix)
 {
   Queue< std::string > postfix;
-  Queue< lli_t > res;
   Stack< std::string > temp;
   while (!infix.empty()) {
-    Queue< std::string > curr = infix.top();
+    std::string sym = infix.front();
     infix.pop();
-    while (!curr.empty()) {
-      std::string sym = curr.front();
-      curr.pop();
-      if (sym == "(") {
-        temp.push(sym);
-      } else if (sym == ")") {
-        while (!temp.empty() && temp.top() != "(") {
+    if (sym == "(") {
+      temp.push(sym);
+    } else if (sym == ")") {
+      while (!temp.empty() && temp.top() != "(") {
+        postfix.push(temp.top());
+        temp.pop();
+      }
+      temp.pop();
+    } else if (!detail::isOperation(sym)) {
+      postfix.push(sym);
+    } else {
+      while (!temp.empty() && temp.top() != "(") {
+        if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
           postfix.push(temp.top());
           temp.pop();
+        } else {
+          break;
         }
-        temp.pop();
-      } else if (!detail::isOperation(sym)) {
-        postfix.push(sym);
-      } else {
-        while (!temp.empty() && temp.top() != "(") {
-          if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
-            postfix.push(temp.top());
-            temp.pop();
-          } else {
-            break;
-          }
-        }
-        temp.push(sym);
       }
+      temp.push(sym);
     }
-    while (!temp.empty()) {
-      postfix.push(temp.top());
-      temp.pop();
-    }
-    temp.clear();
-    res.push(calculatePostfix(postfix));
-    postfix.clear();
+  }
+  while (!temp.empty()) {
+    postfix.push(temp.top());
+    temp.pop();
+  }
+  return postfix;
+}
+
+kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
+{
+  Queue< lli_t > res;
+  while (!infix.empty()) {
+    res.push(calculatePostfix(infixToPostfix(infix.top())));
+    infix.pop();
   }
   return res;
 }
