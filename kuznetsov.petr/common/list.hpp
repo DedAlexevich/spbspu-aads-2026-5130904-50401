@@ -130,6 +130,15 @@ namespace kuznetsov {
     LIter< T > insert(LCIter< T > it, T&& val);
     LIter< T > insert(LCIter< T > it, const T& val);
 
+    template< class... Args >
+    LIter< T > emplace(LCIter< T > pos, Args&&... args);
+
+    template< class... Args >
+    void emplaceFront(Args&&... args);
+
+    template< class... Args >
+    void emplaceBack(Args&&... args);
+
     T& front();
 
     T& back();
@@ -264,17 +273,36 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
 template< class T >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, T&& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{ T(std::forward< T >(val)), nullptr, nullptr };
-  attachList(it.curr_, n, n, 1);
-  return LIter< T >(n);
+  return emplace(it, std::forward< T >(val));
 }
 
 template< class T >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, const T& val)
 {
-  detail::Node< T >* n = new detail::Node< T >{ T(val), nullptr, nullptr };
-  attachList(it.curr_, n, n, 1);
+  return emplace(it, val);
+}
+
+template< class T >
+template< class... Args >
+kuznetsov::LIter< T > kuznetsov::List< T >::emplace(LCIter< T > pos, Args&&... args)
+{
+  detail::Node< T >* n = new detail::Node< T >{ T(std::forward< Args >(args)...), nullptr, nullptr };
+  attachList(pos.curr_, n, n, 1);
   return LIter< T >(n);
+}
+
+template< class T >
+template< class... Args >
+void kuznetsov::List< T >::emplaceFront(Args&&... args)
+{
+  emplace(cbegin(), std::forward< Args >(args)...);
+}
+
+template< class T >
+template< class... Args >
+void kuznetsov::List< T >::emplaceBack(Args&&... args)
+{
+  emplace(cend(), std::forward< Args >(args)...);
 }
 
 template< class T >
