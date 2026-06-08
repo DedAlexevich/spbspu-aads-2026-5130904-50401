@@ -32,6 +32,7 @@ namespace kuznetsov {
 
     bool operator==(const LCIter& y) const noexcept;
     bool operator!=(const LCIter& y) const noexcept;
+
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
@@ -53,6 +54,7 @@ namespace kuznetsov {
 
     bool operator==(const LIter& y) const noexcept;
     bool operator!=(const LIter& y) const noexcept;
+
   private:
     friend class List< T >;
     detail::Node< T >* curr_;
