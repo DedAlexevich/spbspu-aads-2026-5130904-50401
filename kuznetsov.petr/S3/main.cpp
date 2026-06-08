@@ -1,12 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <boost/hash2/siphash.hpp>
-#include <boost/hash2/hash_append.hpp>
+#include <HashTable.hpp>
 #include <boost/describe/class.hpp>
-#include "./graph.hpp"
+#include <boost/hash2/hash_append.hpp>
+#include <boost/hash2/siphash.hpp>
+#include <fstream>
+#include <iostream>
+
 #include "./Hasher.hpp"
-#include "./HashTable.hpp"
 #include "./commands.hpp"
+#include "./graph.hpp"
 
 int main(int argc, char** argv)
 {
@@ -22,8 +23,8 @@ int main(int argc, char** argv)
   namespace kuz = kuznetsov;
   std::string name;
   size_t count = 0;
-  using command = void(*)(std::ostream&, std::istream&, kuz::table&);
-  using constCommand = void(*)(std::ostream&, std::istream&, const kuz::table&);
+  using command = void (*)(std::ostream&, std::istream&, kuz::table&);
+  using constCommand = void (*)(std::ostream&, std::istream&, const kuz::table&);
   kuz::table grphs;
   kuz::HashTable< std::string, command, kuz::SipHasher< std::string >, kuz::KeyComparator > cmds;
   kuz::HashTable< std::string, constCommand, kuz::SipHasher< std::string >, kuz::KeyComparator > constCmds;
@@ -62,4 +63,3 @@ int main(int argc, char** argv)
     }
   }
 }
-
