@@ -209,8 +209,7 @@ template< class T >
 kuznetsov::List< T >::List() noexcept:
   head_(nullptr),
   size_(0)
-{
-}
+{}
 
 template< class T >
 kuznetsov::List< T >::List(const List& other):
@@ -236,8 +235,7 @@ template< class T >
 kuznetsov::List< T >::List(List&& other) noexcept:
   head_(std::exchange(other.head_, nullptr)),
   size_(std::exchange(other.size_, 0))
-{
-}
+{}
 
 template< class T >
 kuznetsov::List< T >::~List() noexcept
@@ -273,7 +271,7 @@ kuznetsov::List< T >& kuznetsov::List< T >::operator=(List&& other) noexcept
 template< class T >
 kuznetsov::LIter< T > kuznetsov::List< T >::insert(LCIter< T > it, T&& val)
 {
-  return emplace(it, std::move(val));
+  return emplace(it, std::forward< T >(val));
 }
 
 template< class T >
@@ -675,8 +673,7 @@ kuznetsov::LIter< T > kuznetsov::List< T >::partition(Predict pred) noexcept
 template< class T >
 kuznetsov::LCIter< T >::LCIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
-{
-}
+{}
 
 template< class T >
 kuznetsov::LCIter< T >& kuznetsov::LCIter< T >::operator++() noexcept
@@ -741,8 +738,7 @@ bool kuznetsov::LCIter< T >::operator!=(const LCIter& y) const noexcept
 template< class T >
 kuznetsov::LIter< T >::LIter(kuznetsov::detail::Node< T >* pn) noexcept:
   curr_(pn)
-{
-}
+{}
 
 template< class T >
 kuznetsov::LIter< T >& kuznetsov::LIter< T >::operator++() noexcept
@@ -807,8 +803,7 @@ bool kuznetsov::LIter< T >::operator!=(const LIter& y) const noexcept
 template< class T >
 kuznetsov::LRCIter< T >::LRCIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
-{
-}
+{}
 
 template< class T >
 kuznetsov::LRCIter< T >& kuznetsov::LRCIter< T >::operator++() noexcept
@@ -873,8 +868,7 @@ bool kuznetsov::LRCIter< T >::operator!=(const LRCIter& y) const noexcept
 template< class T >
 kuznetsov::LRIter< T >::LRIter(detail::Node< T >* pn) noexcept:
   curr_(pn)
-{
-}
+{}
 
 template< class T >
 kuznetsov::LRIter< T >& kuznetsov::LRIter< T >::operator++() noexcept
