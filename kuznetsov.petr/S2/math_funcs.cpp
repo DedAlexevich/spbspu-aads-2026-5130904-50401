@@ -1,14 +1,13 @@
 #include "math_funcs.hpp"
-#include <limits>
-#include <stdexcept>
+
 #include <climits>
 #include <iostream>
-const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
-const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
+#include <limits>
+#include <stdexcept>
 
 bool kuznetsov::detail::isOperation(const std::string& c)
 {
-  std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
+  std::string operators[] = { "+", "-", "*", "/", "%", ">>", "(", ")" };
   for (size_t i = 0; i < 8; ++i) {
     if (c == operators[i]) {
       return true;
@@ -222,4 +221,3 @@ kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInf
   }
   return res;
 }
-
