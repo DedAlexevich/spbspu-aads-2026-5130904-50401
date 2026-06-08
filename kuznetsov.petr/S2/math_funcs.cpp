@@ -97,89 +97,19 @@ kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
   return a >> b;
 }
 
-kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
+void kuznetsov::InfixExpression::pushToken(const std::string& token)
 {
-  std::string current;
-  Queue< std::string > expression;
-  stackOfInfixExpression res;
-  int a = in.get();
-  while (a != -1) {
-    if (a == '\n') {
-      if (!current.empty()) {
-        expression.push(current);
-        current.clear();
-      }
-      if (!expression.empty()) {
-        res.push(expression);
-        expression.clear();
-      }
-    } else if (a == ' ') {
-      expression.push(current);
-      current.clear();
-    } else {
-      current.push_back(static_cast< char >(a));
-    }
-    a = in.get();
-  }
-  if (!current.empty()) {
-    expression.push(current);
-    current.clear();
-  }
-  if (!expression.empty()) {
-    res.push(expression);
-    expression.clear();
-  }
-  return res;
+  tokens_.push(token);
 }
 
-kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
+bool kuznetsov::InfixExpression::empty() const noexcept
 {
-  Stack< lli_t > evalStack;
-  while (!postfix.empty()) {
-    std::string sym = postfix.front();
-    postfix.pop();
-
-    if (!detail::isOperation(sym)) {
-      evalStack.push(std::stoll(sym));
-    } else {
-      if (evalStack.size() < 2) {
-        throw std::logic_error("Not enough operands for operator: " + sym);
-      }
-      lli_t b = evalStack.top();
-      evalStack.pop();
-      lli_t a = evalStack.top();
-      evalStack.pop();
-
-      lli_t result = 0;
-      if (sym == "+") {
-        result = add(a, b);
-      } else if (sym == "-") {
-        result = sub(a, b);
-      } else if (sym == "*") {
-        result = mul(a, b);
-      } else if (sym == "/") {
-        result = div(a, b);
-      } else if (sym == "%") {
-        result = mod(a, b);
-      } else if (sym == ">>") {
-        result = bitShiftToRight(a, b);
-      } else {
-        throw std::logic_error("Unknown operator: " + sym);
-      }
-
-      evalStack.push(result);
-    }
-  }
-
-  if (evalStack.size() != 1) {
-    throw std::logic_error("Must be one res ");
-  }
-
-  return evalStack.top();
+  return tokens_.empty();
 }
 
-kuznetsov::Queue< std::string > kuznetsov::infixToPostfix(Queue< std::string > infix)
+kuznetsov::Queue< std::string > kuznetsov::InfixExpression::toPostfix() const
 {
+  Queue< std::string > infix = tokens_;
   Queue< std::string > postfix;
   Stack< std::string > temp;
   while (!infix.empty()) {
@@ -214,11 +144,87 @@ kuznetsov::Queue< std::string > kuznetsov::infixToPostfix(Queue< std::string > i
   return postfix;
 }
 
+kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
+{
+  std::string current;
+  InfixExpression expression;
+  stackOfInfixExpression res;
+  int a = in.get();
+  while (a != -1) {
+    if (a == '\n') {
+      if (!current.empty()) {
+        expression.pushToken(current);
+        current.clear();
+      }
+      if (!expression.empty()) {
+        res.push(expression);
+        expression = InfixExpression();
+      }
+    } else if (a == ' ') {
+      expression.pushToken(current);
+      current.clear();
+    } else {
+      current.push_back(static_cast< char >(a));
+    }
+    a = in.get();
+  }
+  if (!current.empty()) {
+    expression.pushToken(current);
+    current.clear();
+  }
+  if (!expression.empty()) {
+    res.push(expression);
+  }
+  return res;
+}
+
+kuznetsov::lli_t kuznetsov::InfixExpression::evaluate() const
+{
+  Queue< std::string > postfix = toPostfix();
+  Stack< lli_t > evalStack;
+  while (!postfix.empty()) {
+    std::string sym = postfix.front();
+    postfix.pop();
+    if (!detail::isOperation(sym)) {
+      evalStack.push(std::stoll(sym));
+    } else {
+      if (evalStack.size() < 2) {
+        throw std::logic_error("Not enough operands for operator: " + sym);
+      }
+      lli_t b = evalStack.top();
+      evalStack.pop();
+      lli_t a = evalStack.top();
+      evalStack.pop();
+      lli_t result = 0;
+      if (sym == "+") {
+        result = add(a, b);
+      } else if (sym == "-") {
+        result = sub(a, b);
+      } else if (sym == "*") {
+        result = mul(a, b);
+      } else if (sym == "/") {
+        result = div(a, b);
+      } else if (sym == "%") {
+        result = mod(a, b);
+      } else if (sym == ">>") {
+        result = bitShiftToRight(a, b);
+      } else {
+        throw std::logic_error("Unknown operator: " + sym);
+      }
+      evalStack.push(result);
+    }
+  }
+  if (evalStack.size() != 1) {
+    throw std::logic_error("Must be one res ");
+  }
+  return evalStack.top();
+}
+
 kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
 {
   Queue< lli_t > res;
   while (!infix.empty()) {
-    res.push(calculatePostfix(infixToPostfix(infix.top())));
+    res.push(infix.top().evaluate());
     infix.pop();
   }
   return res;
