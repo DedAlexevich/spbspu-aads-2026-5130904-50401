@@ -7,7 +7,7 @@
 
 bool kuznetsov::detail::isOperation(const std::string& c)
 {
-  std::string operators[] = { "+", "-", "*", "/", "%", ">>", "(", ")" };
+  std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
   for (size_t i = 0; i < 8; ++i) {
     if (c == operators[i]) {
       return true;
@@ -27,55 +27,55 @@ size_t kuznetsov::detail::getPriority(const std::string& c)
   }
 }
 
-kuznetsov::lli_t kuznetsov::detail::add(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
 {
-  if (a > 0 && b > 0 && a > MAX - b) {
+  if (a > 0 && b > 0 && a > detail::MAX - b) {
     throw std::overflow_error("Add overflow");
-  } else if (a < 0 && b < 0 && a < MIN - b) {
+  } else if (a < 0 && b < 0 && a < detail::MIN - b) {
     throw std::overflow_error("Add overflow");
   }
   return a + b;
 }
 
-kuznetsov::lli_t kuznetsov::detail::sub(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
 {
-  if (a < 0 && b > 0 && a < MIN + b) {
+  if (a < 0 && b > 0 && a < detail::MIN + b) {
     throw std::overflow_error("Sub overflow");
-  } else if (a > 0 && b < 0 && a < MAX + b) {
+  } else if (a > 0 && b < 0 && a < detail::MAX + b) {
     throw std::overflow_error("Sub overflow");
   }
   return a - b;
 }
 
-kuznetsov::lli_t kuznetsov::detail::mul(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::mul(const lli_t& a, const lli_t& b)
 {
   if (!a || !b) {
     return 0;
   }
-  if (a > 0 && b > 0 && a > MAX / b) {
+  if (a > 0 && b > 0 && a > detail::MAX / b) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a < 0 && b < 0 && a > MAX / b) {
+  } else if (a < 0 && b < 0 && a > detail::MAX / b) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a > 0 && b < 0 && b < MIN / a) {
+  } else if (a > 0 && b < 0 && b < detail::MIN / a) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a < 0 && b > 0 && a < MIN / b) {
+  } else if (a < 0 && b > 0 && a < detail::MIN / b) {
     throw std::overflow_error("Multiply overflow");
   }
   return a * b;
 }
 
-kuznetsov::lli_t kuznetsov::detail::div(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::div(const lli_t& a, const lli_t& b)
 {
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
   }
-  if (a == MIN && b == -1) {
+  if (a == detail::MIN && b == -1) {
     throw std::overflow_error("Div overflow");
   }
   return a / b;
 }
 
-kuznetsov::lli_t kuznetsov::detail::mod(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
 {
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
@@ -85,7 +85,7 @@ kuznetsov::lli_t kuznetsov::detail::mod(const lli_t& a, const lli_t& b)
   return r;
 }
 
-kuznetsov::lli_t kuznetsov::detail::bitShiftToRight(const lli_t& a, const lli_t& b)
+kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
 {
   if (b < 0) {
     throw std::logic_error("Bit right shift by value less then zero");
@@ -197,17 +197,17 @@ kuznetsov::lli_t kuznetsov::InfixExpression::evaluate() const
       evalStack.pop();
       lli_t result = 0;
       if (sym == "+") {
-        result = detail::add(a, b);
+        result = add(a, b);
       } else if (sym == "-") {
-        result = detail::sub(a, b);
+        result = sub(a, b);
       } else if (sym == "*") {
-        result = detail::mul(a, b);
+        result = mul(a, b);
       } else if (sym == "/") {
-        result = detail::div(a, b);
+        result = div(a, b);
       } else if (sym == "%") {
-        result = detail::mod(a, b);
+        result = mod(a, b);
       } else if (sym == ">>") {
-        result = detail::bitShiftToRight(a, b);
+        result = bitShiftToRight(a, b);
       } else {
         throw std::logic_error("Unknown operator: " + sym);
       }
