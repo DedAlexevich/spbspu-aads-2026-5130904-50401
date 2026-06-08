@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE S4
+#include <BSTree.hpp>
 #include <boost/test/included/unit_test.hpp>
-
-#include "./BSTree.hpp"
 
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
 {
