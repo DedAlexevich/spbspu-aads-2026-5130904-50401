@@ -1,14 +1,16 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
-#include <stdexcept>
-#include <cstddef>
-#include <utility>
 #include <cmath>
+#include <cstddef>
+#include <stdexcept>
+#include <utility>
 
 namespace kuznetsov {
   namespace detail {
     enum class State {
-      FREE, STORE, DELETED
+      FREE,
+      STORE,
+      DELETED
     };
 
     template< bool B, class T, class F >
@@ -16,7 +18,7 @@ namespace kuznetsov {
       using type = T;
     };
 
-    template<class T, class F>
+    template< class T, class F >
     struct conditional< false, T, F > {
       using type = F;
     };
@@ -38,12 +40,12 @@ namespace kuznetsov {
     };
   }
   template< class Key, class Value, bool IsConst >
-  struct Iterator;
+  struct HTIterator;
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
-    using const_iterator = Iterator< Key, Value, true >;
-    using iterator = Iterator< Key, Value, false >;
+    using const_iterator = HTIterator< Key, Value, true >;
+    using iterator = HTIterator< Key, Value, false >;
 
     HashTable();
     HashTable(const HashTable&);
@@ -85,27 +87,27 @@ namespace kuznetsov {
   };
 
   template< class Key, class Value, bool IsConst >
-  struct Iterator {
+  struct HTIterator {
     using pair_type = detail::Slot< const Key, Value >;
     using reference = typename detail::conditional< IsConst, const pair_type&, pair_type& >::type;
     using point = typename detail::conditional< IsConst, const pair_type*, pair_type* >::type;
 
-    Iterator(detail::Slot< Key, Value >* slots , detail::State* s, size_t ind, size_t cap);
+    HTIterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
 
     template< bool OthConst >
-    bool operator==(const Iterator< Key, Value, OthConst >&) const;
+    bool operator==(const HTIterator< Key, Value, OthConst >&) const;
 
     template< bool OthConst >
-    bool operator!=(const Iterator< Key, Value, OthConst >&) const;
+    bool operator!=(const HTIterator< Key, Value, OthConst >&) const;
 
     reference operator*();
     point operator->();
 
-    Iterator operator++();
-    Iterator operator--();
+    HTIterator operator++();
+    HTIterator operator--();
 
-    Iterator operator++(int);
-    Iterator operator--(int);
+    HTIterator operator++(int);
+    HTIterator operator--(int);
 
   private:
     pair_type* slots_;
@@ -169,10 +171,8 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const
   return const_iterator(slots_, states_, capacity_, capacity_);
 }
 
-
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst >::Iterator(detail::Slot< K, V >* slt,
-    detail::State* s, size_t ind, size_t cap):
+kuznetsov::HTIterator< K, V, IsConst >::HTIterator(detail::Slot< K, V >* slt, detail::State* s, size_t ind, size_t cap):
   slots_(reinterpret_cast< pair_type* >(slt)),
   states_(s),
   i_(ind),
@@ -181,7 +181,7 @@ kuznetsov::Iterator< K, V, IsConst >::Iterator(detail::Slot< K, V >* slt,
 
 template< class K, class V, bool IsConst >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, IsConst >::operator==(const Iterator< K, V, OthConst >& oth) const
+bool kuznetsov::HTIterator< K, V, IsConst >::operator==(const HTIterator< K, V, OthConst >& oth) const
 {
   bool f = (this->slots_ + this->i_) == (oth.slots_ + oth.i_);
   return f;
@@ -189,27 +189,25 @@ bool kuznetsov::Iterator< K, V, IsConst >::operator==(const Iterator< K, V, OthC
 
 template< class K, class V, bool IsConst >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, IsConst >::operator!=(const Iterator< K, V, OthConst >& oth) const
+bool kuznetsov::HTIterator< K, V, IsConst >::operator!=(const HTIterator< K, V, OthConst >& oth) const
 {
   return !(*this == oth);
 }
 
 template< class K, class V, bool IsConst >
-typename kuznetsov::Iterator< K, V, IsConst >::reference
-kuznetsov::Iterator< K, V, IsConst >::operator*()
+typename kuznetsov::HTIterator< K, V, IsConst >::reference kuznetsov::HTIterator< K, V, IsConst >::operator*()
 {
   return slots_[i_];
 }
 
 template< class K, class V, bool IsConst >
-typename kuznetsov::Iterator< K, V, IsConst >::point
-kuznetsov::Iterator< K, V, IsConst >::operator->()
+typename kuznetsov::HTIterator< K, V, IsConst >::point kuznetsov::HTIterator< K, V, IsConst >::operator->()
 {
   return slots_ + i_;
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator++()
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator++()
 {
   ++i_;
   while (i_ < cap_ && states_[i_] != detail::State::STORE) {
@@ -219,15 +217,15 @@ kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::opera
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator++(int)
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator++(int)
 {
-  Iterator tmp = *this;
+  HTIterator tmp = *this;
   ++(*this);
   return tmp;
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator--()
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator--()
 {
   if (i_ == 0) {
     return *this;
@@ -239,9 +237,9 @@ kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::opera
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator--(int)
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator--(int)
 {
-  Iterator tmp = *this;
+  HTIterator tmp = *this;
   --(*this);
   return tmp;
 }
@@ -288,7 +286,6 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth)
   }
 }
 
-
 template< class K, class V, class Hash, class Equal >
 kuznetsov::HashTable< K, V, Hash, Equal >::HashTable(size_t capacity):
   hasher_(Hash{}),
@@ -296,10 +293,10 @@ kuznetsov::HashTable< K, V, Hash, Equal >::HashTable(size_t capacity):
   states_(nullptr),
   slots_(nullptr),
   size_(0),
-  capacity_(std::pow(2,ceil(log2(capacity))))
+  capacity_(std::pow(2, ceil(log2(capacity))))
 {
   try {
-    states_ = new detail::State[capacity_] {};
+    states_ = new detail::State[capacity_]{};
     slots_ = static_cast< detail::Slot< K, V >* >(::operator new(sizeof(detail::Slot< K, V >) * capacity_));
   } catch (...) {
     delete[] states_;
@@ -309,12 +306,12 @@ kuznetsov::HashTable< K, V, Hash, Equal >::HashTable(size_t capacity):
 }
 
 template< class Key, class Value, class Hash, class Equal >
-kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noexcept :
+kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noexcept:
   hasher_(oth.hasher_),
   comparator_(oth.comparator_),
   states_(std::exchange(oth.states_, nullptr)),
   slots_(std::exchange(oth.slots_, nullptr)),
-  size_(std::exchange(oth.size_,0)),
+  size_(std::exchange(oth.size_, 0)),
   capacity_(std::exchange(oth.capacity_, 0))
 {}
 
@@ -322,7 +319,7 @@ template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >&
 kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
 {
-  if(std::addressof(oth) == this) {
+  if (std::addressof(oth) == this) {
     return *this;
   }
   HashTable< Key, Value, Hash, Equal > cp(oth);
@@ -334,7 +331,7 @@ template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >&
 kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
 {
-  if(std::addressof(oth) == this) {
+  if (std::addressof(oth) == this) {
     return *this;
   }
   HashTable< Key, Value, Hash, Equal > cp(std::move(oth));
@@ -422,7 +419,6 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
 template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
-
   size_t newCap = !slots ? capacity_ * 2 : pow(2, ceil(log2(slots)));
   if (size_ > newCap) {
     throw std::logic_error("Count of elements more then new count of slots");
@@ -461,4 +457,3 @@ Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(Key k)
 }
 
 #endif
-
