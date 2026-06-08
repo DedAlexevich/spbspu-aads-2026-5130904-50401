@@ -9,6 +9,7 @@ namespace kuznetsov {
       ptr_(ptr)
     {}
     const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
     CIter& operator++() noexcept;
     CIter operator++(int) noexcept;
     CIter& operator--() noexcept;
@@ -34,6 +35,7 @@ namespace kuznetsov {
       ptr_(ptr)
     {}
     T& operator*() const noexcept;
+    T* operator->() const noexcept;
     Iter& operator++() noexcept;
     Iter operator++(int) noexcept;
     Iter& operator--() noexcept;
@@ -58,6 +60,12 @@ template< class T >
 const T& kuznetsov::CIter< T >::operator*() const noexcept
 {
   return *ptr_;
+}
+
+template< class T >
+const T* kuznetsov::CIter< T >::operator->() const noexcept
+{
+  return ptr_;
 }
 
 template< class T >
@@ -91,13 +99,13 @@ kuznetsov::CIter< T >& kuznetsov::CIter< T >::operator-=(size_t n) noexcept
 template< class T >
 kuznetsov::CIter< T > kuznetsov::CIter< T >::operator+(size_t n) const noexcept
 {
-  return CIter< T >{ptr_ + n};
+  return CIter< T >{ ptr_ + n };
 }
 
 template< class T >
 kuznetsov::CIter< T > kuznetsov::CIter< T >::operator-(size_t n) const noexcept
 {
-  return CIter< T >{ptr_ - n};
+  return CIter< T >{ ptr_ - n };
 }
 
 template< class T >
@@ -145,7 +153,7 @@ bool kuznetsov::CIter< T >::operator<=(const CIter& rhs) const noexcept
 template< class T >
 kuznetsov::CIter< T > kuznetsov::CIter< T >::operator++(int) noexcept
 {
-  CIter iter{ptr_};
+  CIter iter{ ptr_ };
   ++ptr_;
   return iter;
 }
@@ -153,7 +161,7 @@ kuznetsov::CIter< T > kuznetsov::CIter< T >::operator++(int) noexcept
 template< class T >
 kuznetsov::CIter< T > kuznetsov::CIter< T >::operator--(int) noexcept
 {
-  CIter iter{ptr_};
+  CIter iter{ ptr_ };
   --ptr_;
   return iter;
 }
@@ -162,6 +170,12 @@ template< class T >
 T& kuznetsov::Iter< T >::operator*() const noexcept
 {
   return *ptr_;
+}
+
+template< class T >
+T* kuznetsov::Iter< T >::operator->() const noexcept
+{
+  return ptr_;
 }
 
 template< class T >
@@ -174,7 +188,7 @@ kuznetsov::Iter< T >& kuznetsov::Iter< T >::operator++() noexcept
 template< class T >
 kuznetsov::Iter< T > kuznetsov::Iter< T >::operator++(int) noexcept
 {
-  Iter it{ptr_};
+  Iter it{ ptr_ };
   ++ptr_;
   return it;
 }
@@ -189,7 +203,7 @@ kuznetsov::Iter< T >& kuznetsov::Iter< T >::operator--() noexcept
 template< class T >
 kuznetsov::Iter< T > kuznetsov::Iter< T >::operator--(int) noexcept
 {
-  Iter it{ptr_};
+  Iter it{ ptr_ };
   --ptr_;
   return it;
 }
@@ -211,13 +225,13 @@ kuznetsov::Iter< T >& kuznetsov::Iter< T >::operator-=(size_t n) noexcept
 template< class T >
 kuznetsov::Iter< T > kuznetsov::Iter< T >::operator+(size_t n) const noexcept
 {
-  return Iter{ptr_ + n};
+  return Iter{ ptr_ + n };
 }
 
 template< class T >
 kuznetsov::Iter< T > kuznetsov::Iter< T >::operator-(size_t n) const noexcept
 {
-  return Iter{ptr_ - n};
+  return Iter{ ptr_ - n };
 }
 
 template< class T >
@@ -263,4 +277,3 @@ bool kuznetsov::Iter< T >::operator<=(const Iter& rhs) const noexcept
 }
 
 #endif
-
