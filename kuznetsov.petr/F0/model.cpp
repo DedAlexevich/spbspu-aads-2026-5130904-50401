@@ -67,3 +67,45 @@ void kuznetsov::Map::addCity(const std::string& name)
   dropRoute();
 }
 
+bool kuznetsov::detail::edgeListRemove(Vector< Edge >& edges, const std::string& to)
+{
+  for (auto it = edges.cbegin(); it != edges.cend(); ++it) {
+    if (it->to == to) {
+      edges.erase(it);
+      return true;
+    }
+  }
+  return false;
+}
+
+void kuznetsov::Map::removeCity(const std::string& name)
+{
+  if (!hasCity(name)) {
+    throw std::logic_error("This city doesnt exist");
+  }
+  Vector< Order > kept;
+  for (auto it = orders.begin(); it != orders.end(); ++it) {
+    if (it->from != name && it->to != name) {
+      kept.pushBack(*it);
+    }
+  }
+  cities.erase(name);
+  for (auto it = cities.begin(); it != cities.end(); ++it) {
+    City& c = it->second;
+    for (auto rt = c.roads.begin(); rt != c.roads.end(); ++rt) {
+      detail::edgeListRemove(rt->second, name);
+    }
+  }
+  orders = kept;
+  dropRoute();
+}
+
+void kuznetsov::Map::addTransport(const std::string& type)
+{
+  if (hasTransport(type)) {
+    throw std::logic_error("Such transport alredy exist");
+  }
+  transports.insert(type, RoadType{1, 0, 1});
+}
+
+
