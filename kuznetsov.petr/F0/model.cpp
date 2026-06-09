@@ -24,18 +24,22 @@ bool kuznetsov::Map::hasCity(const std::string& name) const
 {
   return cities.contains(name);
 }
+
 bool kuznetsov::Map::hasTransport(const std::string& type) const
 {
   return transports.contains(type);
 }
+
 bool kuznetsov::Map::hasTerminal(const std::string& city, const std::string& type) const
 {
   return cities.contains(city) && cities.at(city).terminals.contains(type);
 }
+
 bool kuznetsov::Map::hasOrder(const std::string& id) const
 {
   return orders.contain(id);
 }
+
 bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, const std::string& b) const
 {
   if (!hasCity(a)) {
@@ -105,7 +109,56 @@ void kuznetsov::Map::addTransport(const std::string& type)
   if (hasTransport(type)) {
     throw std::logic_error("Such transport alredy exist");
   }
-  transports.insert(type, RoadType{1, 0, 1});
+  transports.insert(type, RoadType{ 1, 0, 1 });
 }
 
+void kuznetsov::Map::setRoadType(const std::string& type, double k, double b, double n)
+{
+  RoadType r{ k, b, n };
+  transports.insert(type, r);
+  dropRoute();
+}
 
+void kuznetsov::Map::addTerminal(const std::string& city, const std::string& type, double cost)
+{
+  if (!hasCity(city)) {
+    throw std::logic_error("This city doesnt exist");
+  }
+  if (!hasTransport(type)) {
+    throw std::logic_error("No such transport type");
+  }
+  cities.at(city).terminals.insert(type, cost);
+  dropRoute();
+}
+
+void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, const std::string& b, size_t dist)
+{
+  if (!hasTransport(type)) {
+    throw std::logic_error("No such transport type");
+  }
+  if (!hasCity(a) || !hasCity(b)) {
+    throw std::logic_error("No such city");
+  }
+  if (a == b) {
+    throw std::logic_error("Road must connect two different cities");
+  }
+  if (hasRoad(type, a, b)) {
+    throw std::logic_error("Road already exists");
+  }
+
+  City& ca = cities.at(a);
+  if (!ca.roads.contains(type)) {
+    ca.roads.insert(type, Vector< Edge >());
+  }
+  Edge ea{ b, dist };
+  ca.roads.at(type).pushBack(ea);
+
+  City& cb = cities.at(b);
+  if (!cb.roads.contains(type)) {
+    cb.roads.insert(type, Vector< Edge >());
+  }
+  Edge eb{ a, dist };
+  cb.roads.at(type).pushBack(eb);
+
+  dropRoute();
+}

@@ -9,12 +9,6 @@
 #include "unorderedMap.hpp"
 
 namespace kuznetsov {
-  namespace detail {
-    struct StrEqual {
-      bool operator()(const std::string& a, const std::string& b) const;
-    };
-  }
-
   struct RoadType {
     double k;
     double b;
@@ -98,6 +92,13 @@ namespace kuznetsov {
     void switchMap(const std::string& name);
     void removeMap(const std::string& name);
   };
+
+  namespace detail {
+    struct StrEqual {
+      bool operator()(const std::string& a, const std::string& b) const;
+    };
+    bool edgeListRemove(Vector< Edge >& edges, const std::string& to);
+  }
 
 }
 
