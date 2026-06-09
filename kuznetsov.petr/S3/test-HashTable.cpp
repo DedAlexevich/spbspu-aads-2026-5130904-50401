@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <utility>
+
 #include "HashTable.hpp"
 
 struct LongComp {
@@ -22,9 +23,9 @@ BOOST_AUTO_TEST_CASE(Default_Construct_Test)
 BOOST_AUTO_TEST_CASE(Copy_Construct_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
-  long keys[] {1, 2, 3, 4};
+  long keys[]{ 1, 2, 3, 4 };
   for (size_t i = 0; i < 4; ++i) {
-    map.add(keys[i], i*2);
+    map.add(keys[i], i * 2);
   }
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
   BOOST_TEST(map.getSize() == map2.getSize());
@@ -76,7 +77,6 @@ BOOST_AUTO_TEST_CASE(Add_Test)
   map.add(2, 2);
   BOOST_TEST(map.getSize() == 2);
   BOOST_CHECK_THROW(map.add(3, 4), std::logic_error);
-
 }
 
 BOOST_AUTO_TEST_CASE(Has_Test)
@@ -146,8 +146,8 @@ BOOST_AUTO_TEST_CASE(Iterators_Test)
   map.add(1, 34);
   map.add(2, 52);
   map.add(3, 67);
-  long keys[] {1, 2, 3};
-  int values[] {34, 52, 67};
+  long keys[]{ 1, 2, 3 };
+  int values[]{ 34, 52, 67 };
   size_t i = 0;
   kuznetsov::Iterator< long, int, true > it = map.cbegin();
   for (; i < 3; ++i) {
@@ -156,4 +156,3 @@ BOOST_AUTO_TEST_CASE(Iterators_Test)
     ++it;
   }
 }
-

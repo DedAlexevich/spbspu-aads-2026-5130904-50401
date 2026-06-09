@@ -1,15 +1,18 @@
 #include "graph.hpp"
+
 #include <top-it-iters.hpp>
 
 kuznetsov::Graph::Graph():
   table_(),
   vertexes_()
-{}
+{
+}
 
 kuznetsov::Graph::Graph(size_t c):
   table_(c),
   vertexes_()
-{}
+{
+}
 
 void kuznetsov::Graph::addVertexes(const std::string& name)
 {
@@ -37,7 +40,6 @@ void kuznetsov::Graph::removeVertexes(const std::string& name)
       table_.remove((*it).first);
     }
   }
-
 }
 
 void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, size_t w)
@@ -50,7 +52,7 @@ void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, siz
   } else {
     try {
       table_.add(k, Vector< size_t >());
-    } catch(...) {
+    } catch (...) {
       table_.rehash();
       table_.add(k, Vector< size_t >());
     }
@@ -75,5 +77,3 @@ void kuznetsov::Graph::removeEdge(const std::string& v1, const std::string& v2, 
     }
   }
 }
-
-

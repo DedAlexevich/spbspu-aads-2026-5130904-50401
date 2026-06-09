@@ -1,9 +1,9 @@
 #ifndef HASHER_HPP
 #define HASHER_HPP
-#include <utility>
 #include <cstddef>
-#include <boost/hash2/siphash.hpp>
+#include <utility>
 #include <boost/hash2/hash_append.hpp>
+#include <boost/hash2/siphash.hpp>
 namespace kuznetsov {
 
   template< class T >
@@ -41,4 +41,3 @@ namespace kuznetsov {
 }
 
 #endif
-

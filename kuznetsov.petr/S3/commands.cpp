@@ -1,6 +1,8 @@
 #include "commands.hpp"
+
 #include <iostream>
 #include <utility>
+
 #include <top-it-vector.hpp>
 
 struct PairComparator {
@@ -23,11 +25,12 @@ struct Comparator {
 };
 
 template< class T, class Cmp >
-void sort(kuznetsov::Vector< T >& v, Cmp cmp) {
+void sort(kuznetsov::Vector< T >& v, Cmp cmp)
+{
   for (size_t i = 0; i < v.getSize(); ++i) {
     size_t min = i;
     for (size_t j = i + 1; j < v.getSize(); ++j) {
-      if (cmp(v[j],v[min])) {
+      if (cmp(v[j], v[min])) {
         min = j;
       }
     }
@@ -115,7 +118,6 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
     }
   }
   out << '\n';
-
 }
 
 void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
@@ -254,7 +256,7 @@ void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
   }
   try {
     t.add(name, gr3);
-  } catch(...) {
+  } catch (...) {
     t.rehash();
     t.add(name, gr3);
   }
@@ -290,7 +292,6 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
     vertexes.pushBack(v);
   }
 
-
   for (auto it = source.table_.begin(); it != source.table_.end(); ++it) {
     const std::string& from = (*it).first.first;
     const std::string& to = (*it).first.second;
@@ -315,11 +316,8 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
 
   try {
     t.add(name, gr);
-  } catch(...) {
+  } catch (...) {
     t.rehash();
     t.add(name, gr);
   }
 }
-
-
-
