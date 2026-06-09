@@ -1,6 +1,7 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 #include <string>
+#include <cstddef>
 #include <vector.hpp>
 #include <vectorIterators.hpp>
 #include "Hasher.hpp"
@@ -84,11 +85,11 @@ namespace kuznetsov {
     void dropRoute();
   };
 
-  struct MapController {
+  struct MapsController {
     map< std::string, Map > maps;
     std::string active;
 
-    MapController();
+    MapsController();
 
     Map& activeMap();
     const Map& activeMap() const;
