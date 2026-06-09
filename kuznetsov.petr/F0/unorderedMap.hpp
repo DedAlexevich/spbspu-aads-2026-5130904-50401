@@ -6,7 +6,7 @@
 
 namespace kuznetsov {
   template< class Key, class Value, class Hash, class Equal >
-  struct unordered_map {
+  struct unorderedMap {
   public:
     using table_t = HashTable< Key, Value, Hash, Equal >;
     using iterator = typename table_t::iterator;
@@ -34,7 +34,7 @@ namespace kuznetsov {
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void kuznetsov::unordered_map< Key, Value, Hash, Equal >::insert(const Key& k, const Value& v)
+void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(const Key& k, const Value& v)
 {
   if (table_.has(k)) {
     table_.at(k) = v;
@@ -49,7 +49,7 @@ void kuznetsov::unordered_map< Key, Value, Hash, Equal >::insert(const Key& k, c
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void kuznetsov::unordered_map< Key, Value, Hash, Equal >::insert(Key&& k, Value&& v)
+void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(Key&& k, Value&& v)
 {
   if (table_.has(k)) {
     table_.at(k) = v;
@@ -64,79 +64,79 @@ void kuznetsov::unordered_map< Key, Value, Hash, Equal >::insert(Key&& k, Value&
 }
 
 template< class Key, class Value, class Hash, class Equal >
-Value& kuznetsov::unordered_map< Key, Value, Hash, Equal >::at(const Key& k)
+Value& kuznetsov::unorderedMap< Key, Value, Hash, Equal >::at(const Key& k)
 {
   return table_.at(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-const Value& kuznetsov::unordered_map< Key, Value, Hash, Equal >::at(const Key& k) const
+const Value& kuznetsov::unorderedMap< Key, Value, Hash, Equal >::at(const Key& k) const
 {
   return table_.at(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool kuznetsov::unordered_map< Key, Value, Hash, Equal >::contains(const Key& k) const noexcept
+bool kuznetsov::unorderedMap< Key, Value, Hash, Equal >::contains(const Key& k) const noexcept
 {
   return table_.has(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void kuznetsov::unordered_map< Key, Value, Hash, Equal >::erase(const Key& k)
+void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::erase(const Key& k)
 {
   table_.remove(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t kuznetsov::unordered_map< Key, Value, Hash, Equal >::size() const noexcept
+size_t kuznetsov::unorderedMap< Key, Value, Hash, Equal >::size() const noexcept
 {
   return table_.getSize();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool kuznetsov::unordered_map< Key, Value, Hash, Equal >::empty() const noexcept
+bool kuznetsov::unorderedMap< Key, Value, Hash, Equal >::empty() const noexcept
 {
   return table_.getSize() == 0;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::begin()
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::begin()
 {
   return table_.begin();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::end()
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::end()
 {
   return table_.end();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::begin() const
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::begin() const
 {
   return table_.cbegin();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::end() const
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::end() const
 {
   return table_.cend();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::cbegin() const
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::cbegin() const
 {
   return table_.cbegin();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename kuznetsov::unordered_map< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::unordered_map< Key, Value, Hash, Equal >::cend() const
+typename kuznetsov::unorderedMap< Key, Value, Hash, Equal >::const_iterator
+kuznetsov::unorderedMap< Key, Value, Hash, Equal >::cend() const
 {
   return table_.cend();
 }
