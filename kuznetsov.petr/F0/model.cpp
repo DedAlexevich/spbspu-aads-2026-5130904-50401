@@ -38,7 +38,7 @@ bool kuznetsov::Map::hasOrder(const std::string& id) const
 }
 bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, const std::string& b) const
 {
-  if (!cities.contains(a)) {
+  if (!hasCity(a)) {
     return false;
   }
   const City& ca = cities.at(a);
@@ -52,3 +52,18 @@ bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, cons
   }
   return false;
 }
+
+double kuznetsov::Map::terminalCost(const std::string& city, const std::string& type) const
+{
+  return cities.at(city).terminals.at(type);
+}
+
+void kuznetsov::Map::addCity(const std::string& name)
+{
+  if (hasCity(name)) {
+    throw std::logic_error("This city already exist");
+  }
+  cities.insert(name, City());
+  dropRoute();
+}
+
