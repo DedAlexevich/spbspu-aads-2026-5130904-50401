@@ -51,6 +51,10 @@ namespace kuznetsov {
     const Value& at(const Key& k) const;
     void drop(const Key& k);
 
+    const_iterator root() const;
+    const_iterator leftChild(const_iterator) const;
+    const_iterator rightChild(const_iterator) const;
+
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
 
@@ -633,6 +637,24 @@ template< class K, class V, class C >
 kuznetsov::BSTIterator< K, V, true > kuznetsov::BSTree< K, V, C >::cend() const
 {
   return BSTIterator< K, V, true >(nullptr);
+}
+
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator kuznetsov::BSTree< Key, Value, Compare >::root() const
+{
+  return const_iterator(root_);
+}
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
+kuznetsov::BSTree< Key, Value, Compare >::leftChild(const_iterator it) const
+{
+  return const_iterator(it.curr_->lt_);
+}
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
+kuznetsov::BSTree< Key, Value, Compare >::rightChild(const_iterator it) const
+{
+  return const_iterator(it.curr_->rt_);
 }
 
 #endif
