@@ -94,8 +94,6 @@ namespace kuznetsov {
     using reference = typename detail::conditional< IsConst, const pair_type&, pair_type& >::type;
     using point = typename detail::conditional< IsConst, const pair_type*, pair_type* >::type;
 
-    HTIterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
-
     template< bool OthConst >
     bool operator==(const HTIterator< Key, Value, OthConst >&) const;
 
@@ -112,10 +110,14 @@ namespace kuznetsov {
     HTIterator operator--(int);
 
   private:
+    template< class, class, class, class >
+    friend struct HashTable;
     pair_type* slots_;
     detail::State* states_;
     size_t i_;
     size_t cap_;
+
+    HTIterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
   };
 }
 
