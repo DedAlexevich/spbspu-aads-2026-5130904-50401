@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 #include <utility>
-#include <top-it-vector.hpp>
+#include <vector.hpp>
 #include <HashTable.hpp>
 #include "Hasher.hpp"
 namespace kuznetsov {
