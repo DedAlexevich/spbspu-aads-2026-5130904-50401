@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(Iterators_Test)
   long keys[]{ 1, 2, 3 };
   int values[]{ 34, 52, 67 };
   size_t i = 0;
-  kuznetsov::Iterator< long, int, true > it = map.cbegin();
+  kuznetsov::HTIterator< long, int, true > it = map.cbegin();
   for (; i < 3; ++i) {
     BOOST_TEST(it->first == keys[i]);
     BOOST_TEST((*it).second == values[i]);
