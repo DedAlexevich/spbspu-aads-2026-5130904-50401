@@ -12,6 +12,7 @@ namespace kuznetsov {
     using const_iterator = typename tree_t::const_iterator;
 
     void insert(const Key& k, const Value& v);
+    void insert(Key&& k, Value&& v);
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
     bool contains(const Key& k) const noexcept;
@@ -43,6 +44,17 @@ void kuznetsov::map< Key, Value, Compare >::insert(const Key& k, const Value& v)
     return;
   }
   tree_.push(k, v);
+  balance();
+}
+
+template< class Key, class Value, class Compare >
+void kuznetsov::map< Key, Value, Compare >::insert(Key&& k, Value&& v)
+{
+  if (tree_.contain(k)) {
+    tree_.at(k) = v;
+    return;
+  }
+  tree_.push(std::forward< Key >(k), std::forward< Value >(v));
   balance();
 }
 
@@ -133,43 +145,37 @@ size_t kuznetsov::map< Key, Value, Compare >::height() const noexcept
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::iterator
-kuznetsov::map< Key, Value, Compare >::begin()
+typename kuznetsov::map< Key, Value, Compare >::iterator kuznetsov::map< Key, Value, Compare >::begin()
 {
   return tree_.begin();
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::iterator
-kuznetsov::map< Key, Value, Compare >::end()
+typename kuznetsov::map< Key, Value, Compare >::iterator kuznetsov::map< Key, Value, Compare >::end()
 {
   return tree_.end();
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::const_iterator
-kuznetsov::map< Key, Value, Compare >::begin() const
+typename kuznetsov::map< Key, Value, Compare >::const_iterator kuznetsov::map< Key, Value, Compare >::begin() const
 {
   return tree_.cbegin();
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::const_iterator
-kuznetsov::map< Key, Value, Compare >::end() const
+typename kuznetsov::map< Key, Value, Compare >::const_iterator kuznetsov::map< Key, Value, Compare >::end() const
 {
   return tree_.cend();
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::const_iterator
-kuznetsov::map< Key, Value, Compare >::cbegin() const
+typename kuznetsov::map< Key, Value, Compare >::const_iterator kuznetsov::map< Key, Value, Compare >::cbegin() const
 {
   return tree_.cbegin();
 }
 
 template< class Key, class Value, class Compare >
-typename kuznetsov::map< Key, Value, Compare >::const_iterator
-kuznetsov::map< Key, Value, Compare >::cend() const
+typename kuznetsov::map< Key, Value, Compare >::const_iterator kuznetsov::map< Key, Value, Compare >::cend() const
 {
   return tree_.cend();
 }
