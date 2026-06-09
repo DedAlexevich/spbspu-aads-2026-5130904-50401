@@ -224,3 +224,21 @@ void kuznetsov::Map::dropRoute()
   hasRoute = false;
   cursor = 0;
 }
+
+kuznetsov::MapsController::MapsController():
+  maps(),
+  active("default")
+{
+  maps.insert("default", Map());
+}
+
+kuznetsov::Map& kuznetsov::MapsController::activeMap()
+{
+  return maps.at(active);
+}
+
+const kuznetsov::Map& kuznetsov::MapsController::activeMap() const
+{
+  return maps.at(active);
+}
+
