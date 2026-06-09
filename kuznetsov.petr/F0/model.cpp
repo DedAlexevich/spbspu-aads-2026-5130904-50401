@@ -208,3 +208,19 @@ void kuznetsov::Map::removeOrder(const std::string& id)
   }
   throw std::logic_error("No such order");
 }
+
+void kuznetsov::Map::clear()
+{
+  cities = StrHashMap< City >();
+  transports = map< std::string, RoadType >();
+  orders = Vector< Order >;
+  dropRoute();
+}
+
+void kuznetsov::Map::dropRoute()
+{
+  route = Vector< RouteStep >();
+  routeCost = 0.0;
+  hasRoute = false;
+  cursor = 0;
+}
