@@ -1,13 +1,12 @@
-#include <HashTable.hpp>
+#include <fstream>
+#include <iostream>
 #include <boost/describe/class.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/siphash.hpp>
-#include <fstream>
-#include <iostream>
-
-#include "./Hasher.hpp"
-#include "./commands.hpp"
-#include "./graph.hpp"
+#include <HashTable.hpp>
+#include "Hasher.hpp"
+#include "commands.hpp"
+#include "graph.hpp"
 
 int main(int argc, char** argv)
 {
@@ -26,8 +25,9 @@ int main(int argc, char** argv)
   using command = void (*)(std::ostream&, std::istream&, kuz::table&);
   using constCommand = void (*)(std::ostream&, std::istream&, const kuz::table&);
   kuz::table grphs;
-  kuz::HashTable< std::string, command, kuz::SipHasher< std::string >, kuz::KeyComparator > cmds;
-  kuz::HashTable< std::string, constCommand, kuz::SipHasher< std::string >, kuz::KeyComparator > constCmds;
+  using hashString = kuz::SipHasher< std::string >;
+  kuz::HashTable< std::string, command, hashString, kuz::KeyComparator > cmds;
+  kuz::HashTable< std::string, constCommand, hashString, kuz::KeyComparator > constCmds;
   constCmds.add("graphs", kuz::graphs);
   constCmds.add("vertexes", kuz::vertexes);
   constCmds.add("outbound", kuz::outbound);
