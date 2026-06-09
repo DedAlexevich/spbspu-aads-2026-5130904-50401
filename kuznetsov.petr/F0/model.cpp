@@ -330,6 +330,15 @@ void kuznetsov::MapsController::removeMap(const std::string& name)
   }
 }
 
+const std::string& kuznetsov::MapsController::activeName() const
+{
+  return active_;
+}
+const kuznetsov::map< std::string, kuznetsov::Map >& kuznetsov::MapsController::maps() const
+{
+  return maps_;
+}
+
 
 
 

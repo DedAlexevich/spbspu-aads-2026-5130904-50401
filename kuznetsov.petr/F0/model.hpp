@@ -104,6 +104,8 @@ namespace kuznetsov {
 
     Map& activeMap();
     const Map& activeMap() const;
+    const std::string& activeName() const;
+    const map< std::string, Map >& maps() const;
 
     void newMap(const std::string& name);
     void switchMap(const std::string& name);
