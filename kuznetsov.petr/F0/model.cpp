@@ -162,3 +162,49 @@ void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, cons
 
   dropRoute();
 }
+
+void kuznetsov::Map::removeRoad(const std::string& type, const std::string& a, const std::string& b)
+{
+  if (!hasTransport(type)) {
+    throw std::logic_error("No such transport type");
+  }
+  if (!hasCity(a) || !hasCity(b)) {
+    throw std::logic_error("No such city");
+  }
+  if (a == b) {
+    throw std::logic_error("Road must connect two different cities");
+  }
+  if (!hasRoad(type, a, b)) {
+    throw std::logic_error("Road doesnt exists");
+  }
+  detail::edgeListRemove(cities.at(a).roads.at(type), b);
+  detail::edgeListRemove(cities.at(b).roads.at(type), a);
+  dropRoute();
+}
+
+void kuznetsov::Map::addOrder(const Order& o)
+{
+  if (hasOrder(o.id)) {
+    throw std::logic_error("Order already exist");
+  }
+  if (!hasCity(o.from) || !hasCity(o.to)) {
+    throw std::logic_error("No such city");
+  }
+  if (o.importance < 1 || o.importance > 10) {
+    throw std::logic_error("Importance must be in [1, 10]");
+  }
+  orders.pushBack(o);
+  dropRoute();
+}
+
+void kuznetsov::Map::removeOrder(const std::string& id)
+{
+  for (auto it = orders.cbegin(); it != orders.cend(); ++it) {
+    if (it->id == id) {
+      orders.erase(it);
+      dropRoute();
+      return;
+    }
+  }
+  throw std::logic_error("No such order");
+}
