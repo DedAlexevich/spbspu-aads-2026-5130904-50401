@@ -49,15 +49,6 @@ namespace kuznetsov {
   };
 
   struct Map {
-    StrHashMap< City > cities;
-    map< std::string, RoadType > transports;
-    Vector< Order > orders;
-
-    Vector< RouteStep > route;
-    double routeCost;
-    bool hasRoute;
-    size_t cursor;
-
     Map();
 
     bool hasCity(const std::string& name) const;
@@ -83,13 +74,32 @@ namespace kuznetsov {
     void removeOrder(const std::string& id);
 
     void clear();
+
+    const StrHashMap< City >& cities() const;
+    const map< std::string, RoadType >& transports() const;
+    const Vector< Order >& orders() const;
+
+    bool hasRoute() const;
+    double routeCost() const;
+    const Vector< RouteStep >& route() const;
+    size_t cursor() const;
+    void setRoute(Vector< RouteStep > steps, double cost);
     void dropRoute();
+    void cursorNext();
+    void cursorPrev();
+
+  private:
+    StrHashMap< City > cities_;
+    map< std::string, RoadType > transports_;
+    Vector< Order > orders_;
+
+    Vector< RouteStep > route_;
+    double routeCost_;
+    bool hasRoute_;
+    size_t cursor_;
   };
 
   struct MapsController {
-    map< std::string, Map > maps;
-    std::string active;
-
     MapsController();
 
     Map& activeMap();
@@ -98,6 +108,9 @@ namespace kuznetsov {
     void newMap(const std::string& name);
     void switchMap(const std::string& name);
     void removeMap(const std::string& name);
+  private:
+    map< std::string, Map > maps_;
+    std::string active_;
   };
 
 }

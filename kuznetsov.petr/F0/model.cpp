@@ -11,33 +11,33 @@ double kuznetsov::RoadType::cost(double x) const
 }
 
 kuznetsov::Map::Map():
-  cities(),
-  transports(),
-  orders(),
-  route(),
-  routeCost(0.0),
-  hasRoute(false),
-  cursor(0)
+  cities_(),
+  transports_(),
+  orders_(),
+  route_(),
+  routeCost_(0.0),
+  hasRoute_(false),
+  cursor_(0)
 {}
 
 bool kuznetsov::Map::hasCity(const std::string& name) const
 {
-  return cities.contains(name);
+  return cities_.contains(name);
 }
 
 bool kuznetsov::Map::hasTransport(const std::string& type) const
 {
-  return transports.contains(type);
+  return transports_.contains(type);
 }
 
 bool kuznetsov::Map::hasTerminal(const std::string& city, const std::string& type) const
 {
-  return cities.contains(city) && cities.at(city).terminals.contains(type);
+  return cities_.contains(city) && cities_.at(city).terminals.contains(type);
 }
 
 bool kuznetsov::Map::hasOrder(const std::string& id) const
 {
-  return orders.contain(id);
+  return orders_.contain(id);
 }
 
 bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, const std::string& b) const
@@ -45,7 +45,7 @@ bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, cons
   if (!hasCity(a)) {
     return false;
   }
-  const City& ca = cities.at(a);
+  const City& ca = cities_.at(a);
   if (!ca.roads.contains(type)) {
     return false;
   }
@@ -59,7 +59,7 @@ bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, cons
 
 double kuznetsov::Map::terminalCost(const std::string& city, const std::string& type) const
 {
-  return cities.at(city).terminals.at(type);
+  return cities_.at(city).terminals.at(type);
 }
 
 void kuznetsov::Map::addCity(const std::string& name)
@@ -67,7 +67,7 @@ void kuznetsov::Map::addCity(const std::string& name)
   if (hasCity(name)) {
     throw std::logic_error("This city already exist");
   }
-  cities.insert(name, City());
+  cities_.insert(name, City());
   dropRoute();
 }
 
@@ -88,19 +88,19 @@ void kuznetsov::Map::removeCity(const std::string& name)
     throw std::logic_error("This city doesnt exist");
   }
   Vector< Order > kept;
-  for (auto it = orders.begin(); it != orders.end(); ++it) {
+  for (auto it = orders_.begin(); it != orders_.end(); ++it) {
     if (it->from != name && it->to != name) {
       kept.pushBack(*it);
     }
   }
-  cities.erase(name);
-  for (auto it = cities.begin(); it != cities.end(); ++it) {
+  cities_.erase(name);
+  for (auto it = cities_.begin(); it != cities_.end(); ++it) {
     City& c = it->second;
     for (auto rt = c.roads.begin(); rt != c.roads.end(); ++rt) {
       detail::edgeListRemove(rt->second, name);
     }
   }
-  orders = kept;
+  orders_ = kept;
   dropRoute();
 }
 
@@ -109,13 +109,13 @@ void kuznetsov::Map::addTransport(const std::string& type)
   if (hasTransport(type)) {
     throw std::logic_error("Such transport alredy exist");
   }
-  transports.insert(type, RoadType{ 1, 0, 1 });
+  transports_.insert(type, RoadType{ 1, 0, 1 });
 }
 
 void kuznetsov::Map::setRoadType(const std::string& type, double k, double b, double n)
 {
   RoadType r{ k, b, n };
-  transports.insert(type, r);
+  transports_.insert(type, r);
   dropRoute();
 }
 
@@ -127,7 +127,7 @@ void kuznetsov::Map::addTerminal(const std::string& city, const std::string& typ
   if (!hasTransport(type)) {
     throw std::logic_error("No such transport type");
   }
-  cities.at(city).terminals.insert(type, cost);
+  cities_.at(city).terminals.insert(type, cost);
   dropRoute();
 }
 
@@ -146,14 +146,14 @@ void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, cons
     throw std::logic_error("Road already exists");
   }
 
-  City& ca = cities.at(a);
+  City& ca = cities_.at(a);
   if (!ca.roads.contains(type)) {
     ca.roads.insert(type, Vector< Edge >());
   }
   Edge ea{ b, dist };
   ca.roads.at(type).pushBack(ea);
 
-  City& cb = cities.at(b);
+  City& cb = cities_.at(b);
   if (!cb.roads.contains(type)) {
     cb.roads.insert(type, Vector< Edge >());
   }
@@ -177,8 +177,8 @@ void kuznetsov::Map::removeRoad(const std::string& type, const std::string& a, c
   if (!hasRoad(type, a, b)) {
     throw std::logic_error("Road doesnt exists");
   }
-  detail::edgeListRemove(cities.at(a).roads.at(type), b);
-  detail::edgeListRemove(cities.at(b).roads.at(type), a);
+  detail::edgeListRemove(cities_.at(a).roads.at(type), b);
+  detail::edgeListRemove(cities_.at(b).roads.at(type), a);
   dropRoute();
 }
 
@@ -193,15 +193,15 @@ void kuznetsov::Map::addOrder(const Order& o)
   if (o.importance < 1 || o.importance > 10) {
     throw std::logic_error("Importance must be in [1, 10]");
   }
-  orders.pushBack(o);
+  orders_.pushBack(o);
   dropRoute();
 }
 
 void kuznetsov::Map::removeOrder(const std::string& id)
 {
-  for (auto it = orders.cbegin(); it != orders.cend(); ++it) {
+  for (auto it = orders_.cbegin(); it != orders_.cend(); ++it) {
     if (it->id == id) {
-      orders.erase(it);
+      orders_.erase(it);
       dropRoute();
       return;
     }
@@ -211,34 +211,126 @@ void kuznetsov::Map::removeOrder(const std::string& id)
 
 void kuznetsov::Map::clear()
 {
-  cities = StrHashMap< City >();
-  transports = map< std::string, RoadType >();
-  orders = Vector< Order >;
+  cities_ = StrHashMap< City >();
+  transports_ = map< std::string, RoadType >();
+  orders_ = Vector< Order >;
   dropRoute();
 }
 
 void kuznetsov::Map::dropRoute()
 {
-  route = Vector< RouteStep >();
-  routeCost = 0.0;
-  hasRoute = false;
-  cursor = 0;
+  route_ = Vector< RouteStep >();
+  routeCost_ = 0.0;
+  hasRoute_ = false;
+  cursor_ = 0;
+}
+
+const kuznetsov::StrHashMap< kuznetsov::City >& kuznetsov::Map::cities() const
+{
+  return cities_;
+}
+
+const kuznetsov::map< std::string, kuznetsov::RoadType >& kuznetsov::Map::transports() const
+{
+  return transports_;
+}
+
+const Vector< kuznetsov::Order >& kuznetsov::Map::orders() const
+{
+  return orders_;
+}
+
+bool kuznetsov::Map::hasRoute() const
+{
+  return hasRoute_;
+}
+
+double kuznetsov::Map::routeCost() const
+{
+  return routeCost_;
+}
+
+const Vector< kuznetsov::RouteStep >& kuznetsov::Map::route() const
+{
+  return route_;
+}
+
+size_t kuznetsov::Map::cursor() const
+{
+  return cursor_;
+}
+
+void kuznetsov::Map::setRoute(Vector< RouteStep > steps, double cost)
+{
+  route_ = std::move(steps);
+  routeCost_ = cost;
+  hasRoute_ = true;
+  cursor_ = 0;
+}
+
+void kuznetsov::Map::cursorNext()
+{
+  if (cursor_ + 1 < route_.getSize()) {
+    ++cursor_;
+  }
+}
+
+void kuznetsov::Map::cursorPrev()
+{
+  if (cursor_ > 0) {
+    --cursor_;
+  }
 }
 
 kuznetsov::MapsController::MapsController():
-  maps(),
-  active("default")
+  maps_(),
+  active_("default")
 {
-  maps.insert("default", Map());
+  maps_.insert("default", Map());
 }
 
 kuznetsov::Map& kuznetsov::MapsController::activeMap()
 {
-  return maps.at(active);
+  return maps_.at(active_);
 }
 
 const kuznetsov::Map& kuznetsov::MapsController::activeMap() const
 {
-  return maps.at(active);
+  return maps_.at(active_);
 }
+
+void kuznetsov::MapsController::newMap(const std::string& name)
+{
+  if (maps_.contains(name)) {
+    throw std::logic_error("Such map already exist");
+  }
+  maps_.insert(name, Map());
+  active_ = name;
+}
+
+void kuznetsov::MapsController::switchMap(const std::string& name)
+{
+  if (!maps_.contains(name)) {
+    throw std::logic_error("Such map doesnt exist");
+  }
+  active_ = name;
+}
+
+void kuznetsov::MapsController::removeMap(const std::string& name)
+{
+  if (!maps_.contains(name)) {
+    throw std::logic_error("Such map doesnt exist");
+  }
+  maps_.erase(name);
+  if (maps_.size() == 0) {
+    maps_.insert("default", Map());
+    active_ = "default";
+  } else if (active_ == name) {
+    active_ = maps_.cbegin()->first;
+  }
+}
+
+
+
+
 
