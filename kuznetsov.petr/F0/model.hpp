@@ -84,6 +84,20 @@ namespace kuznetsov {
     void dropRoute();
   };
 
+  struct MapController {
+    map< std::string, Map > maps;
+    std::string active;
+
+    MapController();
+
+    Map& activeMap();
+    const Map& activeMap() const;
+
+    void newMap(const std::string& name);
+    void switchMap(const std::string& name);
+    void removeMap(const std::string& name);
+  };
+
 }
 
 #endif
