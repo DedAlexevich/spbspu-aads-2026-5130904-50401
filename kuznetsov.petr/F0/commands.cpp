@@ -1,6 +1,7 @@
 #include "commands.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <fstream>
 
 void kuznetsov::detail::sortStrings(Vector< std::string >& v)
 {
@@ -269,3 +270,15 @@ void kuznetsov::showRoute(std::ostream& out, std::istream&, const MapsController
     out << '[' << i << "] " << m.route()[i].desc << '\n';
   }
 }
+
+void kuznetsov::saveCmd(std::ostream& out, std::istream& in, const MapsController& mc)
+{
+  std::string file = detail::reqStr(in);
+  std::ofstream os(file);
+  if (!os) {
+    throw std::logic_error("Failed to create a file " + file);
+  }
+  saveMap(os, mc.activeMap(), mc.activeName());
+  out << "Atlas saved to a file " << file << "\n";
+}
+
