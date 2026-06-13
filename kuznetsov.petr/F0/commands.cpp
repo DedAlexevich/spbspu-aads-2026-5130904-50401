@@ -161,7 +161,7 @@ void kuznetsov::listCities(std::ostream& out, std::istream&, const MapsControlle
 {
   const Map& m = mc.activeMap();
   if (m.cities().empty()) {
-    out << "<EMPTY>\n";
+    out << "List of cities is empty\n";
     return;
   }
   Vector< std::string > names;
@@ -170,7 +170,7 @@ void kuznetsov::listCities(std::ostream& out, std::istream&, const MapsControlle
   }
   detail::sortStrings(names);
   for (size_t i = 0; i < names.getSize(); ++i) {
-    out << names[i] << '\n';
+    out << (i + 1) << ". " << names[i] << '\n';
   }
 }
 
@@ -194,20 +194,53 @@ void kuznetsov::listTerminals(std::ostream& out, std::istream& in, const MapsCon
     }
     const City& c = m.cities().at(names[i]);
     for (auto t = c.terminals.cbegin(); t != c.terminals.cend(); ++t) {
-      out << names[i] << ' ' << t->first << ' ' << t->second << '\n';
+      out << names[i] << ": " << t->first << " (" << t->second << ")\n";
       any = true;
     }
   }
   if (!any) {
-    out << "<EMPTY>\n";
+    out << "List of terminals is empty\n";
   }
 }
 
-void kuznetsov::listRoads(std::ostream&, std::istream&, const MapsController&)
-{}
+void kuznetsov::listRoads(std::ostream& out, std::istream& in, const MapsController& mc)
+{
+  const Map& m = mc.activeMap();
+  std::string type;
+  bool filter = detail::readOptional(in, type);
+  if (filter && !m.hasTransport(type)) {
+    throw std::logic_error("No such transport type");
+  }
+  Vector< std::string > names;
+  for (auto it = m.cities().cbegin(); it != m.cities().cend(); ++it) {
+    names.pushBack(it->first);
+  }
+  detail::sortStrings(names);
+  bool any = false;
+  for (size_t i = 0; i < names.getSize(); ++i) {
+    const City& c = m.cities().at(names[i]);
+    for (auto rt = c.roads.cbegin(); rt != c.roads.cend(); ++rt) {
+      if (filter && rt->first != type) {
+        continue;
+      }
+      const Vector< Edge >& es = rt->second;
+      for (size_t e = 0; e < es.getSize(); ++e) {
+        if (names[i] < es[e].to) {
+          out << rt->first << ": " << names[i] << " -> " << es[e].to
+            << " (" << es[e].dist << " km)\n";
+          any = true;
+        }
+      }
+    }
+  }
+  if (!any) {
+    out << "List of roads is empty\n";
+  }
+}
 
 void kuznetsov::listOrders(std::ostream&, std::istream&, const MapsController&)
-{}
+{
+}
 
 void kuznetsov::listMaps(std::ostream&, std::istream&, const MapsController&)
 {}
