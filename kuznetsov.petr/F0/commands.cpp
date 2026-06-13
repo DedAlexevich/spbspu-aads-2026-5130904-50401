@@ -226,8 +226,7 @@ void kuznetsov::listRoads(std::ostream& out, std::istream& in, const MapsControl
       const Vector< Edge >& es = rt->second;
       for (size_t e = 0; e < es.getSize(); ++e) {
         if (names[i] < es[e].to) {
-          out << rt->first << ": " << names[i] << " -> " << es[e].to
-            << " (" << es[e].dist << " km)\n";
+          out << rt->first << ": " << names[i] << " -> " << es[e].to << " (" << es[e].dist << " km)\n";
           any = true;
         }
       }
@@ -238,10 +237,23 @@ void kuznetsov::listRoads(std::ostream& out, std::istream& in, const MapsControl
   }
 }
 
-void kuznetsov::listOrders(std::ostream&, std::istream&, const MapsController&)
+void kuznetsov::listOrders(std::ostream& out, std::istream&, const MapsController& mc)
 {
+  const Map& m = mc.activeMap();
+  if (m.orders().getSize() == 0) {
+    out << "List of orders is empty\n";
+    return;
+  }
+  for (size_t i = 0; i < m.orders().getSize(); ++i) {
+    const Order& o = m.orders()[i];
+    out << (i + 1) << ". ";
+    out << o.id << ' ' << o.from << ' ' << o.to << ' ' << o.importance << '\n';
+  }
 }
 
-void kuznetsov::listMaps(std::ostream&, std::istream&, const MapsController&)
-{}
-
+void kuznetsov::listMaps(std::ostream& out, std::istream&, const MapsController& mc)
+{
+  for (auto it = mc.maps().cbegin(); it != mc.maps().cend(); ++it) {
+    out << (it->first == mc.activeName() ? "* " : "  ") << it->first << '\n';
+  }
+}
