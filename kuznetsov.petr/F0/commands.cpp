@@ -282,3 +282,21 @@ void kuznetsov::saveCmd(std::ostream& out, std::istream& in, const MapsControlle
   out << "Atlas saved to a file " << file << "\n";
 }
 
+void kuznetsov::optimizeCmd(std::ostream& out, std::istream& in, MapsController& mc)
+{
+  std::string file = detail::reqStr(in);
+  std::ifstream input(file);
+  if (!input) {
+    throw std::logic_error("Cannot open file for reading");
+  }
+  loadMap(input, mc.activeMap());
+  out << "Atlas loaded from " << file << "\n";
+}
+
+void kuznetsov::loadCmd(std::ostream& out, std::istream& in, MapsController& mc)
+{
+  std::string base = detail::reqStr(in);
+  Map& m = mc.activeMap();
+  optimize(m, base);
+  out << "total " << m.routeCost() << '\n';
+}
