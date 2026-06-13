@@ -2,6 +2,21 @@
 #include <iostream>
 #include <stdexcept>
 
+void kuznetsov::detail::sortStrings(Vector< std::string >& v)
+{
+  for (size_t i = 1; i < v.getSize(); ++i) {
+    size_t min = i;
+    for (size_t j = i + 1; j < v.getSize(); ++j) {
+      if (v[j] < v[min]) {
+        min = j;
+      }
+    }
+    if (min != i) {
+      std::swap(v[min], v[i]);
+    }
+  }
+}
+
 std::string kuznetsov::detail::reqStr(std::istream& in)
 {
   std::string s;
@@ -132,15 +147,68 @@ void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
   out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
 }
 
-void kuznetsov::newMapCmd(std::ostream&, std::istream& in, MapsController& m)
+void kuznetsov::newMapCmd(std::ostream&, std::istream& in, MapsController& mc)
 {
-  m.newMap(detail::reqStr(in));
+  mc.newMap(detail::reqStr(in));
 }
 
-void kuznetsov::switchMapCmd(std::ostream&, std::istream& in, MapsController& m)
+void kuznetsov::switchMapCmd(std::ostream&, std::istream& in, MapsController& mc)
 {
-  m.switchMap(detail::reqStr(in));
+  mc.switchMap(detail::reqStr(in));
 }
 
+void kuznetsov::listCities(std::ostream& out, std::istream&, const MapsController& mc)
+{
+  const Map& m = mc.activeMap();
+  if (m.cities().empty()) {
+    out << "<EMPTY>\n";
+    return;
+  }
+  Vector< std::string > names;
+  for (auto it = m.cities().cbegin(); it != m.cities().cend(); ++it) {
+    names.pushBack(it->first);
+  }
+  detail::sortStrings(names);
+  for (size_t i = 0; i < names.getSize(); ++i) {
+    out << names[i] << '\n';
+  }
+}
 
+void kuznetsov::listTerminals(std::ostream& out, std::istream& in, const MapsController& mc)
+{
+  const Map& m = mc.activeMap();
+  std::string city;
+  bool filter = detail::readOptional(in, city);
+  if (filter && !m.hasCity(city)) {
+    throw std::logic_error("No such city");
+  }
+  Vector< std::string > names;
+  for (auto it = m.cities().cbegin(); it != m.cities().cend(); ++it) {
+    names.pushBack(it->first);
+  }
+  detail::sortStrings(names);
+  bool any = false;
+  for (size_t i = 0; i < names.getSize(); ++i) {
+    if (filter && names[i] != city) {
+      continue;
+    }
+    const City& c = m.cities().at(names[i]);
+    for (auto t = c.terminals.cbegin(); t != c.terminals.cend(); ++t) {
+      out << names[i] << ' ' << t->first << ' ' << t->second << '\n';
+      any = true;
+    }
+  }
+  if (!any) {
+    out << "<EMPTY>\n";
+  }
+}
+
+void kuznetsov::listRoads(std::ostream&, std::istream&, const MapsController&)
+{}
+
+void kuznetsov::listOrders(std::ostream&, std::istream&, const MapsController&)
+{}
+
+void kuznetsov::listMaps(std::ostream&, std::istream&, const MapsController&)
+{}
 

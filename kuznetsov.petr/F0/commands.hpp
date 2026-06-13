@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <string>
+#include <vector.hpp>
 
 namespace kuznetsov {
   using command = void (*)(std::ostream&, std::istream&, MapsController&);
@@ -14,6 +15,7 @@ namespace kuznetsov {
     size_t reqSize(std::istream& in);
     double reqDouble(std::istream& in);
     bool readOptional(std::istream& in, std::string& out);
+    void sortStrings(Vector< std::string >&);
   }
 
   void addTransport(std::ostream&, std::istream&, MapsController&);
