@@ -112,4 +112,27 @@ void kuznetsov::removeMapCmd(std::ostream&, std::istream& in, MapsController& m)
   m.removeMap(detail::reqStr(in));
 }
 
+void kuznetsov::nextStep(std::ostream& out, std::istream&, MapsController& mc)
+{
+  Map& m = mc.activeMap();
+  if (!m.hasRoute() || m.route().getSize() == 0) {
+    throw std::logic_error("No active route");
+  }
+  m.cursorNext();
+  out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
+}
+
+void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
+{
+  Map& m = mc.activeMap();
+  if (!m.hasRoute() || m.route().getSize() == 0) {
+    throw std::logic_error("No active route");
+  }
+  m.cursorNext();
+  out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
+}
+
+
+
+
 
