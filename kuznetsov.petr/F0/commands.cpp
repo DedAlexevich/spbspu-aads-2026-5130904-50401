@@ -132,7 +132,15 @@ void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
   out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
 }
 
+void kuznetsov::newMapCmd(std::ostream&, std::istream& in, MapsController& m)
+{
+  m.newMap(detail::reqStr(in));
+}
 
+void kuznetsov::switchMapCmd(std::ostream&, std::istream& in, MapsController& m)
+{
+  m.switchMap(detail::reqStr(in));
+}
 
 
 
