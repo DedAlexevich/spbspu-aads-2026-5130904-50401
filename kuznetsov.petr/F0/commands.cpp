@@ -69,6 +69,24 @@ void kuznetsov::addTerminal(std::ostream&, std::istream& in, MapsController& m)
   m.activeMap().addTerminal(city, type, cost);
 }
 
+void kuznetsov::addRoad(std::ostream&, std::istream& in, MapsController& m)
+{
+  std::string type = detail::reqStr(in);
+  std::string a = detail::reqStr(in);
+  std::string b = detail::reqStr(in);
+  size_t dist = detail::reqSize(in);
+  m.activeMap().addRoad(type, a, b, dist);
+}
+
+void kuznetsov::addOrder(std::ostream&, std::istream& in, MapsController& m)
+{
+  Order o;
+  o.id = detail::reqStr(in);
+  o.from = detail::reqStr(in);
+  o.to = detail::reqStr(in);
+  o.importance = detail::reqSize(in);
+  m.activeMap().addOrder(o);
+}
 
 
 
