@@ -88,6 +88,28 @@ void kuznetsov::addOrder(std::ostream&, std::istream& in, MapsController& m)
   m.activeMap().addOrder(o);
 }
 
+void kuznetsov::removeCity(std::ostream&, std::istream& in, MapsController& m)
+{
+  std::string name = detail::reqStr(in);
+  m.activeMap().removeCity(name);
+}
 
+void kuznetsov::removeRoad(std::ostream&, std::istream& in, MapsController& m)
+{
+  std::string type = detail::reqStr(in);
+  std::string a = detail::reqStr(in);
+  std::string b = detail::reqStr(in);
+  m.activeMap().removeRoad(type, a, b);
+}
+
+void kuznetsov::removeOrder(std::ostream&, std::istream& in, MapsController& m)
+{
+  m.activeMap().removeOrder(detail::reqStr(in));
+}
+
+void kuznetsov::removeMapCmd(std::ostream&, std::istream& in, MapsController& m)
+{
+  m.removeMap(detail::reqStr(in));
+}
 
 
