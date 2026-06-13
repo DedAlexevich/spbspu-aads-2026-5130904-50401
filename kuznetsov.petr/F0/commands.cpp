@@ -257,3 +257,15 @@ void kuznetsov::listMaps(std::ostream& out, std::istream&, const MapsController&
     out << (it->first == mc.activeName() ? "* " : "  ") << it->first << '\n';
   }
 }
+
+void kuznetsov::showRoute(std::ostream& out, std::istream&, const MapsController& mc)
+{
+  const Map& m = mc.activeMap();
+  if (!m.hasRoute()) {
+    throw std::logic_error("No active route");
+  }
+  out << "total " << m.routeCost() << '\n';
+  for (size_t i = 0; i < m.route().getSize(); ++i) {
+    out << '[' << i << "] " << m.route()[i].desc << '\n';
+  }
+}
