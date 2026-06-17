@@ -42,7 +42,9 @@ int main()
   cst.insert("save", kuz::saveCmd);
 
   std::string cmd;
-  while (std::cin >> cmd) {
+  while (!std::cin.eof()) {
+    std::cout << "> ";
+    std::cin >> cmd;
     try {
       if (mut.contains(cmd)) {
         mut.at(cmd)(std::cout, std::cin, mc);
