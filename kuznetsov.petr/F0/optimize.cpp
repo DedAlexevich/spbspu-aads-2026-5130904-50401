@@ -226,4 +226,83 @@ kuznetsov::detail::PermResult kuznetsov::detail::permute(const Map& map, const S
   return best;
 }
 
+void kuznetsov::optimize(Map& map, const std::string& base)
+{
+  if (!map.hasCity(base)) {
+    throw std::logic_error("No such base city");
+  }
+  if (map.orders().getSize() == 0) {
+    throw std::logic_error("No orders to optimize");
+  }
 
+  size_t orderCount = map.orders().getSize();
+  detail::NodeIndex idx = detail::buildNodeIndex(map);
+  detail::SegmentCache cache;
+  cache.build(map, idx, detail::keyCities(map, base));
+
+  Vector< size_t > best;
+  for (size_t i = 0; i < orderCount; ++i) {
+    best.pushBack(i);
+  }
+
+  if (orderCount <= BRUTE_LIMIT) {
+    Vector< size_t > perm = best;
+    detail::PermResult found = detail::permute(map, cache, base, perm, 0);
+    if (found.cost == detail::INF) {
+      throw std::logic_error("No feasible route for all orders");
+    }
+    best = found.order;
+  } else {
+    for (size_t i = 0; i < orderCount; ++i) {
+      size_t maxIdx = i;
+      for (size_t j = i + 1; j < orderCount; ++j) {
+        if (map.orders()[best[j]].importance > map.orders()[best[maxIdx]].importance) {
+          maxIdx = j;
+        }
+      }
+      std::swap(best[i], best[maxIdx]);
+    }
+    if (detail::sequenceCost(map, cache, base, best) == detail::INF) {
+      throw std::logic_error("No feasible route for all orders");
+    }
+  }
+
+  Vector< RouteStep > steps;
+  double total = 0.0;
+  std::string cur = base;
+  for (size_t p = 0; p < orderCount; ++p) {
+    const Order& order = map.orders()[best[p]];
+    RouteStep header{
+      "== " + order.id + " (pos " + std::to_string(p + 1) + ", imp " + std::to_string(order.importance) + ") ==", 0.0,
+      false
+    };
+    steps.pushBack(header);
+
+    if (cur != order.from) {
+      const detail::Segment& dead = cache.get(cur, order.from);
+      RouteStep runStep{ "  empty run " + cur + "->" + order.from, 0.0, false };
+      steps.pushBack(runStep);
+      for (size_t s = 0; s < dead.steps.getSize(); ++s) {
+        steps.pushBack(dead.steps[s]);
+      }
+      total += dead.cost;
+    }
+
+    const detail::Segment& body = cache.get(order.from, order.to);
+    RouteStep cargoStep{ "  cargo " + order.from + "->" + order.to, 0.0, false };
+    steps.pushBack(cargoStep);
+    for (size_t s = 0; s < body.steps.getSize(); ++s) {
+      steps.pushBack(body.steps[s]);
+    }
+    total += body.cost;
+
+    double fine = static_cast< double >(order.importance) * static_cast< double >(p + 1);
+    RouteStep fineStep{ "  fine " + std::to_string(order.importance) + "*" + std::to_string(p + 1) + " = ", fine,
+                        true };
+    steps.pushBack(fineStep);
+    total += fine;
+    cur = order.to;
+  }
+
+  map.setRoute(std::move(steps), total);
+}
