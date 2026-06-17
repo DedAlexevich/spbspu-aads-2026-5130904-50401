@@ -151,3 +151,15 @@ void kuznetsov::detail::SegmentCache::build(const Map& map, const NodeIndex& idx
     }
   }
 }
+
+const kuznetsov::detail::Segment& kuznetsov::detail::SegmentCache::get(const std::string& from,
+  const std::string& to) const
+{
+  for (size_t i = 0; i < segments.getSize(); ++i) {
+    if (segments[i].from == from && segments[i].to == to) {
+      return segments[i];
+    }
+  }
+  throw std::logic_error("Segment not precomputed");
+}
+
