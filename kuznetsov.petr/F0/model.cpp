@@ -37,20 +37,25 @@ bool kuznetsov::Map::hasTerminal(const std::string& city, const std::string& typ
 
 bool kuznetsov::Map::hasOrder(const std::string& id) const
 {
-  return orders_.contain(id);
+  for (auto it = orders_.cbegin(); it != orders_.cend(); ++it) {
+    if (it->id == id) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool kuznetsov::Map::hasRoad(const std::string& type, const std::string& a, const std::string& b) const
 {
-  if (!hasCity(a)) {
+  if (!cities().contains(a)) {
     return false;
   }
-  const City& ca = cities_.at(a);
+  const City& ca = cities().at(a);
   if (!ca.roads.contains(type)) {
     return false;
   }
-  for (size_t i = 0; i < ca.roads.getSize(); ++i) {
-    if (ca.roads[i].to == b) {
+  for (size_t i = 0; i < ca.roads.at(type).getSize(); ++i) {
+    if (ca.roads.at(type)[i].to == b) {
       return true;
     }
   }
@@ -213,7 +218,7 @@ void kuznetsov::Map::clear()
 {
   cities_ = StrHashMap< City >();
   transports_ = map< std::string, RoadType >();
-  orders_ = Vector< Order >;
+  orders_ = Vector< Order >();
   dropRoute();
 }
 
@@ -235,7 +240,7 @@ const kuznetsov::map< std::string, kuznetsov::RoadType >& kuznetsov::Map::transp
   return transports_;
 }
 
-const Vector< kuznetsov::Order >& kuznetsov::Map::orders() const
+const kuznetsov::Vector< kuznetsov::Order >& kuznetsov::Map::orders() const
 {
   return orders_;
 }
@@ -250,7 +255,7 @@ double kuznetsov::Map::routeCost() const
   return routeCost_;
 }
 
-const Vector< kuznetsov::RouteStep >& kuznetsov::Map::route() const
+const kuznetsov::Vector< kuznetsov::RouteStep >& kuznetsov::Map::route() const
 {
   return route_;
 }
