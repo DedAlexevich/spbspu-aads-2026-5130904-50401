@@ -22,7 +22,6 @@ kuznetsov::detail::NodeIndex kuznetsov::detail::buildNodeIndex(const Map& m)
 kuznetsov::detail::Segment kuznetsov::detail::routeSegment(const Map& map, const NodeIndex& idx,
   const std::string& from, const std::string& to)
 {
-  constexpr double INF = std::numeric_limits< double >::infinity();
   constexpr size_t NPOS = std::numeric_limits< double >::max();
 
   Segment result{ from, to, false, 0.0, Vector< RouteStep >() };
@@ -190,7 +189,6 @@ double kuznetsov::detail::fineSum(const Map& map, const Vector< size_t >& perm)
 double kuznetsov::detail::sequenceCost(const Map& map, const SegmentCache& cache, const std::string& base,
   const Vector< size_t >& perm)
 {
-  const double INF = std::numeric_limits< double >::infinity();
   double total = 0.0;
   std::string cur = base;
   for (size_t p = 0; p < perm.getSize(); ++p) {
@@ -205,3 +203,27 @@ double kuznetsov::detail::sequenceCost(const Map& map, const SegmentCache& cache
   }
   return total;
 }
+
+kuznetsov::detail::PermResult kuznetsov::detail::permute(const Map& map, const SegmentCache& cache,
+  const std::string& base, Vector< size_t >& perm, size_t k)
+{
+  if (k == perm.getSize()) {
+    double seqCost = sequenceCost(map, cache, base, perm);
+    if (seqCost == INF) {
+      return PermResult{ Vector< size_t >(), INF };
+    }
+    return PermResult{ perm, seqCost + fineSum(map, perm) };
+  }
+  PermResult best{ Vector< size_t >(), INF };
+  for (size_t i = k; i < perm.getSize(); ++i) {
+    std::swap(perm[k], perm[i]);
+    PermResult cand = permute(map, cache, base, perm, k + 1);
+    std::swap(perm[k], perm[i]);
+    if (cand.cost < best.cost) {
+      best = cand;
+    }
+  }
+  return best;
+}
+
+

@@ -2,6 +2,7 @@
 #define OPTIMIZE_HPP
 #include <string>
 #include <vector.hpp>
+#include <limits>
 #include "model.hpp"
 
 namespace kuznetsov {
@@ -10,6 +11,7 @@ namespace kuznetsov {
   void optimize(Map& map, const std::string& base);
 
   namespace detail {
+    constexpr double INF = std::numeric_limits< double >::infinity();
     enum class EdgeKind {
       Board,
       Road,
@@ -52,8 +54,14 @@ namespace kuznetsov {
     Vector< std::string > keyCities(const Map& m, const std::string& base);
     double fineSum(const Map& m, const Vector< size_t >& perm);
     double sequenceCost(const Map& m, const SegmentCache& cache, const std::string& base, const Vector< size_t >& perm);
-    void permute(const Map& m, const SegmentCache& cache, const std::string& base, Vector< size_t >& perm, size_t k,
-                 Vector< size_t >& best, double& bestCost);
+
+    struct PermResult {
+      Vector< size_t > order;
+      double cost;
+    };
+
+    PermResult permute(const Map& map, const SegmentCache& cache, const std::string& base,
+      Vector< size_t >& perm, size_t k);
   }
 }
 
