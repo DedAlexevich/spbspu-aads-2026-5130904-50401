@@ -1,10 +1,9 @@
 #include "commands.hpp"
-
-#include "saveLoad.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include "optimize.hpp"
+#include "saveLoad.hpp"
 
 void kuznetsov::detail::sortStrings(Vector< std::string >& v)
 {
