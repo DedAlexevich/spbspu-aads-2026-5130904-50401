@@ -1,7 +1,10 @@
 #include "commands.hpp"
+
+#include "saveLoad.hpp"
+
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <fstream>
 
 void kuznetsov::detail::sortStrings(Vector< std::string >& v)
 {
@@ -289,7 +292,7 @@ void kuznetsov::optimizeCmd(std::ostream& out, std::istream& in, MapsController&
   if (!input) {
     throw std::logic_error("Cannot open file for reading");
   }
-  loadMap(input, mc.activeMap());
+  loadMap(input, mc);
   out << "Atlas loaded from " << file << "\n";
 }
 

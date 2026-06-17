@@ -1,7 +1,6 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 #include <string>
-#include <cstddef>
 #include <vector.hpp>
 #include <vectorIterators.hpp>
 #include "Hasher.hpp"
