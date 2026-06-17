@@ -146,7 +146,7 @@ void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
   if (!m.hasRoute() || m.route().getSize() == 0) {
     throw std::logic_error("No active route");
   }
-  m.cursorNext();
+  m.cursorPrev();
   out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
 }
 
@@ -269,7 +269,7 @@ void kuznetsov::showRoute(std::ostream& out, std::istream&, const MapsController
   }
   out << "total " << m.routeCost() << '\n';
   for (size_t i = 0; i < m.route().getSize(); ++i) {
-    out << '[' << i << "] " << m.route()[i].desc << '\n';
+    out << '[' << i << "] " << m.route()[i].desc << m.route()[i].cost << '\n';
   }
 }
 

@@ -1,5 +1,5 @@
 #include "model.hpp"
-#include <math.h>
+#include <cmath>
 bool kuznetsov::detail::StrEqual::operator()(const std::string& a, const std::string& b) const
 {
   return a == b;
@@ -115,6 +115,7 @@ void kuznetsov::Map::addTransport(const std::string& type)
     throw std::logic_error("Such transport alredy exist");
   }
   transports_.insert(type, RoadType{ 1, 0, 1 });
+  dropRoute();
 }
 
 void kuznetsov::Map::setRoadType(const std::string& type, double k, double b, double n)

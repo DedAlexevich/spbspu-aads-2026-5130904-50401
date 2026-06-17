@@ -180,7 +180,7 @@ double kuznetsov::detail::fineSum(const Map& map, const Vector< size_t >& perm)
 {
   double sum = 0.0;
   for (size_t p = 0; p < perm.getSize(); ++p) {
-    sum += map.orders()[perm[p]].importance * p + 1;
+    sum += map.orders()[perm[p]].importance * (p + 1);
   }
   return sum;
 }
