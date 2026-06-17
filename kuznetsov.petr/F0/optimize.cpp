@@ -177,3 +177,31 @@ kuznetsov::Vector< std::string > kuznetsov::detail::keyCities(const Map& map, co
   }
   return keys;
 }
+
+double kuznetsov::detail::fineSum(const Map& map, const Vector< size_t >& perm)
+{
+  double sum = 0.0;
+  for (size_t p = 0; p < perm.getSize(); ++p) {
+    sum += map.orders()[perm[p]].importance * p + 1;
+  }
+  return sum;
+}
+
+double kuznetsov::detail::sequenceCost(const Map& map, const SegmentCache& cache, const std::string& base,
+  const Vector< size_t >& perm)
+{
+  const double INF = std::numeric_limits< double >::infinity();
+  double total = 0.0;
+  std::string cur = base;
+  for (size_t p = 0; p < perm.getSize(); ++p) {
+    const Order& order = map.orders()[perm[p]];
+    const Segment& dead = cache.get(cur, order.from);
+    const Segment& body = cache.get(order.from, order.to);
+    if (!dead.reachable || !body.reachable) {
+      return INF;
+    }
+    total += dead.cost + body.cost;
+    cur = order.to;
+  }
+  return total;
+}
