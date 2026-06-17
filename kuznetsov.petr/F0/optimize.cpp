@@ -142,3 +142,12 @@ kuznetsov::detail::Segment kuznetsov::detail::routeSegment(const Map& map, const
   result.cost = endCost;
   return result;
 }
+
+void kuznetsov::detail::SegmentCache::build(const Map& map, const NodeIndex& idx, const Vector< std::string >& keys)
+{
+  for (size_t i = 0; i < keys.getSize(); ++i) {
+    for (size_t j = 0; j < keys.getSize(); ++j) {
+      segments.pushBack(routeSegment(map, idx, keys[i], keys[j]));
+    }
+  }
+}
