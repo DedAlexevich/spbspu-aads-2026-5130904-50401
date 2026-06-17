@@ -36,8 +36,8 @@ namespace kuznetsov {
     NodeIndex buildNodeIndex(const Map& m);
 
     struct Segment {
-      std::string a;
-      std::string b;
+      std::string from;
+      std::string to;
       bool reachable;
       double cost;
       Vector< RouteStep > steps;

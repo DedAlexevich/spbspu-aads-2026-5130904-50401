@@ -22,7 +22,7 @@ kuznetsov::detail::NodeIndex kuznetsov::detail::buildNodeIndex(const Map& m)
 kuznetsov::detail::Segment kuznetsov::detail::routeSegment(const Map& map, const NodeIndex& idx,
   const std::string& from, const std::string& to)
 {
-  constexpr size_t NPOS = std::numeric_limits< double >::max();
+  constexpr size_t NPOS = std::numeric_limits< size_t >::max();
 
   Segment result{ from, to, false, 0.0, Vector< RouteStep >() };
   if (from == to) {
@@ -127,13 +127,12 @@ kuznetsov::detail::Segment kuznetsov::detail::routeSegment(const Map& map, const
     const std::string& city = idx.cityNames[node / typeCount];
     const std::string& typeName = idx.typeNames[state[node].type];
     if (state[node].kind == EdgeKind::Transship) {
-      RouteStep step{ "  switch->" + typeName + " @" + city + " fee ", state[node].cost, true };
+      RouteStep step{ "  switch->" + typeName + " @" + city + " fee ", state[node].cost };
       result.steps.pushBack(step);
     } else if (state[node].kind == EdgeKind::Road) {
       const std::string& prevCity = idx.cityNames[state[node].prev / typeCount];
       RouteStep step{ "  " + typeName + " " + prevCity + "->" + city + " (" + std::to_string(state[node].len)
-                          + ") cost ",
-                      state[node].cost, true };
+                          + ") cost ",state[node].cost };
       result.steps.pushBack(step);
     }
   }
@@ -273,14 +272,12 @@ void kuznetsov::optimize(Map& map, const std::string& base)
   for (size_t p = 0; p < orderCount; ++p) {
     const Order& order = map.orders()[best[p]];
     RouteStep header{
-      "== " + order.id + " (pos " + std::to_string(p + 1) + ", imp " + std::to_string(order.importance) + ") ==", 0.0,
-      false
-    };
+      "== " + order.id + " (pos " + std::to_string(p + 1) + ", imp " + std::to_string(order.importance) + ") ==", 0.0,};
     steps.pushBack(header);
 
     if (cur != order.from) {
       const detail::Segment& dead = cache.get(cur, order.from);
-      RouteStep runStep{ "  empty run " + cur + "->" + order.from, 0.0, false };
+      RouteStep runStep{ "  empty run " + cur + "->" + order.from, 0.0 };
       steps.pushBack(runStep);
       for (size_t s = 0; s < dead.steps.getSize(); ++s) {
         steps.pushBack(dead.steps[s]);
@@ -289,7 +286,7 @@ void kuznetsov::optimize(Map& map, const std::string& base)
     }
 
     const detail::Segment& body = cache.get(order.from, order.to);
-    RouteStep cargoStep{ "  cargo " + order.from + "->" + order.to, 0.0, false };
+    RouteStep cargoStep{ "  cargo " + order.from + "->" + order.to, 0.0 };
     steps.pushBack(cargoStep);
     for (size_t s = 0; s < body.steps.getSize(); ++s) {
       steps.pushBack(body.steps[s]);
@@ -297,8 +294,7 @@ void kuznetsov::optimize(Map& map, const std::string& base)
     total += body.cost;
 
     double fine = static_cast< double >(order.importance) * static_cast< double >(p + 1);
-    RouteStep fineStep{ "  fine " + std::to_string(order.importance) + "*" + std::to_string(p + 1) + " = ", fine,
-                        true };
+    RouteStep fineStep{ "  fine " + std::to_string(order.importance) + "*" + std::to_string(p + 1) + " = ", fine};
     steps.pushBack(fineStep);
     total += fine;
     cur = order.to;
