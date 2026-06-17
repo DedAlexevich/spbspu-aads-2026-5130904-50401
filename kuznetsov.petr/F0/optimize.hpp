@@ -10,6 +10,21 @@ namespace kuznetsov {
   void optimize(Map& map, const std::string& base);
 
   namespace detail {
+    enum class EdgeKind {
+      Board,
+      Road,
+      Transship
+    };
+    struct NodeState {
+      double dist;
+      bool done;
+      size_t prev;
+      EdgeKind kind;
+      size_t len;
+      double cost;
+      size_t type;
+    };
+
     struct NodeIndex {
       Vector< std::string > cityNames;
       StrHashMap< size_t > cityIdx;
@@ -36,10 +51,9 @@ namespace kuznetsov {
 
     Vector< std::string > keyCities(const Map& m, const std::string& base);
     double fineSum(const Map& m, const Vector< size_t >& perm);
-    double sequenceCost(const Map& m, const SegmentCache& cache, const std::string& base,
-      const Vector< size_t >& perm);
-    void permute(const Map& m, const SegmentCache& cache, const std::string& base,
-      Vector< size_t >& perm, size_t k, Vector< size_t >& best, double& bestCost);
+    double sequenceCost(const Map& m, const SegmentCache& cache, const std::string& base, const Vector< size_t >& perm);
+    void permute(const Map& m, const SegmentCache& cache, const std::string& base, Vector< size_t >& perm, size_t k,
+                 Vector< size_t >& best, double& bestCost);
   }
 }
 
