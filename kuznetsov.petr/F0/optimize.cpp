@@ -163,3 +163,17 @@ const kuznetsov::detail::Segment& kuznetsov::detail::SegmentCache::get(const std
   throw std::logic_error("Segment not precomputed");
 }
 
+kuznetsov::Vector< std::string > kuznetsov::detail::keyCities(const Map& map, const std::string& base)
+{
+  Vector< std::string > keys;
+  keys.pushBack(base);
+  for (size_t i = 0; i < map.orders().getSize(); ++i) {
+    if (!keys.contain(map.orders()[i].from)) {
+      keys.pushBack(map.orders()[i].from);
+    }
+    if (!keys.contain(map.orders()[i].to)) {
+      keys.pushBack(map.orders()[i].to);
+    }
+  }
+  return keys;
+}
