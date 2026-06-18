@@ -45,6 +45,7 @@ namespace kuznetsov {
   struct RouteStep {
     std::string desc;
     double cost;
+    bool hasValue;
   };
 
   struct Map {

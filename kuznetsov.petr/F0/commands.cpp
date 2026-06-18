@@ -137,7 +137,10 @@ void kuznetsov::nextStep(std::ostream& out, std::istream&, MapsController& mc)
     throw std::logic_error("No active route");
   }
   m.cursorNext();
-  out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
+  const RouteStep& s = m.route()[m.cursor()];
+  out << '[' << m.cursor() << "] " << s.desc;
+  if (s.hasValue) out << s.cost;
+  out << '\n';
 }
 
 void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
@@ -147,7 +150,10 @@ void kuznetsov::prevStep(std::ostream& out, std::istream&, MapsController& mc)
     throw std::logic_error("No active route");
   }
   m.cursorPrev();
-  out << '[' << m.cursor() << "] " << m.route()[m.cursor()].desc << '\n';
+  const RouteStep& s = m.route()[m.cursor()];
+  out << '[' << m.cursor() << "] " << s.desc;
+  if (s.hasValue) out << s.cost;
+  out << '\n';
 }
 
 void kuznetsov::newMapCmd(std::ostream&, std::istream& in, MapsController& mc)
@@ -269,7 +275,10 @@ void kuznetsov::showRoute(std::ostream& out, std::istream&, const MapsController
   }
   out << "total " << m.routeCost() << '\n';
   for (size_t i = 0; i < m.route().getSize(); ++i) {
-    out << '[' << i << "] " << m.route()[i].desc << m.route()[i].cost << '\n';
+    const RouteStep& s = m.route()[i];
+    out << '[' << i << "] " << s.desc;
+    if (s.hasValue) out << s.cost;
+    out << '\n';
   }
 }
 
