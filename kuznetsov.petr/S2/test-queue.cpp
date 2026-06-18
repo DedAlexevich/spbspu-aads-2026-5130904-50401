@@ -1,8 +1,6 @@
 #include <boost/test/unit_test.hpp>
+#include <list.hpp>
 #include <queue.hpp>
-
-#include "../common/list.hpp"
-#include "../common/queue.hpp"
 
 BOOST_AUTO_TEST_CASE(EmptyQueueTest)
 {
@@ -96,8 +94,7 @@ namespace kuznetsov {
       TestData(int a, int b):
         a_(a),
         b_(b)
-      {
-      }
+      {}
       int sum()
       {
         return a_ + b_;

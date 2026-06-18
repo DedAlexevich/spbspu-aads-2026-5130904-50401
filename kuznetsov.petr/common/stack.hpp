@@ -60,7 +60,7 @@ void kuznetsov::Stack< T >::push(const T& val)
 template< class T >
 void kuznetsov::Stack< T >::push(T&& val)
 {
-  list_.insert(list_.cbegin(), std::move(val));
+  list_.insert(list_.cbegin(), std::forward< T >(val));
 }
 
 template< class T >

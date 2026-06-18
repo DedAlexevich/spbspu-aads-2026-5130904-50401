@@ -53,7 +53,7 @@ void kuznetsov::Queue< T >::emplace(Args&&... args)
 template< class T >
 void kuznetsov::Queue< T >::push(T&& val)
 {
-  list_.insert(list_.cend(), std::move(val));
+  list_.insert(list_.cend(), std::forward< T >(val));
 }
 
 template< class T >
