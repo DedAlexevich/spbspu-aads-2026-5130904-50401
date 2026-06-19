@@ -41,7 +41,7 @@ void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
   }
   Vector< std::string > names;
   for (auto it = t.cbegin(); it != t.cend(); ++it) {
-    names.pushBack((*it).first);
+    names.pushBack(it->first);
   }
   sort(names, std::less< std::string >{});
   auto it = names.cbegin();
@@ -91,10 +91,10 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
   Vector< std::pair< std::string, size_t > > res;
   auto it = g.table_.begin();
   while (it != g.table_.end()) {
-    if ((*it).first.first == v) {
-      const Vector< size_t >& weights = (*it).second;
+    if (it->first.first == v) {
+      const Vector< size_t >& weights = it->second;
       for (size_t i = 0; i < weights.getSize(); ++i) {
-        res.pushBack(std::make_pair((*it).first.second, weights[i]));
+        res.pushBack(std::make_pair(it->first.second, weights[i]));
       }
     }
     ++it;
@@ -104,13 +104,13 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
   }
   sort(res, PairComparator{});
   auto itr = res.cbegin();
-  out << (*itr).first << ' ' << (*itr).second;
+  out << itr->first << ' ' << itr->second;
   ++itr;
   for (; itr != res.cend(); ++itr) {
-    if ((*(itr - 1)).first == (*(itr)).first) {
-      out << ' ' << (*itr).second;
+    if ((*(itr - 1)).first == itr->first) {
+      out << ' ' << itr->second;
     } else {
-      out << '\n' << (*itr).first << ' ' << (*itr).second;
+      out << '\n' << itr->first << ' ' << itr->second;
     }
   }
 }
@@ -132,10 +132,10 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
   Vector< std::pair< std::string, size_t > > res;
   auto it = g.table_.begin();
   while (it != g.table_.end()) {
-    if ((*it).first.second == v) {
-      const Vector< size_t >& weights = (*it).second;
+    if (it->first.second == v) {
+      const Vector< size_t >& weights = it->second;
       for (size_t i = 0; i < weights.getSize(); ++i) {
-        res.pushBack(std::make_pair((*it).first.first, weights[i]));
+        res.pushBack(std::make_pair(it->first.first, weights[i]));
       }
     }
     ++it;
@@ -145,13 +145,13 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
   }
   sort(res, PairComparator{});
   auto itr = res.cbegin();
-  out << (*itr).first << ' ' << (*itr).second;
+  out << itr->first << ' ' << itr->second;
   ++itr;
   for (; itr != res.cend(); ++itr) {
-    if ((*(itr - 1)).first == (*(itr)).first) {
-      out << ' ' << (*itr).second;
+    if ((*(itr - 1)).first == itr->first) {
+      out << ' ' << itr->second;
     } else {
-      out << '\n' << (*itr).first << ' ' << (*itr).second;
+      out << '\n' << itr->first << ' ' << itr->second;
     }
   }
 }
@@ -286,8 +286,8 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
   }
 
   for (auto it = source.table_.begin(); it != source.table_.end(); ++it) {
-    const std::string& from = (*it).first.first;
-    const std::string& to = (*it).first.second;
+    const std::string& from = it->first.first;
+    const std::string& to = it->first.second;
 
     bool fromExists = false, toExists = false;
     for (size_t i = 0; i < vertexes.getSize(); ++i) {
@@ -300,7 +300,7 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
     }
 
     if (fromExists && toExists) {
-      const Vector< size_t >& weights = (*it).second;
+      const Vector< size_t >& weights = it->second;
       for (size_t i = 0; i < weights.getSize(); ++i) {
         gr.addEdge(from, to, weights[i]);
       }
