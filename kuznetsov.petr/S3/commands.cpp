@@ -37,7 +37,6 @@ void sort(kuznetsov::Vector< T >& v, Cmp cmp)
 void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
 {
   if (t.size() == 0) {
-    out << '\n';
     return;
   }
   Vector< std::string > names;
@@ -46,8 +45,10 @@ void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
   }
   sort(names, std::less< std::string >{});
   auto it = names.cbegin();
+  out << *it;
+  ++it;
   for (; it != names.cend(); ++it) {
-    out << *it << '\n';
+    out << '\n' << *it;
   }
 }
 
@@ -61,13 +62,15 @@ void kuznetsov::vertexes(std::ostream& out, std::istream& in, const table& t)
 
   const Graph& g = t.at(name);
   if (g.vertexes_.isEmpty()) {
-    out << '\n';
     return;
   }
   Vector< std::string > vrts(g.vertexes_);
   sort(vrts, std::less< std::string >{});
-  for (auto it = vrts.cbegin(); it != vrts.cend(); ++it) {
-    out << *it << '\n';
+  auto it = vrts.cbegin();
+  out << *it;
+  ++it;
+  for (; it != vrts.cend(); ++it) {
+    out << '\n' << *it;
   }
 }
 
@@ -97,7 +100,6 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
     ++it;
   }
   if (res.isEmpty()) {
-    out << '\n';
     return;
   }
   sort(res, PairComparator{});
@@ -111,7 +113,6 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
       out << '\n' << (*itr).first << ' ' << (*itr).second;
     }
   }
-  out << '\n';
 }
 
 void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
@@ -140,7 +141,6 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
     ++it;
   }
   if (res.isEmpty()) {
-    out << '\n';
     return;
   }
   sort(res, PairComparator{});
@@ -154,7 +154,6 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
       out << '\n' << (*itr).first << ' ' << (*itr).second;
     }
   }
-  out << '\n';
 }
 
 void kuznetsov::bind(std::ostream&, std::istream& in, table& t)

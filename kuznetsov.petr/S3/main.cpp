@@ -56,6 +56,7 @@ int main(int argc, char** argv)
         cmds.at(cmd)(std::cout, std::cin, grphs);
       } else {
         constCmds.at(cmd)(std::cout, std::cin, grphs);
+        std::cout << '\n';
       }
     } catch (const std::logic_error& e) {
       std::cout << "<INVALID COMMAND>\n";
