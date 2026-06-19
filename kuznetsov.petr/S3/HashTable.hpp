@@ -70,6 +70,8 @@ namespace kuznetsov {
 
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
+    Value& operator[](const Key& k);
+    const Value& operator[](const Key& k) const;
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -471,6 +473,23 @@ const Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(const Key& k) c
     }
   }
   throw std::out_of_range("Key not found");
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
+{
+  try {
+    return at(k);
+  } catch (const std::out_of_range&) {
+    this->add(k, Value{});
+    return at(k);
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::operator[](const Key& k) const
+{
+  return at(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >

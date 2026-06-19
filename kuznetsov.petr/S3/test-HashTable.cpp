@@ -140,6 +140,29 @@ BOOST_AUTO_TEST_CASE(At_Const_Method_Test)
   BOOST_CHECK_THROW(map2.at(4), std::out_of_range);
 }
 
+BOOST_AUTO_TEST_CASE(Operator_Get_Access_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map.add(1, 34);
+  map.add(2, 52);
+  map[3] = 67;
+  BOOST_TEST(map[1] == 34);
+  BOOST_TEST(map[2] == 52);
+  BOOST_TEST(map[3] == 67);
+}
+
+BOOST_AUTO_TEST_CASE(Const_Operator_Get_Access)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map[1] = 34;
+  map[2] = 52;
+  map[3] = 67;
+  const kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
+  BOOST_TEST(map2[1] == 34);
+  BOOST_TEST(map2[2] == 52);
+  BOOST_TEST(map2[3] == 67);
+}
+
 BOOST_AUTO_TEST_CASE(Iterators_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
