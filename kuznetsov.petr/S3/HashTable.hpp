@@ -413,7 +413,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::addImpl(K&& k, V&& val)
 template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
 {
-  addImpl(std::forward(k), std::forward(val));
+  addImpl(std::forward< Key >(k), std::forward< Value >(val));
 }
 
 template< class Key, class Value, class Hash, class Equal >

@@ -5,24 +5,18 @@
 
 #include <top-it-vector.hpp>
 
-struct PairComparator {
-  using pair_t = std::pair< std::string, size_t >;
-  bool operator()(const pair_t& p1, const pair_t& p2)
-  {
-    if (p1.first != p2.first) {
-      return p1.first < p2.first;
+namespace {
+  struct PairComparator {
+    using pair_t = std::pair< std::string, size_t >;
+    bool operator()(const pair_t& p1, const pair_t& p2)
+    {
+      if (p1.first != p2.first) {
+        return p1.first < p2.first;
+      }
+      return p1.second < p2.second;
     }
-    return p1.second < p2.second;
-  }
-};
-
-template< class T >
-struct Comparator {
-  bool operator()(const T& p1, const T& p2)
-  {
-    return p1 < p2;
-  }
-};
+  };
+}
 
 template< class T, class Cmp >
 void sort(kuznetsov::Vector< T >& v, Cmp cmp)
@@ -50,7 +44,7 @@ void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
   for (auto it = t.cbegin(); it != t.cend(); ++it) {
     names.pushBack((*it).first);
   }
-  sort(names, Comparator< std::string >{});
+  sort(names, std::less< std::string >{});
   auto it = names.cbegin();
   for (; it != names.cend(); ++it) {
     out << *it << '\n';
@@ -71,7 +65,7 @@ void kuznetsov::vertexes(std::ostream& out, std::istream& in, const table& t)
     return;
   }
   Vector< std::string > vrts(g.vertexes_);
-  sort(vrts, Comparator< std::string >{});
+  sort(vrts, std::less< std::string >{});
   for (auto it = vrts.cbegin(); it != vrts.cend(); ++it) {
     out << *it << '\n';
   }
