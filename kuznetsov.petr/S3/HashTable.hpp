@@ -94,6 +94,8 @@ namespace kuznetsov {
     size_t capacity_;
     size_t getFreeSlot(const Key& k) const noexcept;
     size_t findIndex(const Key& k) const noexcept;
+    template< class K, class V >
+    void addImpl(K&& k, V&& val);
   };
 
   template< class Key, class Value, bool IsConst >
@@ -393,7 +395,8 @@ size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::findIndex(const Key& k) 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
+template< class K, class V >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::addImpl(K&& k, V&& val)
 {
   if (size_ == capacity_) {
     throw std::logic_error("Not enough slots_");
@@ -402,24 +405,21 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
     throw std::logic_error("Such key already exist");
   }
   size_t pos = getFreeSlot(k);
-  new (slots_ + pos) detail::Slot< Key, Value >(std::forward< Key >(k), std::forward< Value >(val));
+  new (slots_ + pos) detail::Slot< Key, Value >(std::forward< K >(k), std::forward< V >(val));
   states_[pos] = detail::State::STORE;
   ++size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
+{
+  addImpl(std::forward(k), std::forward(val));
+}
+
+template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(const Key& k, const Value& val)
 {
-  if (size_ == capacity_) {
-    throw std::logic_error("Not enough slots_");
-  }
-  if (contains(k)) {
-    throw std::logic_error("Such key already exist");
-  }
-  size_t pos = getFreeSlot(k);
-  new (slots_ + pos) detail::Slot< Key, Value >(k, val);
-  states_[pos] = detail::State::STORE;
-  ++size_;
+  addImpl(k, val);
 }
 
 template< class Key, class Value, class Hash, class Equal >
