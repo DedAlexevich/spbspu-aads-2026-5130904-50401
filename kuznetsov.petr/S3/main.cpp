@@ -10,6 +10,11 @@
 
 int main(int argc, char** argv)
 {
+  using command = void (*)(std::ostream&, std::istream&, kuz::table&);
+  using constCommand = void (*)(std::ostream&, std::istream&, const kuz::table&);
+  using hashString = kuz::SipHasher< std::string >;
+  namespace kuz = kuznetsov;
+
   if (argc < 2) {
     std::cerr << "Not enough arguments\n";
     return 1;
@@ -19,15 +24,13 @@ int main(int argc, char** argv)
     std::cerr << "Couldn't open file\n";
     return 1;
   }
-  namespace kuz = kuznetsov;
+
   std::string name;
   size_t count = 0;
-  using command = void (*)(std::ostream&, std::istream&, kuz::table&);
-  using constCommand = void (*)(std::ostream&, std::istream&, const kuz::table&);
   kuz::table grphs;
-  using hashString = kuz::SipHasher< std::string >;
   kuz::HashTable< std::string, command, hashString, kuz::KeyComparator > cmds;
   kuz::HashTable< std::string, constCommand, hashString, kuz::KeyComparator > constCmds;
+
   constCmds.add("graphs", kuz::graphs);
   constCmds.add("vertexes", kuz::vertexes);
   constCmds.add("outbound", kuz::outbound);
