@@ -129,7 +129,7 @@ namespace kuznetsov {
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() noexcept
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != detail::State::STORE) {
@@ -140,7 +140,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() noexcept
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const noexcept
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != detail::State::STORE) {
@@ -151,7 +151,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::begin() const noexcept
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
 {
   size_t i = 0;
   while (i < capacity_ && states_[i] != detail::State::STORE) {
@@ -162,21 +162,21 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::end() noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::end() noexcept
 {
   return iterator(slots_, states_, capacity_, capacity_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::end() const noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::end() const noexcept
 {
   return const_iterator(slots_, states_, capacity_, capacity_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
-kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
 {
   return const_iterator(slots_, states_, capacity_, capacity_);
 }
@@ -327,7 +327,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >&
-kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
 {
   if (std::addressof(oth) == this) {
     return *this;
@@ -339,7 +339,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& oth)
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >&
-kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& oth) noexcept
 {
   if (std::addressof(oth) == this) {
     return *this;
