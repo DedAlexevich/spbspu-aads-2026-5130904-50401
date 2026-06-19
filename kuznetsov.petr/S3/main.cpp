@@ -10,10 +10,10 @@
 
 int main(int argc, char** argv)
 {
+  namespace kuz = kuznetsov;
   using command = void (*)(std::ostream&, std::istream&, kuz::table&);
   using constCommand = void (*)(std::ostream&, std::istream&, const kuz::table&);
   using hashString = kuz::SipHasher< std::string >;
-  namespace kuz = kuznetsov;
 
   if (argc < 2) {
     std::cerr << "Not enough arguments\n";
