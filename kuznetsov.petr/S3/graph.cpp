@@ -5,14 +5,12 @@
 kuznetsov::Graph::Graph():
   table_(),
   vertexes_()
-{
-}
+{}
 
 kuznetsov::Graph::Graph(size_t c):
   table_(c),
   vertexes_()
-{
-}
+{}
 
 void kuznetsov::Graph::addVertexes(const std::string& name)
 {

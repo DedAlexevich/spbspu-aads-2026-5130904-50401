@@ -52,4 +52,3 @@ size_t kuznetsov::SipHasher< std::pair< First, Second > >::operator()(const std:
 }
 
 #endif
-

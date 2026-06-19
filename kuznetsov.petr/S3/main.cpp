@@ -1,9 +1,8 @@
+#include <fstream>
+#include <iostream>
 #include <boost/describe/class.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/siphash.hpp>
-#include <fstream>
-#include <iostream>
-
 #include "./HashTable.hpp"
 #include "./Hasher.hpp"
 #include "./commands.hpp"
