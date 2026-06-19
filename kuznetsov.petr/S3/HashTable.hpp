@@ -98,9 +98,9 @@ namespace kuznetsov {
 
   template< class Key, class Value, bool IsConst >
   struct Iterator {
-    using pair_type = detail::Slot< const Key, Value >;
-    using reference = typename detail::conditional< IsConst, const pair_type&, pair_type& >::type;
-    using point = typename detail::conditional< IsConst, const pair_type*, pair_type* >::type;
+    using value_type = detail::Slot< const Key, Value >;
+    using reference = typename detail::conditional< IsConst, const value_type&, value_type& >::type;
+    using pointer = typename detail::conditional< IsConst, const value_type*, value_type* >::type;
 
     Iterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
 
@@ -111,7 +111,7 @@ namespace kuznetsov {
     bool operator!=(const Iterator< Key, Value, OthConst >&) const;
 
     reference operator*();
-    point operator->();
+    pointer operator->();
 
     Iterator operator++();
     Iterator operator--();
@@ -120,7 +120,7 @@ namespace kuznetsov {
     Iterator operator--(int);
 
   private:
-    pair_type* slots_;
+    value_type* slots_;
     detail::State* states_;
     size_t i_;
     size_t cap_;
@@ -183,7 +183,7 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
 
 template< class K, class V, bool IsConst >
 kuznetsov::Iterator< K, V, IsConst >::Iterator(detail::Slot< K, V >* slt, detail::State* s, size_t ind, size_t cap):
-  slots_(reinterpret_cast< pair_type* >(slt)),
+  slots_(reinterpret_cast< value_type* >(slt)),
   states_(s),
   i_(ind),
   cap_(cap)
@@ -211,7 +211,7 @@ typename kuznetsov::Iterator< K, V, IsConst >::reference kuznetsov::Iterator< K,
 }
 
 template< class K, class V, bool IsConst >
-typename kuznetsov::Iterator< K, V, IsConst >::point kuznetsov::Iterator< K, V, IsConst >::operator->()
+typename kuznetsov::Iterator< K, V, IsConst >::pointer kuznetsov::Iterator< K, V, IsConst >::operator->()
 {
   return slots_ + i_;
 }
