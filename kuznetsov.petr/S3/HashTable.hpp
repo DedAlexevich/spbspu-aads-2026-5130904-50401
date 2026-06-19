@@ -59,9 +59,14 @@ namespace kuznetsov {
 
     void add(Key&& k, Value&& val);
     void add(const Key& k, const Value& val);
+
     void remove(const Key& k);
+
     bool contains(const Key& k) const noexcept;
     void rehash(size_t slots = 0);
+
+    iterator find(const Key&);
+    const_iterator find(const Key&) const;
 
     void swap(HashTable&) noexcept;
 
@@ -88,6 +93,7 @@ namespace kuznetsov {
     size_t size_;
     size_t capacity_;
     size_t getFreeSlot(const Key& k) const noexcept;
+    size_t findIndex(const Key& k) const noexcept;
   };
 
   template< class Key, class Value, bool IsConst >
@@ -370,6 +376,23 @@ size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getFreeSlot(const Key& k
 }
 
 template< class Key, class Value, class Hash, class Equal >
+size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::findIndex(const Key& k) const noexcept
+{
+  size_t hash = hasher_(k);
+  size_t pos = 0;
+  for (size_t i = 0; i < capacity_; ++i) {
+    pos = (hash + (i + i * i) / 2) % capacity_;
+    if (states_[pos] == detail::State::FREE) {
+      return capacity_;
+    }
+    if (states_[pos] == detail::State::STORE && comparator_(k, slots_[pos].first)) {
+      return pos;
+    }
+  }
+  return capacity_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
 {
   if (size_ == capacity_) {
@@ -402,44 +425,19 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(const Key& k, const Va
 template< class Key, class Value, class Hash, class Equal >
 bool kuznetsov::HashTable< Key, Value, Hash, Equal >::contains(const Key& k) const noexcept
 {
-  size_t hash = hasher_(k);
-  size_t i = 0;
-  size_t pos = 0;
-  for (; i < capacity_; ++i) {
-    pos = (hash + (i + i * i) / 2) % capacity_;
-    if (states_[pos] == detail::State::FREE) {
-      return false;
-    }
-    if (states_[pos] == detail::State::STORE) {
-      if (comparator_(k, slots_[pos].first)) {
-        return true;
-      }
-    }
-  }
-  return false;
+  return findIndex(k) != capacity_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::HashTable< Key, Value, Hash, Equal >::remove(const Key& k)
 {
-  size_t hash = hasher_(k);
-  size_t i = 0;
-  size_t pos = 0;
-  for (; i < capacity_; ++i) {
-    pos = (hash + (i + i * i) / 2) % capacity_;
-    if (states_[pos] == detail::State::FREE) {
-      throw std::logic_error("Not found key");
-    }
-    if (states_[pos] == detail::State::STORE) {
-      if (comparator_(k, slots_[pos].first)) {
-        (slots_ + pos)->~Slot();
-        states_[pos] = detail::State::DELETED;
-        --size_;
-        return;
-      }
-    }
+  size_t pos = findIndex(k);
+  if (pos == capacity_) {
+    throw std::logic_error("Not found key");
   }
-  throw std::logic_error("Unexpected error");
+  (slots_ + pos)->~Slot();
+  states_[pos] = detail::State::DELETED;
+  --size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -461,18 +459,11 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 template< class Key, class Value, class Hash, class Equal >
 const Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(const Key& k) const
 {
-  size_t hash = hasher_(k);
-  size_t pos = 0;
-  for (size_t i = 0; i < capacity_; ++i) {
-    pos = (hash + (i + i * i) / 2) % capacity_;
-    if (states_[pos] == detail::State::FREE) {
-      break;
-    }
-    if (states_[pos] == detail::State::STORE && comparator_(k, slots_[pos].first)) {
-      return slots_[pos].second;
-    }
+  size_t pos = findIndex(k);
+  if (pos == capacity_) {
+    throw std::out_of_range("Key not found");
   }
-  throw std::out_of_range("Key not found");
+  return slots_[pos].second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -497,6 +488,20 @@ Value& kuznetsov::HashTable< Key, Value, Hash, Equal >::at(const Key& k)
 {
   const HashTable* cthis = this;
   return const_cast< Value& >((*cthis).at(k));
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::iterator
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::find(const Key& k)
+{
+  return iterator(slots_, states_, findIndex(k), capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
+  kuznetsov::HashTable< Key, Value, Hash, Equal >::find(const Key& k) const
+{
+  return const_iterator(slots_, states_, findIndex(k), capacity_);
 }
 
 #endif

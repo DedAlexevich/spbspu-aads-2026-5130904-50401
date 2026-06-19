@@ -163,6 +163,18 @@ BOOST_AUTO_TEST_CASE(Const_Operator_Get_Access)
   BOOST_TEST(map2[3] == 67);
 }
 
+BOOST_AUTO_TEST_CASE(Const_Find_Test)
+{
+  kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
+  map[1] = 34;
+  map[2] = 52;
+  map[3] = 67;
+  const kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map2(map);
+  BOOST_TEST(map.find(1)->second == 34);
+  BOOST_TEST(map.find(2)->second == 52);
+  BOOST_TEST(map.find(3)->second == 67);
+}
+
 BOOST_AUTO_TEST_CASE(Iterators_Test)
 {
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
