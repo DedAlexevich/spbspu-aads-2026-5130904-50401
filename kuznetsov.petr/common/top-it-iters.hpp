@@ -9,6 +9,7 @@ namespace kuznetsov {
       ptr_(ptr)
     {}
     const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
     CIter& operator++() noexcept;
     CIter operator++(int) noexcept;
     CIter& operator--() noexcept;
@@ -34,6 +35,7 @@ namespace kuznetsov {
       ptr_(ptr)
     {}
     T& operator*() const noexcept;
+    T* operator->() const noexcept;
     Iter& operator++() noexcept;
     Iter operator++(int) noexcept;
     Iter& operator--() noexcept;
@@ -260,6 +262,18 @@ template< class T >
 bool kuznetsov::Iter< T >::operator<=(const Iter& rhs) const noexcept
 {
   return ptr_ <= rhs.ptr_;
+}
+
+template< class T >
+const T* kuznetsov::CIter< T >::operator->() const noexcept
+{
+  return ptr_;
+}
+
+template< class T >
+T* kuznetsov::Iter< T >::operator->() const noexcept
+{
+  return ptr_;
 }
 
 #endif
