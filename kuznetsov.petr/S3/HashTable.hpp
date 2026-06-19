@@ -303,7 +303,7 @@ kuznetsov::HashTable< K, V, Hash, Equal >::HashTable(size_t capacity):
   states_(nullptr),
   slots_(nullptr),
   size_(0),
-  capacity_(std::pow(2, ceil(log2(capacity))))
+  capacity_(std::pow(2, std::ceil(std::log2(capacity))))
 {
   try {
     states_ = new detail::State[capacity_]{};
