@@ -42,7 +42,7 @@ void sort(kuznetsov::Vector< T >& v, Cmp cmp)
 
 void kuznetsov::graphs(std::ostream& out, std::istream&, const table& t)
 {
-  if (t.getSize() == 0) {
+  if (t.size() == 0) {
     out << '\n';
     return;
   }

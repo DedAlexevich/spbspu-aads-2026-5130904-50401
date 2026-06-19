@@ -65,8 +65,8 @@ namespace kuznetsov {
 
     void swap(HashTable&) noexcept;
 
-    size_t getSize() const noexcept;
-    size_t getCapacity() const noexcept;
+    size_t size() const noexcept;
+    size_t capacity() const noexcept;
 
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
@@ -264,20 +264,20 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::~HashTable() noexcept
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getSize() const noexcept
+size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::getCapacity() const noexcept
+size_t kuznetsov::HashTable< Key, Value, Hash, Equal >::capacity() const noexcept
 {
   return capacity_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth):
-  HashTable(oth.getCapacity())
+  HashTable(oth.capacity())
 {
   for (size_t i = 0; i < capacity_; ++i) {
     if (oth.states_[i] == detail::State::STORE) {
