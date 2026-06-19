@@ -84,9 +84,9 @@ BOOST_AUTO_TEST_CASE(Has_Test)
   kuznetsov::HashTable< long, int, std::hash< long >, LongComp > map;
   map.add(1, 21);
   map.add(2, 34);
-  BOOST_TEST(map.has(1) == true);
-  BOOST_TEST(map.has(3) == false);
-  BOOST_TEST(map.has(2) == true);
+  BOOST_TEST(map.contains(1) == true);
+  BOOST_TEST(map.contains(3) == false);
+  BOOST_TEST(map.contains(2) == true);
 }
 
 BOOST_AUTO_TEST_CASE(Drop_Test)

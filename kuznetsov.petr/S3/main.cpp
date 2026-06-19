@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   std::string cmd;
   while (std::cin >> cmd) {
     try {
-      if (cmds.has(cmd)) {
+      if (cmds.contains(cmd)) {
         cmds.at(cmd)(std::cout, std::cin, grphs);
       } else {
         constCmds.at(cmd)(std::cout, std::cin, grphs);

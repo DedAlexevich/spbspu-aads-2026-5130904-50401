@@ -61,7 +61,7 @@ void kuznetsov::vertexes(std::ostream& out, std::istream& in, const table& t)
 {
   std::string name;
   in >> name;
-  if (!t.has(name)) {
+  if (!t.contains(name)) {
     throw std::logic_error("Graph doesnt exist");
   }
 
@@ -82,7 +82,7 @@ void kuznetsov::outbound(std::ostream& out, std::istream& in, const table& t)
   std::string nameGraph;
   in >> nameGraph;
 
-  if (!t.has(nameGraph)) {
+  if (!t.contains(nameGraph)) {
     throw std::logic_error("Such graph doesnt exist");
   }
   const Graph& g = t.at(nameGraph);
@@ -125,7 +125,7 @@ void kuznetsov::inbound(std::ostream& out, std::istream& in, const table& t)
   std::string nameGraph;
   in >> nameGraph;
 
-  if (!t.has(nameGraph)) {
+  if (!t.contains(nameGraph)) {
     throw std::logic_error("Such graph doesnt exist");
   }
   const Graph& g = t.at(nameGraph);
@@ -167,7 +167,7 @@ void kuznetsov::bind(std::ostream&, std::istream& in, table& t)
 {
   std::string name;
   in >> name;
-  if (!t.has(name)) {
+  if (!t.contains(name)) {
     throw std::logic_error("Such graph doesnt exist");
   }
   std::string v1, v2;
@@ -180,7 +180,7 @@ void kuznetsov::cut(std::ostream&, std::istream& in, table& t)
 {
   std::string name;
   in >> name;
-  if (!t.has(name)) {
+  if (!t.contains(name)) {
     throw std::logic_error("Such graph doesnt exist");
   }
   std::string v1, v2;
@@ -189,7 +189,7 @@ void kuznetsov::cut(std::ostream&, std::istream& in, table& t)
   Graph& g = t.at(name);
   bool f = !g.vertexes_.contain(v1);
   f = f || !g.vertexes_.contain(v2);
-  f = f || !g.table_.has(std::make_pair(v1, v2));
+  f = f || !g.table_.contains(std::make_pair(v1, v2));
   f = f || !g.table_.at(std::make_pair(v1, v2)).contain(w);
   if (f) {
     throw std::logic_error("Vertex or edge with this weight doesnt exist");
@@ -203,7 +203,7 @@ void kuznetsov::create(std::ostream&, std::istream& in, table& t)
   size_t count = 0;
   std::string v;
   in >> name;
-  if (t.has(name)) {
+  if (t.contains(name)) {
     throw std::logic_error("Such graph already exist");
   }
   in >> count;
@@ -222,12 +222,12 @@ void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
 {
   std::string name;
   in >> name;
-  if (t.has(name)) {
+  if (t.contains(name)) {
     throw std::logic_error("Such graph already exist");
   }
   std::string g1, g2;
   in >> g1 >> g2;
-  if (!t.has(g1) || !t.has(g2)) {
+  if (!t.contains(g1) || !t.contains(g2)) {
     throw std::logic_error("One of graphs doesnt exist");
   }
   Graph& gr1 = t.at(g1);
@@ -266,12 +266,12 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
 {
   std::string name;
   in >> name;
-  if (t.has(name)) {
+  if (t.contains(name)) {
     throw std::logic_error("Such graph already exist");
   }
   std::string g1;
   in >> g1;
-  if (!t.has(g1)) {
+  if (!t.contains(g1)) {
     throw std::logic_error("graph doesnt exist");
   }
 

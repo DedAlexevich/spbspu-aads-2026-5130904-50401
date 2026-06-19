@@ -60,7 +60,7 @@ namespace kuznetsov {
     void add(Key&& k, Value&& val);
     void add(const Key& k, const Value& val);
     void remove(const Key& k);
-    bool has(const Key& k) const noexcept;
+    bool contains(const Key& k) const noexcept;
     void rehash(size_t slots = 0);
 
     void swap(HashTable&) noexcept;
@@ -373,7 +373,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(Key&& k, Value&& val)
   if (size_ == capacity_) {
     throw std::logic_error("Not enough slots_");
   }
-  if (has(k)) {
+  if (contains(k)) {
     throw std::logic_error("Such key already exist");
   }
   size_t pos = getFreeSlot(k);
@@ -388,7 +388,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(const Key& k, const Va
   if (size_ == capacity_) {
     throw std::logic_error("Not enough slots_");
   }
-  if (has(k)) {
+  if (contains(k)) {
     throw std::logic_error("Such key already exist");
   }
   size_t pos = getFreeSlot(k);
@@ -398,7 +398,7 @@ void kuznetsov::HashTable< Key, Value, Hash, Equal >::add(const Key& k, const Va
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool kuznetsov::HashTable< Key, Value, Hash, Equal >::has(const Key& k) const noexcept
+bool kuznetsov::HashTable< Key, Value, Hash, Equal >::contains(const Key& k) const noexcept
 {
   size_t hash = hasher_(k);
   size_t i = 0;

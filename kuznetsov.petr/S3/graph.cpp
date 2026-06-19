@@ -47,7 +47,7 @@ void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, siz
   addVertexes(v1);
   addVertexes(v2);
   auto k = std::make_pair(v1, v2);
-  if (table_.has(k)) {
+  if (table_.contains(k)) {
     table_.at(k).pushBack(w);
   } else {
     try {
@@ -63,7 +63,7 @@ void kuznetsov::Graph::addEdge(const std::string& v1, const std::string& v2, siz
 void kuznetsov::Graph::removeEdge(const std::string& v1, const std::string& v2, size_t w)
 {
   auto k = std::make_pair(v1, v2);
-  if (table_.has(k)) {
+  if (table_.contains(k)) {
     Vector< size_t >& slot = table_.at(k);
     if (slot.getSize() > 1) {
       for (auto it = slot.cbegin(); it != slot.cend(); ++it) {
