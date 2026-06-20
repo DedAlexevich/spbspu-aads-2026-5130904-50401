@@ -1,5 +1,17 @@
 #include "model.hpp"
 #include <cmath>
+
+void kuznetsov::Map::swap(Map& other) noexcept
+{
+  std::swap(cities_, other.cities_);
+  std::swap(transports_, other.transports_);
+  std::swap(orders_, other.orders_);
+  std::swap(route_, other.route_);
+  std::swap(routeCost_, other.routeCost_);
+  std::swap(hasRoute_, other.hasRoute_);
+  std::swap(cursor_, other.cursor_);
+}
+
 bool kuznetsov::detail::StrEqual::operator()(const std::string& a, const std::string& b) const
 {
   return a == b;
@@ -92,21 +104,23 @@ void kuznetsov::Map::removeCity(const std::string& name)
   if (!hasCity(name)) {
     throw std::logic_error("This city doesnt exist");
   }
-  Vector< Order > kept;
-  for (auto it = orders_.begin(); it != orders_.end(); ++it) {
-    if (it->from != name && it->to != name) {
-      kept.pushBack(*it);
-    }
-  }
-  cities_.erase(name);
-  for (auto it = cities_.begin(); it != cities_.end(); ++it) {
+  Map tmp(*this);
+  tmp.cities_.erase(name);
+  for (auto it = tmp.cities_.begin(); it != tmp.cities_.end(); ++it) {
     City& c = it->second;
     for (auto rt = c.roads.begin(); rt != c.roads.end(); ++rt) {
       detail::edgeListRemove(rt->second, name);
     }
   }
-  orders_ = kept;
-  dropRoute();
+  Vector< Order > kept;
+  for (auto it = tmp.orders_.begin(); it != tmp.orders_.end(); ++it) {
+    if (it->from != name && it->to != name) {
+      kept.pushBack(*it);
+    }
+  }
+  tmp.orders_ = kept;
+  tmp.dropRoute();
+  swap(tmp);
 }
 
 void kuznetsov::Map::addTransport(const std::string& type)
@@ -151,8 +165,8 @@ void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, cons
   if (hasRoad(type, a, b)) {
     throw std::logic_error("Road already exists");
   }
-
-  City& ca = cities_.at(a);
+  Map tmp(*this);
+  City& ca = tmp.cities_.at(a);
   if (!ca.roads.contains(type)) {
     ca.roads.insert(type, Vector< Edge >());
   }
@@ -165,8 +179,8 @@ void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, cons
   }
   Edge eb{ a, dist };
   cb.roads.at(type).pushBack(eb);
-
-  dropRoute();
+  tmp.dropRoute();
+  swap(tmp);
 }
 
 void kuznetsov::Map::removeRoad(const std::string& type, const std::string& a, const std::string& b)
@@ -183,9 +197,11 @@ void kuznetsov::Map::removeRoad(const std::string& type, const std::string& a, c
   if (!hasRoad(type, a, b)) {
     throw std::logic_error("Road doesnt exists");
   }
-  detail::edgeListRemove(cities_.at(a).roads.at(type), b);
-  detail::edgeListRemove(cities_.at(b).roads.at(type), a);
-  dropRoute();
+  Map tmp(*this);
+  detail::edgeListRemove(tmp.cities_.at(a).roads.at(type), b);
+  detail::edgeListRemove(tmp.cities_.at(b).roads.at(type), a);
+  tmp.dropRoute();
+  swap(tmp);
 }
 
 void kuznetsov::Map::addOrder(const Order& o)

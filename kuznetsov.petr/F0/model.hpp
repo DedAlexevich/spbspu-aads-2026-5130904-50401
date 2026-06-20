@@ -88,6 +88,7 @@ namespace kuznetsov {
     void cursorNext();
     void cursorPrev();
 
+    void swap(Map& other) noexcept;
   private:
     StrHashMap< City > cities_;
     map< std::string, RoadType > transports_;
