@@ -247,12 +247,7 @@ void kuznetsov::merge(std::ostream&, std::istream& in, table& t)
   for (size_t i = 0; i < gr2.vertexes_.getSize(); ++i) {
     gr3.addVertexes(gr2.vertexes_[i]);
   }
-  try {
-    t.add(name, gr3);
-  } catch (...) {
-    t.rehash();
-    t.add(name, gr3);
-  }
+  t.add(name, gr3);
 }
 
 void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
@@ -306,11 +301,5 @@ void kuznetsov::extract(std::ostream&, std::istream& in, table& t)
       }
     }
   }
-
-  try {
-    t.add(name, gr);
-  } catch (...) {
-    t.rehash();
-    t.add(name, gr);
-  }
+  t.add(name, gr);
 }
