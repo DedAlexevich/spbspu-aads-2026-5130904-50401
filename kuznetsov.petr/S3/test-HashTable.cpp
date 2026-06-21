@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(Add_Test)
   BOOST_CHECK_THROW(map.add(1, 4), std::logic_error);
   map.add(2, 2);
   BOOST_TEST(map.size() == 2);
-  BOOST_CHECK_THROW(map.add(3, 4), std::logic_error);
+  map.add(3, 4);
+  BOOST_TEST(map.capacity() == 4);
 }
 
 BOOST_AUTO_TEST_CASE(Has_Test)
