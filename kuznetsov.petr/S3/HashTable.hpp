@@ -64,6 +64,10 @@ namespace kuznetsov {
 
     bool contains(const Key& k) const noexcept;
     void rehash(size_t slots = 0);
+    double loadFactor() const noexcept;
+    double tombstoneFactor() const noexcept;
+    void setMaxLoadFactor(double max);
+    void setMaxThumbFactor(double max);
 
     iterator find(const Key&);
     const_iterator find(const Key&) const;
@@ -92,6 +96,8 @@ namespace kuznetsov {
     detail::Slot< Key, Value >* slots_;
     size_t size_;
     size_t capacity_;
+    double maxLoadFactor_;
+    double maxThumbFactor_;
     size_t getFreeSlot(const Key& k) const noexcept;
     size_t findIndex(const Key& k) const noexcept;
     template< class K, class V >
@@ -289,6 +295,8 @@ template< class Key, class Value, class Hash, class Equal >
 kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& oth):
   HashTable(oth.capacity())
 {
+  maxLoadFactor_ = oth.maxLoadFactor_;
+  maxThumbFactor_ = oth.maxThumbFactor_;
   for (size_t i = 0; i < capacity_; ++i) {
     if (oth.states_[i] == detail::State::STORE) {
       new (slots_ + i) detail::Slot< Key, Value >(oth.slots_[i].first, oth.slots_[i].second);
@@ -305,7 +313,9 @@ kuznetsov::HashTable< K, V, Hash, Equal >::HashTable(size_t capacity):
   states_(nullptr),
   slots_(nullptr),
   size_(0),
-  capacity_(std::pow(2, std::ceil(std::log2(capacity))))
+  capacity_(std::pow(2, std::ceil(std::log2(capacity)))),
+  maxLoadFactor_(0.75),
+  maxThumbFactor_(0.75)
 {
   try {
     states_ = new detail::State[capacity_]{};
@@ -324,7 +334,9 @@ kuznetsov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& oth) noex
   states_(std::exchange(oth.states_, nullptr)),
   slots_(std::exchange(oth.slots_, nullptr)),
   size_(std::exchange(oth.size_, 0)),
-  capacity_(std::exchange(oth.capacity_, 0))
+  capacity_(std::exchange(oth.capacity_, 0)),
+  maxLoadFactor_(std::exchange(oth.maxLoadFactor_, 0.0)),
+  maxThumbFactor_(std::exchange(oth.maxThumbFactor_, 0.0))
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -502,6 +514,46 @@ typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
   kuznetsov::HashTable< Key, Value, Hash, Equal >::find(const Key& k) const
 {
   return const_iterator(slots_, states_, findIndex(k), capacity_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+double kuznetsov::HashTable< Key, Value, Hash, Equal >::loadFactor() const noexcept
+{
+  double stored = 0.0;
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (states_[i] == detail::State::STORE) {
+      stored += 1.0;
+    }
+  }
+  return stored / capacity_;
+}
+template< class Key, class Value, class Hash, class Equal >
+double kuznetsov::HashTable< Key, Value, Hash, Equal >::tombstoneFactor() const noexcept
+{
+  double tomb = 0.0;
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (states_[i] == detail::State::DELETED) {
+      tomb += 1.0;
+    }
+  }
+  return tomb / capacity_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::setMaxLoadFactor(double max)
+{
+  if (max <= 0) {
+    throw std::logic_error("Invalid argument");
+  }
+  maxLoadFactor_ = max;
+}
+template< class Key, class Value, class Hash, class Equal >
+void kuznetsov::HashTable< Key, Value, Hash, Equal >::setMaxThumbFactor(double max)
+{
+  if (max <= 0) {
+    throw std::logic_error("Invalid argument");
+  }
+  maxThumbFactor_ = max;
 }
 
 #endif
