@@ -49,7 +49,7 @@ namespace kuznetsov {
     void push(const Key& k, UV&& v);
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
-    void drop(const Key& k);
+    size_t drop(const Key& k);
 
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
@@ -331,7 +331,7 @@ V& kuznetsov::BSTree< K, V, C >::at(const K& k)
   return const_cast< V& >(cthis->at(k));
 }
 template< class K, class V, class Cmp >
-void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
+size_t kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
 {
   detail::Node< K, V >* curr = find(key);
   if (!curr) {
@@ -380,7 +380,7 @@ void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
     }
   }
   delete curr;
-  --size_;
+  return --size_;
 }
 
 template< class K, class V, class Cmp >
