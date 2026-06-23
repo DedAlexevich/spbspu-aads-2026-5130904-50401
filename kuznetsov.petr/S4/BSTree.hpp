@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
+#include <memory>
 #include <utility>
 
 namespace kuznetsov {
@@ -144,7 +145,7 @@ template< class Key, class Value, bool IsConst >
 typename kuznetsov::Iterator< Key, Value, IsConst >::pointer
 kuznetsov::Iterator< Key, Value, IsConst >::operator->()
 {
-  return &curr_->value;
+  return std::addressof(curr_->value);
 }
 
 template< class Key, class Value, bool IsConst >
