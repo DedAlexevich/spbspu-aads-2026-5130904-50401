@@ -28,6 +28,9 @@ namespace kuznetsov {
     template< class Key, class Value >
     Node< Key, Value >* maximum(Node< Key, Value >* root);
 
+    template< class Key, class Value >
+    void clearNodes(Node< Key, Value >* root);
+
   }
 
   template< class Key, class Value, bool IsConst >
@@ -237,6 +240,17 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 {}
 
 template< class Key, class Value >
+void kuznetsov::detail::clearNodes(Node< Key, Value >* node)
+{
+  if (!node) {
+    return;
+  }
+  clearNodes(node->lt);
+  clearNodes(node->rt);
+  delete node;
+}
+
+template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p)
 {
   if (!oth) {
@@ -247,6 +261,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< K
     n->lt = copyTree(oth->lt, n);
     n->rt = copyTree(oth->rt, n);
   } catch (...) {
+    detail::clearNodes(n->lt);
     delete n;
     throw;
   }
@@ -459,20 +474,9 @@ void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare >::clear(detail::Node< Key, Value >* node) noexcept
-{
-  if (!node) {
-    return;
-  }
-  clear(node->lt);
-  clear(node->rt);
-  delete node;
-}
-
-template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare >::clear() noexcept
 {
-  clear(root_);
+  detail::clearNodes(root_);
   root_ = nullptr;
   size_ = 0;
 }
