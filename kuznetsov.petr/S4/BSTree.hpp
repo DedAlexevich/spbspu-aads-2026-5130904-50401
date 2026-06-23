@@ -619,39 +619,39 @@ typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, false > kuznetsov::BSTree< K, V, C >::begin()
+typename kuznetsov::BSTree< K, V, C >::iterator kuznetsov::BSTree< K, V, C >::begin()
 {
-  return Iterator< K, V, false >(detail::minimum(root_));
+  return iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::begin() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::begin() const
 {
-  return Iterator< K, V, true >(detail::minimum(root_));
+  return const_iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::cbegin() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::cbegin() const
 {
-  return Iterator< K, V, true >(detail::minimum(root_));
+  return const_iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, false > kuznetsov::BSTree< K, V, C >::end()
+typename kuznetsov::BSTree< K, V, C >::iterator kuznetsov::BSTree< K, V, C >::end()
 {
-  return Iterator< K, V, false >(nullptr);
+  return iterator(nullptr);
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::end() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::end() const
 {
-  return Iterator< K, V, true >(nullptr);
+  return const_iterator(nullptr);
 }
 
 template< class K, class V, class C >
-kuznetsov::Iterator< K, V, true > kuznetsov::BSTree< K, V, C >::cend() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::cend() const
 {
-  return Iterator< K, V, true >(nullptr);
+  return const_iterator(nullptr);
 }
 
 #endif
