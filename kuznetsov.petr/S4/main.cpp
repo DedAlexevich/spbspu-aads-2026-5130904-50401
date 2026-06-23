@@ -48,6 +48,9 @@ int main(int argc, char** argv)
   while (std::cin >> token) {
     try {
       commands.at(token)(std::cout, std::cin, dcts);
+      if (token == "print") {
+        std::cout << '\n';
+      }
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();

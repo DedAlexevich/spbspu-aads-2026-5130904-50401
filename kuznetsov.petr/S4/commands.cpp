@@ -11,7 +11,7 @@ void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
   }
   const record& dict = ds.at(title);
   if (dict.empty()) {
-    out << "<EMPTY>\n";
+    out << "<EMPTY>";
     return;
   }
   out << title << ' ';
@@ -21,7 +21,6 @@ void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
   for (; it != dict.cend(); ++it) {
     out << ' ' << it->first << ' ' << it->second;
   }
-  out << '\n';
 }
 
 void kuznetsov::complement(std::ostream&, std::istream& in, dicts& ds)
