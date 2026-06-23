@@ -3,17 +3,18 @@
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
+#include <memory>
 #include <utility>
 
 namespace kuznetsov {
   namespace detail {
     template< class Key, class Value >
     struct Node {
-      std::pair< const Key, Value > value_;
+      std::pair< const Key, Value > value;
 
-      Node* parent_;
-      Node* lt_;
-      Node* rt_;
+      Node* parent;
+      Node* lt;
+      Node* rt;
 
       Node(const Key& k, const Value& v, Node* p);
     };
@@ -27,6 +28,9 @@ namespace kuznetsov {
     template< class Key, class Value >
     Node< Key, Value >* maximum(Node< Key, Value >* root);
 
+    template< class Key, class Value >
+    void clearNodes(Node< Key, Value >* root);
+
   }
 
   template< class Key, class Value, bool IsConst >
@@ -34,6 +38,9 @@ namespace kuznetsov {
 
   template< class Key, class Value, class Compare >
   struct BSTree {
+    using iterator = BSTIterator< Key, Value, false >;
+    using const_iterator = BSTIterator< Key, Value, true >;
+
     BSTree();
     BSTree(const BSTree&);
     BSTree(BSTree&&) noexcept;
@@ -42,14 +49,12 @@ namespace kuznetsov {
     BSTree& operator=(const BSTree&);
     BSTree& operator=(BSTree&&) noexcept;
 
-    using iterator = BSTIterator< Key, Value, false >;
-    using const_iterator = BSTIterator< Key, Value, true >;
+    void push(const Key& k, const Value& v);
+    void push(const Key& k, Value&& v);
 
-    template< class UV >
-    void push(const Key& k, UV&& v);
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
-    void drop(const Key& k);
+    size_t drop(const Key& k);
 
     const_iterator root() const;
     const_iterator leftChild(const_iterator) const;
@@ -64,8 +69,8 @@ namespace kuznetsov {
     size_t height(const_iterator it) const noexcept;
     size_t height() const noexcept;
 
-    size_t getSize() const noexcept;
-    bool isEmpty() const noexcept;
+    size_t size() const noexcept;
+    bool empty() const noexcept;
     bool contain(const Key& k) const noexcept;
 
     void swap(BSTree& oth) noexcept;
@@ -84,6 +89,9 @@ namespace kuznetsov {
     Compare cmptr_;
     detail::Node< Key, Value >* root_;
     size_t size_;
+
+    template< class UV >
+    void pushImp(const Key& k, UV&& v);
 
     detail::Node< Key, Value >* find(const Key& key) const noexcept;
     size_t calcHeight(const detail::Node< Key, Value >*) const noexcept;
@@ -114,8 +122,8 @@ namespace kuznetsov {
   private:
     template< class, class, class >
     friend struct BSTree;
-    BSTIterator(detail::Node< Key, Value >*);
     detail::Node< Key, Value >* curr_;
+    BSTIterator(detail::Node< Key, Value >*);
   };
 }
 
@@ -134,31 +142,29 @@ bool kuznetsov::BSTIterator< K, V, C >::operator!=(const BSTIterator< K, V, OthC
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::BSTIterator< Key, Value, IsConst >::reference
-kuznetsov::BSTIterator< Key, Value, IsConst >::operator*()
+typename kuznetsov::BSTIterator< Key, Value, IsConst >::reference kuznetsov::BSTIterator< Key, Value, IsConst >::operator*()
 {
-  return curr_->value_;
+  return curr_->value;
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::BSTIterator< Key, Value, IsConst >::pointer
-kuznetsov::BSTIterator< Key, Value, IsConst >::operator->()
+typename kuznetsov::BSTIterator< Key, Value, IsConst >::pointer kuznetsov::BSTIterator< Key, Value, IsConst >::operator->()
 {
-  return &curr_->value_;
+  return std::addressof(curr_->value);
 }
 
 template< class Key, class Value, bool IsConst >
 kuznetsov::BSTIterator< Key, Value, IsConst >& kuznetsov::BSTIterator< Key, Value, IsConst >::operator++()
 {
   detail::Node< Key, Value >* next = curr_;
-  if (next->rt_) {
-    next = next->rt_;
+  if (next->rt) {
+    next = next->rt;
     next = detail::minimum(next);
   } else {
-    detail::Node< Key, Value >* parent = next->parent_;
-    while (parent && parent->lt_ != next) {
+    detail::Node< Key, Value >* parent = next->parent;
+    while (parent && parent->lt != next) {
       next = parent;
-      parent = next->parent_;
+      parent = next->parent;
     }
     next = parent;
   }
@@ -178,14 +184,14 @@ template< class Key, class Value, bool IsConst >
 kuznetsov::BSTIterator< Key, Value, IsConst >& kuznetsov::BSTIterator< Key, Value, IsConst >::operator--()
 {
   detail::Node< Key, Value >* next = curr_;
-  if (next->lt_) {
-    next = next->lt_;
+  if (next->lt) {
+    next = next->lt;
     next = maximum(next);
   } else {
-    detail::Node< Key, Value >* parent = next->parent_;
-    while (parent && parent->rt_ != next) {
+    detail::Node< Key, Value >* parent = next->parent;
+    while (parent && parent->rt != next) {
       next = parent;
-      parent = next->parent_;
+      parent = next->parent;
     }
     next = parent;
   }
@@ -208,10 +214,10 @@ kuznetsov::BSTIterator< Key, Value, IsConst >::BSTIterator(detail::Node< Key, Va
 
 template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >::Node(const Key& k, const Value& v, Node* p):
-  value_(std::make_pair(k, v)),
-  parent_(p),
-  lt_(nullptr),
-  rt_(nullptr)
+  value(std::make_pair(k, v)),
+  parent(p),
+  lt(nullptr),
+  rt(nullptr)
 {}
 
 template< class Key, class Value, class Compare >
@@ -238,16 +244,28 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 {}
 
 template< class Key, class Value >
+void kuznetsov::detail::clearNodes(Node< Key, Value >* node)
+{
+  if (!node) {
+    return;
+  }
+  clearNodes(node->lt);
+  clearNodes(node->rt);
+  delete node;
+}
+
+template< class Key, class Value >
 kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p)
 {
   if (!oth) {
     return nullptr;
   }
-  Node< Key, Value >* n = new Node< Key, Value >(oth->value_.first, oth->value_.second, p);
+  Node< Key, Value >* n = new Node< Key, Value >(oth->value.first, oth->value.second, p);
   try {
-    n->lt_ = copyTree(oth->lt_, n);
-    n->rt_ = copyTree(oth->rt_, n);
+    n->lt = copyTree(oth->lt, n);
+    n->rt = copyTree(oth->rt, n);
   } catch (...) {
+    detail::clearNodes(n->lt);
     delete n;
     throw;
   }
@@ -284,7 +302,7 @@ kuznetsov::BSTree< K, V, C >& kuznetsov::BSTree< K, V, C >::operator=(BSTree&& o
 
 template< class Key, class Value, class Compare >
 template< class UV >
-void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
+void kuznetsov::BSTree< Key, Value, Compare >::pushImp(const Key& k, UV&& v)
 {
   if (!root_) {
     root_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), nullptr);
@@ -298,21 +316,33 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
     curr = root_;
     while (curr) {
       p = curr;
-      if (cmptr_(k, curr->value_.first)) {
-        curr = curr->lt_;
+      if (cmptr_(k, curr->value.first)) {
+        curr = curr->lt;
       } else {
-        curr = curr->rt_;
+        curr = curr->rt;
       }
     }
-    if (cmptr_(k, p->value_.first)) {
-      p->lt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+    if (cmptr_(k, p->value.first)) {
+      p->lt = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
     } else {
-      p->rt_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
+      p->rt = new detail::Node< Key, Value >(k, std::forward< UV >(v), p);
     }
     ++size_;
   } else {
-    curr->value_.second = std::forward< UV >(v);
+    curr->value.second = std::forward< UV >(v);
   }
+}
+
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, const Value& v)
+{
+  pushImp(k, v);
+}
+
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, Value&& v)
+{
+  pushImp(k, std::forward< Value >(v));
 }
 
 template< class K, class V, class C >
@@ -322,7 +352,7 @@ const V& kuznetsov::BSTree< K, V, C >::at(const K& k) const
   if (!curr) {
     throw std::logic_error("No element with such case");
   }
-  return curr->value_.second;
+  return curr->value.second;
 }
 
 template< class K, class V, class C >
@@ -332,56 +362,56 @@ V& kuznetsov::BSTree< K, V, C >::at(const K& k)
   return const_cast< V& >(cthis->at(k));
 }
 template< class K, class V, class Cmp >
-void kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
+size_t kuznetsov::BSTree< K, V, Cmp >::drop(const K& key)
 {
   detail::Node< K, V >* curr = find(key);
   if (!curr) {
     throw std::logic_error("Element with such key doesnt exist");
   }
 
-  if (curr->lt_ && curr->rt_) {
-    detail::Node< K, V >* succ = detail::maximum(curr->lt_);
+  if (curr->lt && curr->rt) {
+    detail::Node< K, V >* succ = detail::maximum(curr->lt);
 
-    if (succ->parent_ != curr) {
-      succ->parent_->rt_ = succ->lt_;
-      if (succ->lt_) {
-        succ->lt_->parent_ = succ->parent_;
+    if (succ->parent != curr) {
+      succ->parent->rt = succ->lt;
+      if (succ->lt) {
+        succ->lt->parent = succ->parent;
       }
-      succ->lt_ = curr->lt_;
-      curr->lt_->parent_ = succ;
+      succ->lt = curr->lt;
+      curr->lt->parent = succ;
     }
-    succ->rt_ = curr->rt_;
-    curr->rt_->parent_ = succ;
-    succ->parent_ = curr->parent_;
-    if (curr->parent_) {
-      if (curr->parent_->lt_ == curr) {
-        curr->parent_->lt_ = succ;
+    succ->rt = curr->rt;
+    curr->rt->parent = succ;
+    succ->parent = curr->parent;
+    if (curr->parent) {
+      if (curr->parent->lt == curr) {
+        curr->parent->lt = succ;
       } else {
-        curr->parent_->rt_ = succ;
+        curr->parent->rt = succ;
       }
     } else {
       root_ = succ;
     }
   } else {
-    detail::Node< K, V >* child = curr->lt_ ? curr->lt_ : curr->rt_;
-    if (curr->parent_) {
-      if (curr->parent_->lt_ == curr) {
-        curr->parent_->lt_ = child;
+    detail::Node< K, V >* child = curr->lt ? curr->lt : curr->rt;
+    if (curr->parent) {
+      if (curr->parent->lt == curr) {
+        curr->parent->lt = child;
       } else {
-        curr->parent_->rt_ = child;
+        curr->parent->rt = child;
       }
       if (child) {
-        child->parent_ = curr->parent_;
+        child->parent = curr->parent;
       }
     } else {
       root_ = child;
       if (child) {
-        child->parent_ = nullptr;
+        child->parent = nullptr;
       }
     }
   }
   delete curr;
-  --size_;
+  return --size_;
 }
 
 template< class K, class V, class Cmp >
@@ -389,10 +419,10 @@ kuznetsov::detail::Node< K, V >* kuznetsov::BSTree< K, V, Cmp >::find(const K& k
 {
   detail::Node< K, V >* curr = root_;
   while (curr) {
-    if (cmptr_(key, curr->value_.first)) {
-      curr = curr->lt_;
-    } else if (cmptr_(curr->value_.first, key)) {
-      curr = curr->rt_;
+    if (cmptr_(key, curr->value.first)) {
+      curr = curr->lt;
+    } else if (cmptr_(curr->value.first, key)) {
+      curr = curr->rt;
     } else {
       return curr;
     }
@@ -408,13 +438,13 @@ bool kuznetsov::BSTree< Key, Value, Compare >::contain(const Key& k) const noexc
 }
 
 template< class Key, class Value, class Compare >
-size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
+size_t kuznetsov::BSTree< Key, Value, Compare >::size() const noexcept
 {
   return size_;
 }
 
 template< class Key, class Value, class Compare >
-bool kuznetsov::BSTree< Key, Value, Compare >::isEmpty() const noexcept
+bool kuznetsov::BSTree< Key, Value, Compare >::empty() const noexcept
 {
   return !size_;
 }
@@ -437,7 +467,7 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< 
   if (!n) {
     return 0;
   }
-  return 1 + std::max(calcHeight(n->lt_), calcHeight(n->rt_));
+  return 1 + std::max(calcHeight(n->lt), calcHeight(n->rt));
 }
 
 template< class Key, class Value, class Compare >
@@ -448,20 +478,9 @@ void kuznetsov::BSTree< Key, Value, Compare >::swap(BSTree& oth) noexcept
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::BSTree< Key, Value, Compare >::clear(detail::Node< Key, Value >* node) noexcept
-{
-  if (!node) {
-    return;
-  }
-  clear(node->lt_);
-  clear(node->rt_);
-  delete node;
-}
-
-template< class Key, class Value, class Compare >
 void kuznetsov::BSTree< Key, Value, Compare >::clear() noexcept
 {
-  clear(root_);
+  detail::clearNodes(root_);
   root_ = nullptr;
   size_ = 0;
 }
@@ -473,8 +492,8 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::minimum(Node< Key, Val
     return nullptr;
   }
   auto curr = root;
-  while (curr->lt_) {
-    curr = curr->lt_;
+  while (curr->lt) {
+    curr = curr->lt;
   }
   return curr;
 }
@@ -486,8 +505,8 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::maximum(Node< Key, Val
     return nullptr;
   }
   auto curr = root;
-  while (curr->rt_) {
-    curr = curr->rt_;
+  while (curr->rt) {
+    curr = curr->rt;
   }
   return curr;
 }
@@ -497,33 +516,33 @@ typename kuznetsov::BSTree< K, V, Cmp >::const_iterator kuznetsov::BSTree< K, V,
 {
   detail::Node< K, V >* y = it.curr_;
 
-  if (!y || !y->parent_) {
+  if (!y || !y->parent) {
     return const_iterator(y);
   }
 
-  detail::Node< K, V >* x = y->parent_;
+  detail::Node< K, V >* x = y->parent;
 
-  if (x->rt_ != y) {
+  if (x->rt != y) {
     throw std::logic_error("Invalid left rotation");
   }
 
-  x->rt_ = y->lt_;
-  if (y->lt_) {
-    y->lt_->parent_ = x;
+  x->rt = y->lt;
+  if (y->lt) {
+    y->lt->parent = x;
   }
 
-  y->parent_ = x->parent_;
+  y->parent = x->parent;
 
-  if (!x->parent_) {
+  if (!x->parent) {
     root_ = y;
-  } else if (x->parent_->lt_ == x) {
-    x->parent_->lt_ = y;
+  } else if (x->parent->lt == x) {
+    x->parent->lt = y;
   } else {
-    x->parent_->rt_ = y;
+    x->parent->rt = y;
   }
 
-  y->lt_ = x;
-  x->parent_ = y;
+  y->lt = x;
+  x->parent = y;
 
   return const_iterator(y);
 }
@@ -533,49 +552,49 @@ typename kuznetsov::BSTree< K, V, Cmp >::const_iterator kuznetsov::BSTree< K, V,
 {
   detail::Node< K, V >* x = it.curr_;
 
-  if (!x || !x->parent_) {
+  if (!x || !x->parent) {
     return const_iterator(x);
   }
 
-  detail::Node< K, V >* y = x->parent_;
+  detail::Node< K, V >* y = x->parent;
 
-  if (y->lt_ != x) {
+  if (y->lt != x) {
     throw std::logic_error("Invalid right rotation");
   }
 
-  y->lt_ = x->rt_;
-  if (x->rt_) {
-    x->rt_->parent_ = y;
+  y->lt = x->rt;
+  if (x->rt) {
+    x->rt->parent = y;
   }
 
-  x->parent_ = y->parent_;
+  x->parent = y->parent;
 
-  if (!y->parent_) {
+  if (!y->parent) {
     root_ = x;
-  } else if (y->parent_->lt_ == y) {
-    y->parent_->lt_ = x;
+  } else if (y->parent->lt == y) {
+    y->parent->lt = x;
   } else {
-    y->parent_->rt_ = x;
+    y->parent->rt = x;
   }
 
-  x->rt_ = y;
-  y->parent_ = x;
+  x->rt = y;
+  y->parent = x;
 
   return const_iterator(x);
 }
 
 template< class K, class V, class Cmp >
 typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
+  kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
 {
   detail::Node< K, V >* b = it.curr_;
 
-  if (!b || !b->parent_ || !b->parent_->parent_) {
+  if (!b || !b->parent || !b->parent->parent) {
     throw std::logic_error("Invalid large left rotation");
   }
-  detail::Node< K, V >* c = b->parent_;
-  detail::Node< K, V >* a = c->parent_;
-  if (a->rt_ != c || c->lt_ != b) {
+  detail::Node< K, V >* c = b->parent;
+  detail::Node< K, V >* a = c->parent;
+  if (a->rt != c || c->lt != b) {
     throw std::logic_error("Not a large left rotation configuration");
   }
   rotateRight(const_iterator(b));
@@ -584,18 +603,18 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
 
 template< class K, class V, class Cmp >
 typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
+  kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
 {
   detail::Node< K, V >* b = it.curr_;
 
-  if (!b || !b->parent_ || !b->parent_->parent_) {
+  if (!b || !b->parent || !b->parent->parent) {
     throw std::logic_error("Invalid large right rotation");
   }
 
-  detail::Node< K, V >* a = b->parent_;
-  detail::Node< K, V >* c = a->parent_;
+  detail::Node< K, V >* a = b->parent;
+  detail::Node< K, V >* c = a->parent;
 
-  if (c->lt_ != a || a->rt_ != b) {
+  if (c->lt != a || a->rt != b) {
     throw std::logic_error("Not a large right rotation configuration");
   }
 
@@ -604,39 +623,39 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, false > kuznetsov::BSTree< K, V, C >::begin()
+typename kuznetsov::BSTree< K, V, C >::iterator kuznetsov::BSTree< K, V, C >::begin()
 {
-  return BSTIterator< K, V, false >(detail::minimum(root_));
+  return iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, true > kuznetsov::BSTree< K, V, C >::begin() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::begin() const
 {
-  return BSTIterator< K, V, true >(detail::minimum(root_));
+  return const_iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, true > kuznetsov::BSTree< K, V, C >::cbegin() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::cbegin() const
 {
-  return BSTIterator< K, V, true >(detail::minimum(root_));
+  return const_iterator(detail::minimum(root_));
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, false > kuznetsov::BSTree< K, V, C >::end()
+typename kuznetsov::BSTree< K, V, C >::iterator kuznetsov::BSTree< K, V, C >::end()
 {
-  return BSTIterator< K, V, false >(nullptr);
+  return iterator(nullptr);
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, true > kuznetsov::BSTree< K, V, C >::end() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::end() const
 {
-  return BSTIterator< K, V, true >(nullptr);
+  return const_iterator(nullptr);
 }
 
 template< class K, class V, class C >
-kuznetsov::BSTIterator< K, V, true > kuznetsov::BSTree< K, V, C >::cend() const
+typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::cend() const
 {
-  return BSTIterator< K, V, true >(nullptr);
+  return const_iterator(nullptr);
 }
 
 template< class Key, class Value, class Compare >
@@ -644,17 +663,18 @@ typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator kuznetsov::BST
 {
   return const_iterator(root_);
 }
+
 template< class Key, class Value, class Compare >
 typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
-kuznetsov::BSTree< Key, Value, Compare >::leftChild(const_iterator it) const
+  kuznetsov::BSTree< Key, Value, Compare >::leftChild(const_iterator it) const
 {
-  return const_iterator(it.curr_->lt_);
+  return const_iterator(it.curr_->lt);
 }
 template< class Key, class Value, class Compare >
 typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
-kuznetsov::BSTree< Key, Value, Compare >::rightChild(const_iterator it) const
+  kuznetsov::BSTree< Key, Value, Compare >::rightChild(const_iterator it) const
 {
-  return const_iterator(it.curr_->rt_);
+  return const_iterator(it.curr_->rt);
 }
 
 #endif
