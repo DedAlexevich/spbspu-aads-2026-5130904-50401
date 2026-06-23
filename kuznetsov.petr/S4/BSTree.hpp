@@ -45,8 +45,9 @@ namespace kuznetsov {
     BSTree& operator=(const BSTree&);
     BSTree& operator=(BSTree&&) noexcept;
 
-    template< class UV >
-    void push(const Key& k, UV&& v);
+    void push(const Key& k, const Value& v);
+    void push(const Key& k, Value&& v);
+
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
     size_t drop(const Key& k);
@@ -80,6 +81,9 @@ namespace kuznetsov {
     Compare cmptr_;
     detail::Node< Key, Value >* root_;
     size_t size_;
+
+    template< class UV >
+    void pushImp(const Key& k, UV&& v);
 
     detail::Node< Key, Value >* find(const Key& key) const noexcept;
     size_t calcHeight(const detail::Node< Key, Value >*) const noexcept;
@@ -283,7 +287,7 @@ kuznetsov::BSTree< K, V, C >& kuznetsov::BSTree< K, V, C >::operator=(BSTree&& o
 
 template< class Key, class Value, class Compare >
 template< class UV >
-void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
+void kuznetsov::BSTree< Key, Value, Compare >::pushImp(const Key& k, UV&& v)
 {
   if (!root_) {
     root_ = new detail::Node< Key, Value >(k, std::forward< UV >(v), nullptr);
@@ -312,6 +316,18 @@ void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, UV&& v)
   } else {
     curr->value.second = std::forward< UV >(v);
   }
+}
+
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, const Value& v)
+{
+  pushImp(k, v);
+}
+
+template< class Key, class Value, class Compare >
+void kuznetsov::BSTree< Key, Value, Compare >::push(const Key& k, Value&& v)
+{
+  pushImp(k, std::forward< Value >(v));
 }
 
 template< class K, class V, class C >
