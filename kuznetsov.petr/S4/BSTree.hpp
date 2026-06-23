@@ -135,15 +135,13 @@ bool kuznetsov::Iterator< K, V, C >::operator!=(const Iterator< K, V, OthConst >
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::reference
-kuznetsov::Iterator< Key, Value, IsConst >::operator*()
+typename kuznetsov::Iterator< Key, Value, IsConst >::reference kuznetsov::Iterator< Key, Value, IsConst >::operator*()
 {
   return curr_->value;
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::pointer
-kuznetsov::Iterator< Key, Value, IsConst >::operator->()
+typename kuznetsov::Iterator< Key, Value, IsConst >::pointer kuznetsov::Iterator< Key, Value, IsConst >::operator->()
 {
   return std::addressof(curr_->value);
 }
@@ -168,8 +166,7 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
 {
   auto it = Iterator< Key, Value, IsConst >(curr_);
   ++(*this);
@@ -196,8 +193,7 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
+kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
 {
   auto it = Iterator< Key, Value, IsConst >(curr_);
   --(*this);
@@ -241,8 +237,7 @@ kuznetsov::BSTree< Key, Value, Compare >::BSTree(BSTree&& oth) noexcept:
 {}
 
 template< class Key, class Value >
-kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth,
-                                                                   Node< Key, Value >* p)
+kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::copyTree(const Node< Key, Value >* oth, Node< Key, Value >* p)
 {
   if (!oth) {
     return nullptr;
@@ -448,8 +443,7 @@ size_t kuznetsov::BSTree< Key, Value, Compare >::height(const_iterator it) const
 }
 
 template< class Key, class Value, class Compare >
-size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(
-    const detail::Node< Key, Value >* n) const noexcept
+size_t kuznetsov::BSTree< Key, Value, Compare >::calcHeight(const detail::Node< Key, Value >* n) const noexcept
 {
   if (!n) {
     return 0;
@@ -510,8 +504,7 @@ kuznetsov::detail::Node< Key, Value >* kuznetsov::detail::maximum(Node< Key, Val
 }
 
 template< class K, class V, class Cmp >
-typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
+typename kuznetsov::BSTree< K, V, Cmp >::const_iterator kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
 {
   detail::Node< K, V >* y = it.curr_;
 
@@ -547,8 +540,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLeft(const_iterator it)
 }
 
 template< class K, class V, class Cmp >
-typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
+typename kuznetsov::BSTree< K, V, Cmp >::const_iterator kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
 {
   detail::Node< K, V >* x = it.curr_;
 
@@ -585,7 +577,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateRight(const_iterator it)
 
 template< class K, class V, class Cmp >
 typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
+  kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
 {
   detail::Node< K, V >* b = it.curr_;
 
@@ -603,7 +595,7 @@ kuznetsov::BSTree< K, V, Cmp >::rotateLargeLeft(const_iterator it)
 
 template< class K, class V, class Cmp >
 typename kuznetsov::BSTree< K, V, Cmp >::const_iterator
-kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
+  kuznetsov::BSTree< K, V, Cmp >::rotateLargeRight(const_iterator it)
 {
   detail::Node< K, V >* b = it.curr_;
 
