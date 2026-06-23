@@ -114,8 +114,8 @@ namespace kuznetsov {
   private:
     template< class, class, class >
     friend struct BSTree;
-    Iterator(detail::Node< Key, Value >*);
     detail::Node< Key, Value >* curr_;
+    Iterator(detail::Node< Key, Value >*);
   };
 }
 
