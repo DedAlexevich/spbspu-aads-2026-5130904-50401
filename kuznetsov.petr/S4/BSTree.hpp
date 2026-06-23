@@ -60,8 +60,8 @@ namespace kuznetsov {
     size_t height(const_iterator it) const noexcept;
     size_t height() const noexcept;
 
-    size_t getSize() const noexcept;
-    bool isEmpty() const noexcept;
+    size_t size() const noexcept;
+    bool empty() const noexcept;
     bool contain(const Key& k) const noexcept;
 
     void swap(BSTree& oth) noexcept;
@@ -407,13 +407,13 @@ bool kuznetsov::BSTree< Key, Value, Compare >::contain(const Key& k) const noexc
 }
 
 template< class Key, class Value, class Compare >
-size_t kuznetsov::BSTree< Key, Value, Compare >::getSize() const noexcept
+size_t kuznetsov::BSTree< Key, Value, Compare >::size() const noexcept
 {
   return size_;
 }
 
 template< class Key, class Value, class Compare >
-bool kuznetsov::BSTree< Key, Value, Compare >::isEmpty() const noexcept
+bool kuznetsov::BSTree< Key, Value, Compare >::empty() const noexcept
 {
   return !size_;
 }

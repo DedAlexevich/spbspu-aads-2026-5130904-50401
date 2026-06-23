@@ -13,7 +13,7 @@ void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
     throw std::logic_error("Not found dict");
   }
   const record& dict = ds.at(title);
-  if (dict.isEmpty()) {
+  if (dict.empty()) {
     out << "<EMPTY>\n";
     return;
   }
