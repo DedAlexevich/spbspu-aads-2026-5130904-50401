@@ -1,10 +1,9 @@
 #include "math_funcs.hpp"
-#include <limits>
-#include <stdexcept>
+
 #include <climits>
 #include <iostream>
-const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
-const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
+#include <limits>
+#include <stdexcept>
 
 bool kuznetsov::detail::isOperation(const std::string& c)
 {
@@ -30,9 +29,9 @@ size_t kuznetsov::detail::getPriority(const std::string& c)
 
 kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
 {
-  if (a > 0 && b > 0 && a > MAX - b) {
+  if (a > 0 && b > 0 && a > detail::MAX - b) {
     throw std::overflow_error("Add overflow");
-  } else if (a < 0 && b < 0 && a < MIN - b) {
+  } else if (a < 0 && b < 0 && a < detail::MIN - b) {
     throw std::overflow_error("Add overflow");
   }
   return a + b;
@@ -40,9 +39,9 @@ kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
 
 kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
 {
-  if (a < 0 && b > 0 && a < MIN + b) {
+  if (a < 0 && b > 0 && a < detail::MIN + b) {
     throw std::overflow_error("Sub overflow");
-  } else if (a > 0 && b < 0 && a < MAX + b) {
+  } else if (a > 0 && b < 0 && a < detail::MAX + b) {
     throw std::overflow_error("Sub overflow");
   }
   return a - b;
@@ -53,13 +52,13 @@ kuznetsov::lli_t kuznetsov::mul(const lli_t& a, const lli_t& b)
   if (!a || !b) {
     return 0;
   }
-  if (a > 0 && b > 0 && a > MAX / b) {
+  if (a > 0 && b > 0 && a > detail::MAX / b) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a < 0 && b < 0 && a > MAX / b) {
+  } else if (a < 0 && b < 0 && a > detail::MAX / b) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a > 0 && b < 0 && b < MIN / a) {
+  } else if (a > 0 && b < 0 && b < detail::MIN / a) {
     throw std::overflow_error("Multiply overflow");
-  } else if (a < 0 && b > 0 && a < MIN / b) {
+  } else if (a < 0 && b > 0 && a < detail::MIN / b) {
     throw std::overflow_error("Multiply overflow");
   }
   return a * b;
@@ -70,7 +69,7 @@ kuznetsov::lli_t kuznetsov::div(const lli_t& a, const lli_t& b)
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
   }
-  if (a == MIN && b == -1) {
+  if (a == detail::MIN && b == -1) {
     throw std::overflow_error("Div overflow");
   }
   return a / b;
@@ -98,24 +97,71 @@ kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
   return a >> b;
 }
 
+void kuznetsov::InfixExpression::pushToken(const std::string& token)
+{
+  tokens_.push(token);
+}
+
+bool kuznetsov::InfixExpression::empty() const noexcept
+{
+  return tokens_.empty();
+}
+
+kuznetsov::Queue< std::string > kuznetsov::InfixExpression::toPostfix() const
+{
+  Queue< std::string > infix = tokens_;
+  Queue< std::string > postfix;
+  Stack< std::string > temp;
+  while (!infix.empty()) {
+    std::string sym = infix.front();
+    infix.pop();
+    if (sym == "(") {
+      temp.push(sym);
+    } else if (sym == ")") {
+      while (!temp.empty() && temp.top() != "(") {
+        postfix.push(temp.top());
+        temp.pop();
+      }
+      temp.pop();
+    } else if (!detail::isOperation(sym)) {
+      postfix.push(sym);
+    } else {
+      while (!temp.empty() && temp.top() != "(") {
+        if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
+          postfix.push(temp.top());
+          temp.pop();
+        } else {
+          break;
+        }
+      }
+      temp.push(sym);
+    }
+  }
+  while (!temp.empty()) {
+    postfix.push(temp.top());
+    temp.pop();
+  }
+  return postfix;
+}
+
 kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
 {
   std::string current;
-  Queue< std::string > expression;
+  InfixExpression expression;
   stackOfInfixExpression res;
   int a = in.get();
   while (a != -1) {
     if (a == '\n') {
       if (!current.empty()) {
-        expression.push(current);
+        expression.pushToken(current);
         current.clear();
       }
       if (!expression.empty()) {
         res.push(expression);
-        expression.clear();
+        expression = InfixExpression();
       }
     } else if (a == ' ') {
-      expression.push(current);
+      expression.pushToken(current);
       current.clear();
     } else {
       current.push_back(static_cast< char >(a));
@@ -123,23 +169,22 @@ kuznetsov::stackOfInfixExpression kuznetsov::getExpressions(std::istream& in)
     a = in.get();
   }
   if (!current.empty()) {
-    expression.push(current);
+    expression.pushToken(current);
     current.clear();
   }
   if (!expression.empty()) {
     res.push(expression);
-    expression.clear();
   }
   return res;
 }
 
-kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
+kuznetsov::lli_t kuznetsov::InfixExpression::evaluate() const
 {
+  Queue< std::string > postfix = toPostfix();
   Stack< lli_t > evalStack;
   while (!postfix.empty()) {
     std::string sym = postfix.front();
     postfix.pop();
-
     if (!detail::isOperation(sym)) {
       evalStack.push(std::stoll(sym));
     } else {
@@ -150,7 +195,6 @@ kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
       evalStack.pop();
       lli_t a = evalStack.top();
       evalStack.pop();
-
       lli_t result = 0;
       if (sym == "+") {
         result = add(a, b);
@@ -167,59 +211,21 @@ kuznetsov::lli_t kuznetsov::calculatePostfix(Queue< std::string > postfix)
       } else {
         throw std::logic_error("Unknown operator: " + sym);
       }
-
       evalStack.push(result);
     }
   }
-
   if (evalStack.size() != 1) {
     throw std::logic_error("Must be one res ");
   }
-
   return evalStack.top();
 }
 
 kuznetsov::Queue< kuznetsov::lli_t > kuznetsov::calculateStackOfInfix(stackOfInfixExpression infix)
 {
-  Queue< std::string > postfix;
   Queue< lli_t > res;
-  Stack< std::string > temp;
   while (!infix.empty()) {
-    Queue< std::string > curr = infix.top();
+    res.push(infix.top().evaluate());
     infix.pop();
-    while (!curr.empty()) {
-      std::string sym = curr.front();
-      curr.pop();
-      if (sym == "(") {
-        temp.push(sym);
-      } else if (sym == ")") {
-        while (!temp.empty() && temp.top() != "(") {
-          postfix.push(temp.top());
-          temp.pop();
-        }
-        temp.pop();
-      } else if (!detail::isOperation(sym)) {
-        postfix.push(sym);
-      } else {
-        while (!temp.empty() && temp.top() != "(") {
-          if (detail::getPriority(sym) <= detail::getPriority(temp.top())) {
-            postfix.push(temp.top());
-            temp.pop();
-          } else {
-            break;
-          }
-        }
-        temp.push(sym);
-      }
-    }
-    while (!temp.empty()) {
-      postfix.push(temp.top());
-      temp.pop();
-    }
-    temp.clear();
-    res.push(calculatePostfix(postfix));
-    postfix.clear();
   }
   return res;
 }
-

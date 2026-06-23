@@ -40,12 +40,12 @@ namespace kuznetsov {
     };
   }
   template< class Key, class Value, bool IsConst >
-  struct Iterator;
+  struct HTIterator;
 
   template< class Key, class Value, class Hash, class Equal >
   struct HashTable {
-    using const_iterator = Iterator< Key, Value, true >;
-    using iterator = Iterator< Key, Value, false >;
+    using const_iterator = HTIterator< Key, Value, true >;
+    using iterator = HTIterator< Key, Value, false >;
 
     HashTable();
     HashTable(const HashTable&);
@@ -105,25 +105,25 @@ namespace kuznetsov {
   };
 
   template< class Key, class Value, bool IsConst >
-  struct Iterator {
+  struct HTIterator {
     using value_type = detail::Slot< const Key, Value >;
     using reference = typename detail::conditional< IsConst, const value_type&, value_type& >::type;
     using pointer = typename detail::conditional< IsConst, const value_type*, value_type* >::type;
 
     template< bool OthConst >
-    bool operator==(const Iterator< Key, Value, OthConst >&) const;
+    bool operator==(const HTIterator< Key, Value, OthConst >&) const;
 
     template< bool OthConst >
-    bool operator!=(const Iterator< Key, Value, OthConst >&) const;
+    bool operator!=(const HTIterator< Key, Value, OthConst >&) const;
 
     reference operator*();
     pointer operator->();
 
-    Iterator operator++();
-    Iterator operator--();
+    HTIterator operator++();
+    HTIterator operator--();
 
-    Iterator operator++(int);
-    Iterator operator--(int);
+    HTIterator operator++(int);
+    HTIterator operator--(int);
 
   private:
     template< class, class, class, class >
@@ -132,7 +132,8 @@ namespace kuznetsov {
     detail::State* states_;
     size_t i_;
     size_t cap_;
-    Iterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
+
+    HTIterator(detail::Slot< Key, Value >* slots, detail::State* s, size_t ind, size_t cap);
   };
 }
 
@@ -191,7 +192,7 @@ typename kuznetsov::HashTable< Key, Value, Hash, Equal >::const_iterator
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst >::Iterator(detail::Slot< K, V >* slt, detail::State* s, size_t ind, size_t cap):
+kuznetsov::HTIterator< K, V, IsConst >::HTIterator(detail::Slot< K, V >* slt, detail::State* s, size_t ind, size_t cap):
   slots_(reinterpret_cast< value_type* >(slt)),
   states_(s),
   i_(ind),
@@ -200,7 +201,7 @@ kuznetsov::Iterator< K, V, IsConst >::Iterator(detail::Slot< K, V >* slt, detail
 
 template< class K, class V, bool IsConst >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, IsConst >::operator==(const Iterator< K, V, OthConst >& oth) const
+bool kuznetsov::HTIterator< K, V, IsConst >::operator==(const HTIterator< K, V, OthConst >& oth) const
 {
   bool f = (this->slots_ + this->i_) == (oth.slots_ + oth.i_);
   return f;
@@ -208,25 +209,25 @@ bool kuznetsov::Iterator< K, V, IsConst >::operator==(const Iterator< K, V, OthC
 
 template< class K, class V, bool IsConst >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, IsConst >::operator!=(const Iterator< K, V, OthConst >& oth) const
+bool kuznetsov::HTIterator< K, V, IsConst >::operator!=(const HTIterator< K, V, OthConst >& oth) const
 {
   return !(*this == oth);
 }
 
 template< class K, class V, bool IsConst >
-typename kuznetsov::Iterator< K, V, IsConst >::reference kuznetsov::Iterator< K, V, IsConst >::operator*()
+typename kuznetsov::HTIterator< K, V, IsConst >::reference kuznetsov::HTIterator< K, V, IsConst >::operator*()
 {
   return slots_[i_];
 }
 
 template< class K, class V, bool IsConst >
-typename kuznetsov::Iterator< K, V, IsConst >::pointer kuznetsov::Iterator< K, V, IsConst >::operator->()
+typename kuznetsov::HTIterator< K, V, IsConst >::pointer kuznetsov::HTIterator< K, V, IsConst >::operator->()
 {
   return slots_ + i_;
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator++()
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator++()
 {
   ++i_;
   while (i_ < cap_ && states_[i_] != detail::State::STORE) {
@@ -236,15 +237,15 @@ kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::opera
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator++(int)
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator++(int)
 {
-  Iterator tmp = *this;
+  HTIterator tmp = *this;
   ++(*this);
   return tmp;
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator--()
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator--()
 {
   if (i_ == 0) {
     return *this;
@@ -256,9 +257,9 @@ kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::opera
 }
 
 template< class K, class V, bool IsConst >
-kuznetsov::Iterator< K, V, IsConst > kuznetsov::Iterator< K, V, IsConst >::operator--(int)
+kuznetsov::HTIterator< K, V, IsConst > kuznetsov::HTIterator< K, V, IsConst >::operator--(int)
 {
-  Iterator tmp = *this;
+  HTIterator tmp = *this;
   --(*this);
   return tmp;
 }

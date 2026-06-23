@@ -34,12 +34,12 @@ namespace kuznetsov {
   }
 
   template< class Key, class Value, bool IsConst >
-  struct Iterator;
+  struct BSTIterator;
 
   template< class Key, class Value, class Compare >
   struct BSTree {
-    using iterator = Iterator< Key, Value, false >;
-    using const_iterator = Iterator< Key, Value, true >;
+    using iterator = BSTIterator< Key, Value, false >;
+    using const_iterator = BSTIterator< Key, Value, true >;
 
     BSTree();
     BSTree(const BSTree&);
@@ -55,6 +55,10 @@ namespace kuznetsov {
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
     size_t drop(const Key& k);
+
+    const_iterator root() const;
+    const_iterator leftChild(const_iterator) const;
+    const_iterator rightChild(const_iterator) const;
 
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
@@ -91,66 +95,65 @@ namespace kuznetsov {
 
     detail::Node< Key, Value >* find(const Key& key) const noexcept;
     size_t calcHeight(const detail::Node< Key, Value >*) const noexcept;
-    void clear(detail::Node< Key, Value >*) noexcept;
   };
 
   template< class Key, class Value, bool IsConst >
-  struct Iterator {
+  struct BSTIterator {
     using type_t = std::pair< const Key, Value >;
     using reference = typename std::conditional< IsConst, const type_t&, type_t& >::type;
     using pointer = typename std::conditional< IsConst, const type_t*, type_t* >::type;
 
-    Iterator& operator++();
-    Iterator& operator--();
+    BSTIterator& operator++();
+    BSTIterator& operator--();
 
-    Iterator operator++(int);
-    Iterator operator--(int);
+    BSTIterator operator++(int);
+    BSTIterator operator--(int);
 
     reference operator*();
     pointer operator->();
 
     template< bool OthConst >
-    bool operator==(const Iterator< Key, Value, OthConst >&);
+    bool operator==(const BSTIterator< Key, Value, OthConst >&);
 
     template< bool OthConst >
-    bool operator!=(const Iterator< Key, Value, OthConst >&);
+    bool operator!=(const BSTIterator< Key, Value, OthConst >&);
 
   private:
     template< class, class, class >
     friend struct BSTree;
     detail::Node< Key, Value >* curr_;
-    Iterator(detail::Node< Key, Value >*);
+    BSTIterator(detail::Node< Key, Value >*);
   };
 }
 
 template< class K, class V, bool C >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, C >::operator==(const Iterator< K, V, OthConst >& oth)
+bool kuznetsov::BSTIterator< K, V, C >::operator==(const BSTIterator< K, V, OthConst >& oth)
 {
   return curr_ == oth.curr_;
 }
 
 template< class K, class V, bool C >
 template< bool OthConst >
-bool kuznetsov::Iterator< K, V, C >::operator!=(const Iterator< K, V, OthConst >& oth)
+bool kuznetsov::BSTIterator< K, V, C >::operator!=(const BSTIterator< K, V, OthConst >& oth)
 {
   return curr_ != oth.curr_;
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::reference kuznetsov::Iterator< Key, Value, IsConst >::operator*()
+typename kuznetsov::BSTIterator< Key, Value, IsConst >::reference kuznetsov::BSTIterator< Key, Value, IsConst >::operator*()
 {
   return curr_->value;
 }
 
 template< class Key, class Value, bool IsConst >
-typename kuznetsov::Iterator< Key, Value, IsConst >::pointer kuznetsov::Iterator< Key, Value, IsConst >::operator->()
+typename kuznetsov::BSTIterator< Key, Value, IsConst >::pointer kuznetsov::BSTIterator< Key, Value, IsConst >::operator->()
 {
   return std::addressof(curr_->value);
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator++()
+kuznetsov::BSTIterator< Key, Value, IsConst >& kuznetsov::BSTIterator< Key, Value, IsConst >::operator++()
 {
   detail::Node< Key, Value >* next = curr_;
   if (next->rt) {
@@ -169,15 +172,15 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator++(int)
+kuznetsov::BSTIterator< Key, Value, IsConst > kuznetsov::BSTIterator< Key, Value, IsConst >::operator++(int)
 {
-  auto it = Iterator< Key, Value, IsConst >(curr_);
+  auto it = BSTIterator< Key, Value, IsConst >(curr_);
   ++(*this);
   return it;
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsConst >::operator--()
+kuznetsov::BSTIterator< Key, Value, IsConst >& kuznetsov::BSTIterator< Key, Value, IsConst >::operator--()
 {
   detail::Node< Key, Value >* next = curr_;
   if (next->lt) {
@@ -196,15 +199,15 @@ kuznetsov::Iterator< Key, Value, IsConst >& kuznetsov::Iterator< Key, Value, IsC
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst > kuznetsov::Iterator< Key, Value, IsConst >::operator--(int)
+kuznetsov::BSTIterator< Key, Value, IsConst > kuznetsov::BSTIterator< Key, Value, IsConst >::operator--(int)
 {
-  auto it = Iterator< Key, Value, IsConst >(curr_);
+  auto it = BSTIterator< Key, Value, IsConst >(curr_);
   --(*this);
   return it;
 }
 
 template< class Key, class Value, bool IsConst >
-kuznetsov::Iterator< Key, Value, IsConst >::Iterator(detail::Node< Key, Value >* n):
+kuznetsov::BSTIterator< Key, Value, IsConst >::BSTIterator(detail::Node< Key, Value >* n):
   curr_(n)
 {}
 
@@ -652,6 +655,25 @@ template< class K, class V, class C >
 typename kuznetsov::BSTree< K, V, C >::const_iterator kuznetsov::BSTree< K, V, C >::cend() const
 {
   return const_iterator(nullptr);
+}
+
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator kuznetsov::BSTree< Key, Value, Compare >::root() const
+{
+  return const_iterator(root_);
+}
+
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
+  kuznetsov::BSTree< Key, Value, Compare >::leftChild(const_iterator it) const
+{
+  return const_iterator(it.curr_->lt);
+}
+template< class Key, class Value, class Compare >
+typename kuznetsov::BSTree< Key, Value, Compare >::const_iterator
+  kuznetsov::BSTree< Key, Value, Compare >::rightChild(const_iterator it) const
+{
+  return const_iterator(it.curr_->rt);
 }
 
 #endif

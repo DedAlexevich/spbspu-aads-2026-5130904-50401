@@ -1,11 +1,12 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
+
 #include "math_funcs.hpp"
 
 int main(int argc, char* argv[])
 {
   namespace kuz = kuznetsov;
-  kuz::Stack< kuz::Queue< std::string > > mathExpressions;
+  kuz::Stack< kuz::InfixExpression > mathExpressions;
   std::ifstream file;
   std::istream* source = &std::cin;
   if (argc > 1) {
@@ -41,11 +42,10 @@ int main(int argc, char* argv[])
   std::cout << res.front();
   res.pop();
   while (!res.empty()) {
-    std:: cout << ' ' << res.front();
+    std::cout << ' ' << res.front();
     res.pop();
   }
   std::cout << '\n';
 
   return 0;
 }
-

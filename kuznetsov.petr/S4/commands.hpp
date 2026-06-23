@@ -1,9 +1,8 @@
 #ifndef COMMANDSS4_HPP
 #define COMMANDSS4_HPP
+#include <BSTree.hpp>
 #include <cstddef>
 #include <iosfwd>
-
-#include "BSTree.hpp"
 
 namespace kuznetsov {
   using record = BSTree< size_t, std::string, std::less< size_t > >;

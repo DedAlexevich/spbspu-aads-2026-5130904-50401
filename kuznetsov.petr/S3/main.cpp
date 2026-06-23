@@ -3,10 +3,10 @@
 #include <boost/describe/class.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/siphash.hpp>
-#include "./HashTable.hpp"
-#include "./Hasher.hpp"
-#include "./commands.hpp"
-#include "./graph.hpp"
+#include <HashTable.hpp>
+#include "Hasher.hpp"
+#include "commands.hpp"
+#include "graph.hpp"
 
 int main(int argc, char** argv)
 {

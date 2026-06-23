@@ -3,10 +3,8 @@
 #include <cstddef>
 #include <string>
 #include <utility>
-
-#include <top-it-vector.hpp>
-
-#include "HashTable.hpp"
+#include <vector.hpp>
+#include <HashTable.hpp>
 #include "Hasher.hpp"
 namespace kuznetsov {
   using key = std::pair< std::string, std::string >;

@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <list.hpp>
 #include <queue.hpp>
 
 BOOST_AUTO_TEST_CASE(EmptyQueueTest)
@@ -87,3 +88,34 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentOperatorOfQueueTest)
   BOOST_CHECK(3 == queue2.front());
 }
 
+namespace kuznetsov {
+  namespace test {
+    struct TestData {
+      TestData(int a, int b):
+        a_(a),
+        b_(b)
+      {}
+      int sum()
+      {
+        return a_ + b_;
+      }
+    private:
+      int a_, b_;
+    };
+
+  }
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceTestInQueue)
+{
+  namespace kuz = kuznetsov;
+  kuz::Queue< kuz::test::TestData > q;
+  q.emplace(1, 2);
+  q.emplace(2, 3);
+  q.emplace(3, 4);
+  q.emplace(4, 5);
+  for (int i = 1; i < 5; ++i) {
+    BOOST_CHECK(q.front().sum() == i + i + 1);
+    q.pop();
+  }
+}

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 
-#include <top-it-vector.hpp>
+#include <vector.hpp>
 
 namespace {
   struct PairComparator {

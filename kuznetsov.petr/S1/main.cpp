@@ -1,18 +1,18 @@
 #include <iostream>
-#include <utility>
 #include <limits>
 #include <list.hpp>
+#include <utility>
 
 int main()
 {
-  namespace  kuz = kuznetsov;
+  namespace kuz = kuznetsov;
   size_t MAX = std::numeric_limits< size_t >::max();
   using stringListpair = std::pair< std::string, kuz::List< size_t > >;
-  auto list = kuz::List< stringListpair >();
+  kuz::List< stringListpair > list;
   std::string name;
 
   while (std::cin >> name) {
-    auto currSequence = kuz::List< size_t >();
+    kuz::List< size_t > currSequence;
     size_t t = 0;
     while (std::cin >> t) {
       currSequence.insert(currSequence.cend(), t);
@@ -30,19 +30,18 @@ int main()
   }
 
   auto listBegin = list.cbegin();
-  std::cout << (*listBegin).first;
+  std::cout << listBegin->first;
   listBegin++;
   for (size_t i = 1; i < list.size(); ++i) {
-    std::cout << ' ' << (*listBegin).first;
+    std::cout << ' ' << listBegin->first;
     listBegin++;
   }
-
 
   std::cout << '\n';
   size_t countRows = 0;
   listBegin = list.cbegin();
   do {
-    countRows = std::max(countRows, (*listBegin).second.size());
+    countRows = std::max(countRows, listBegin->second.size());
     listBegin++;
   } while (listBegin != list.cbegin());
 
@@ -51,7 +50,7 @@ int main()
     return 0;
   }
 
-  auto sums = kuz::List< size_t >();
+  kuz::List< size_t > sums;
   for (size_t i = 0; i < countRows; ++i) {
     sums.insert(sums.cend(), 0);
   }
@@ -61,7 +60,7 @@ int main()
     bool first = true;
     listBegin = list.cbegin();
     do {
-      auto& seq = (*listBegin).second;
+      const kuz::List< size_t >& seq = listBegin->second;
       if (row < seq.size()) {
         auto it = seq.cbegin();
         for (size_t i = 0; i < row; ++i) {
@@ -86,16 +85,12 @@ int main()
   }
 
   sumIt = sums.begin();
-  bool first = true;
-  do {
-    if (!first) {
-      std::cout << ' ';
-    }
-    std::cout << *sumIt;
-    first = false;
+  std::cout << *sumIt;
+  ++sumIt;
+  while (sumIt != sums.begin()) {
+    std::cout << ' ' << *sumIt;
     ++sumIt;
-  } while (sumIt != sums.begin());
+  }
   std::cout << '\n';
   return 0;
 }
-

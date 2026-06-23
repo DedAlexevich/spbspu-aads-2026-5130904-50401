@@ -10,6 +10,8 @@ namespace kuznetsov {
 
     void push(const T& val);
     void push(T&& val);
+    template< class... Args >
+    void emplace(Args&&... args);
 
     void pop();
 
@@ -42,9 +44,16 @@ void kuznetsov::Queue< T >::push(const T& val)
 }
 
 template< class T >
+template< class... Args >
+void kuznetsov::Queue< T >::emplace(Args&&... args)
+{
+  list_.emplaceBack(std::forward< Args >(args)...);
+}
+
+template< class T >
 void kuznetsov::Queue< T >::push(T&& val)
 {
-  list_.insert(list_.cend(),std::move(val));
+  list_.insert(list_.cend(), std::forward< T >(val));
 }
 
 template< class T >
@@ -71,4 +80,3 @@ void kuznetsov::Queue< T >::clear() noexcept
   list_.clear();
 }
 #endif
-
