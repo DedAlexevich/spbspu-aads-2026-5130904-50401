@@ -36,8 +36,8 @@ void kuznetsov::complement(std::ostream&, std::istream& in, dicts& ds)
   }
 
   record nd;
-  record& dataset1 = ds.at(dict2);
-  record& dataset2 = ds.at(dict1);
+  const record& dataset1 = ds.at(dict2);
+  const record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (!dataset2.contain(it->first)) {
       nd.push(it->first, it->second);
@@ -58,8 +58,8 @@ void kuznetsov::intersect(std::ostream&, std::istream& in, dicts& ds)
     throw std::logic_error("Not found dict");
   }
   record nd;
-  record& dataset1 = ds.at(dict2);
-  record& dataset2 = ds.at(dict1);
+  const record& dataset1 = ds.at(dict2);
+  const record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (dataset2.contain(it->first)) {
       nd.push(it->first, it->second);
@@ -80,8 +80,8 @@ void kuznetsov::unionDicts(std::ostream&, std::istream& in, dicts& ds)
     throw std::logic_error("Not found dict");
   }
   record nd;
-  record& dataset1 = ds.at(dict2);
-  record& dataset2 = ds.at(dict1);
+  const record& dataset1 = ds.at(dict2);
+  const record& dataset2 = ds.at(dict1);
   for (auto it = dataset1.cbegin(); it != dataset1.cend(); ++it) {
     if (!nd.contain(it->first)) {
       nd.push(it->first, it->second);
