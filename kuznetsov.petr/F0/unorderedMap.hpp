@@ -13,7 +13,7 @@ namespace kuznetsov {
     using const_iterator = typename table_t::const_iterator;
 
     void insert(const Key& k, const Value& v);
-    void insert(Key&& k, Value&& v);
+    void insert(const Key& k, Value&& v);
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
     bool contains(const Key& k) const noexcept;
@@ -36,7 +36,7 @@ namespace kuznetsov {
 template< class Key, class Value, class Hash, class Equal >
 void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(const Key& k, const Value& v)
 {
-  if (table_.has(k)) {
+  if (table_.contains(k)) {
     table_.at(k) = v;
     return;
   }
@@ -49,18 +49,13 @@ void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(const Key& k, co
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(Key&& k, Value&& v)
+void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::insert(const Key& k, Value&& v)
 {
-  if (table_.has(k)) {
+  if (table_.contains(k)) {
     table_.at(k) = v;
     return;
   }
-  try {
-    table_.add(std::forward< Key >(k), std::forward< Value >(v));
-  } catch (const std::logic_error&) {
-    table_.rehash();
-    table_.add(std::forward< Key >(k), std::forward< Value >(v));
-  }
+  table_.add(k, std::forward< Value >(v));
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -78,7 +73,7 @@ const Value& kuznetsov::unorderedMap< Key, Value, Hash, Equal >::at(const Key& k
 template< class Key, class Value, class Hash, class Equal >
 bool kuznetsov::unorderedMap< Key, Value, Hash, Equal >::contains(const Key& k) const noexcept
 {
-  return table_.has(k);
+  return table_.contains(k);
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -90,13 +85,13 @@ void kuznetsov::unorderedMap< Key, Value, Hash, Equal >::erase(const Key& k)
 template< class Key, class Value, class Hash, class Equal >
 size_t kuznetsov::unorderedMap< Key, Value, Hash, Equal >::size() const noexcept
 {
-  return table_.getSize();
+  return table_.size();
 }
 
 template< class Key, class Value, class Hash, class Equal >
 bool kuznetsov::unorderedMap< Key, Value, Hash, Equal >::empty() const noexcept
 {
-  return table_.getSize() == 0;
+  return table_.size() == 0;
 }
 
 template< class Key, class Value, class Hash, class Equal >

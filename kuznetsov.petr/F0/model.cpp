@@ -173,7 +173,7 @@ void kuznetsov::Map::addRoad(const std::string& type, const std::string& a, cons
   Edge ea{ b, dist };
   ca.roads.at(type).pushBack(ea);
 
-  City& cb = cities_.at(b);
+  City& cb = tmp.cities_.at(b);
   if (!cb.roads.contains(type)) {
     cb.roads.insert(type, Vector< Edge >());
   }

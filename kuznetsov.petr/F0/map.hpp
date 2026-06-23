@@ -12,7 +12,7 @@ namespace kuznetsov {
     using const_iterator = typename tree_t::const_iterator;
 
     void insert(const Key& k, const Value& v);
-    void insert(Key&& k, Value&& v);
+    void insert(const Key& k, Value&& v);
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
     bool contains(const Key& k) const noexcept;
@@ -48,13 +48,13 @@ void kuznetsov::map< Key, Value, Compare >::insert(const Key& k, const Value& v)
 }
 
 template< class Key, class Value, class Compare >
-void kuznetsov::map< Key, Value, Compare >::insert(Key&& k, Value&& v)
+void kuznetsov::map< Key, Value, Compare >::insert(const Key& k, Value&& v)
 {
   if (tree_.contain(k)) {
     tree_.at(k) = v;
     return;
   }
-  tree_.push(std::forward< Key >(k), std::forward< Value >(v));
+  tree_.push(k, std::forward< Value >(v));
   balance();
 }
 
@@ -129,13 +129,13 @@ void kuznetsov::map< Key, Value, Compare >::erase(const Key& k)
 template< class Key, class Value, class Compare >
 size_t kuznetsov::map< Key, Value, Compare >::size() const noexcept
 {
-  return tree_.getSize();
+  return tree_.size();
 }
 
 template< class Key, class Value, class Compare >
 bool kuznetsov::map< Key, Value, Compare >::empty() const noexcept
 {
-  return tree_.isEmpty();
+  return tree_.empty();
 }
 
 template< class Key, class Value, class Compare >

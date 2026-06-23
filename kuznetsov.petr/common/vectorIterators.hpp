@@ -276,16 +276,4 @@ bool kuznetsov::Iter< T >::operator<=(const Iter& rhs) const noexcept
   return ptr_ <= rhs.ptr_;
 }
 
-template< class T >
-const T* kuznetsov::CIter< T >::operator->() const noexcept
-{
-  return ptr_;
-}
-
-template< class T >
-T* kuznetsov::Iter< T >::operator->() const noexcept
-{
-  return ptr_;
-}
-
 #endif

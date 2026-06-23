@@ -95,7 +95,6 @@ namespace kuznetsov {
 
     detail::Node< Key, Value >* find(const Key& key) const noexcept;
     size_t calcHeight(const detail::Node< Key, Value >*) const noexcept;
-    void clear(detail::Node< Key, Value >*) noexcept;
   };
 
   template< class Key, class Value, bool IsConst >
