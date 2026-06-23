@@ -9,11 +9,11 @@ namespace kuznetsov {
   namespace detail {
     template< class Key, class Value >
     struct Node {
-      std::pair< const Key, Value > value_;
+      std::pair< const Key, Value > value;
 
-      Node* parent_;
-      Node* lt_;
-      Node* rt_;
+      Node* parent;
+      Node* lt;
+      Node* rt;
 
       Node(const Key& k, const Value& v, Node* p);
     };
