@@ -9,9 +9,6 @@ void kuznetsov::print(std::ostream& out, std::istream& in, dicts& ds)
   if (in.fail()) {
     throw std::logic_error("Smth went wrong");
   }
-  if (!ds.contain(title)) {
-    throw std::logic_error("Not found dict");
-  }
   const record& dict = ds.at(title);
   if (dict.empty()) {
     out << "<EMPTY>\n";
